@@ -1,6 +1,7 @@
 import { lessonContentSchema } from "@/shared/content-schema";
-import { findLesson } from "../repo/lessons";
-import { replaceLessonContent } from "../repo/lesson-content";
+import { qualityIssues } from "@/shared/content-quality";
+import { findLesson, lessonsOfCourse } from "../repo/lessons";
+import { getTranscript, replaceLessonContent } from "../repo/lesson-content";
 
 /**
  * Validates agent-written JSON and stores it. Throws a readable error listing every problem.
@@ -17,6 +18,18 @@ export const saveLessonContent = (token: string, raw: unknown, opts: { force?: b
   if (!parsed.success) {
     const issues = parsed.error.issues.map((i) => `  - ${i.path.join(".") || "(root)"}: ${i.message}`);
     throw new Error(`Invalid content for ${token}:\n${issues.join("\n")}`);
+  }
+
+  // Template-shaped notes (all answers at A, grid timestamps, reused filler) are refused even with --force.
+  const startSec = lesson.startSec ?? 0;
+  const issues = qualityIssues(parsed.data, {
+    startSec,
+    endSec: lesson.endSec ?? startSec + lesson.durationSec,
+    segmentStarts: (getTranscript(lesson.id)?.segments ?? []).map(([sec]) => sec),
+    otherSummaries: lessonsOfCourse(lesson.courseId).flatMap((l) => (l.id !== lesson.id && l.summary ? [l.summary] : [])),
+  });
+  if (issues.length) {
+    throw new Error(`Notes for ${token} look template-generated; fix and save again:\n${issues.map((i) => `  - ${i}`).join("\n")}`);
   }
 
   replaceLessonContent(lesson.id, parsed.data);

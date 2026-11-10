@@ -121,6 +121,19 @@ fenced code with a language, **bold** key terms.
 - **Practice**: 3–6 items covering easy, medium and hard. For DSA or coding, use real LeetCode/GFG problems with URLs. For theory or system design, use paper exercises. Give medium and hard items a `hint`.
 - **Quiz**: 3–5 multiple-choice questions with plausible wrong options. `atSec` must point at where the transcript explains the answer, because a wrong answer seeks the video there. Add an `explanation`.
 
+## Quality bar (any agent: Claude, Codex, …)
+
+An earlier pass generated 37 lessons from one template, and the output passed every count check while teaching nothing. Don't repeat that:
+
+- **Write each lesson by hand from its own transcript.** Never generate notes with a script, loop or template. Scripts may only read data or check your own JSON.
+- **Timestamps come from real transcript lines** where that idea is explained. Never place them at evenly spaced fractions of the video.
+- **Quiz questions test understanding** (why, when, what happens if), preferably as scenarios, not "which description fits X". Spread correct answers across positions. Wrong options are mistakes a learner would plausibly make, about as long and specific as the right one. The explanation says *why*, not the answer again.
+- **Be specific to the video**: the functions, libraries, numbers, examples and analogies the teacher actually used. Never reuse a sentence from another lesson.
+- **Partial transcript?** Say so on the first line of the summary, and only cite timestamps inside the part you have.
+- **Many lessons to fill?** Do 5, show the user, then continue only after they approve.
+
+`save` enforces the mechanical part (`src/shared/content-quality.ts`, which applies even with `--force`). It refuses notes where every answer is at the same position, the longest option is always correct, timestamps sit on a 20%/25% grid or match no transcript line, options are copied from "Important points", or a sentence repeats another lesson. Passing those checks is the floor, not the goal.
+
 ## Content JSON (`src/shared/content-schema.ts` is the source of truth)
 
 ```json
