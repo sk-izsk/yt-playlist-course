@@ -77,3 +77,7 @@ Thumbs.db
 
 # Python bytecode from the bundled design skill scripts (.claude/skills, .codex/skills)
 __pycache__/
+
+# Agent skills are installed per machine (~/.claude/skills, ~/.codex); not part of the app.
+.claude/skills/
+.codex/
