@@ -74,3 +74,6 @@ Thumbs.db
 
 # Deploy tooling (not used — app is local-only)
 .vercel
+
+# Python bytecode from the bundled design skill scripts (.claude/skills, .codex/skills)
+__pycache__/
