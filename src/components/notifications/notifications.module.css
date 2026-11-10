@@ -1,0 +1,126 @@
+.drawer :global(.ant-drawer-body) {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 16px 20px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.head h3 {
+  margin-right: auto;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.empty {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+/* ---------- updates ---------- */
+.update {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.updateTitle {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink) !important;
+}
+
+.updateCount {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--lime-soft);
+  color: var(--moss);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---------- activity ---------- */
+.event {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: var(--ink) !important;
+  transition: background 0.15s;
+}
+
+.event:hover {
+  background: var(--muted);
+}
+
+.event[data-unread="true"] {
+  background: var(--lime-soft);
+}
+
+.icon {
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.icon[data-kind="success"] {
+  color: var(--ok-fg);
+}
+
+.icon[data-kind="error"] {
+  color: var(--err-fg);
+}
+
+.icon[data-kind="update"] {
+  color: var(--dusk);
+}
+
+.icon[data-kind="info"] {
+  color: var(--ink-soft);
+}
+
+.eventText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+}
+
+.eventText span {
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+
+.time {
+  color: var(--ink-soft);
+  font-size: 11px;
+  white-space: nowrap;
+}

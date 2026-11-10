@@ -1,0 +1,129 @@
+/* ---------- hero ---------- */
+.hero {
+  position: relative;
+  min-height: 760px;
+  margin-top: -64px; /* slide under the sticky nav */
+  overflow: hidden;
+}
+
+.scene {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+:global(.dark) .scene {
+  filter: brightness(0.5) saturate(0.85) hue-rotate(-8deg);
+}
+
+.heroContent {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 150px 16px 0;
+  text-align: center;
+}
+
+.heroTitle {
+  font-size: clamp(36px, 5.4vw, 64px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.heroSub {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 17px;
+}
+
+.addCard {
+  width: min(640px, 100%);
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--glass);
+  backdrop-filter: blur(16px);
+  box-shadow: var(--shadow);
+  scroll-margin-top: 120px;
+}
+
+.addForm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.addForm :global(.ant-input-affix-wrapper) {
+  border-radius: 999px;
+}
+
+.addActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* "Add many": the pill becomes a rounded panel with the textarea on top. */
+.addCard:has([data-many="true"]) {
+  border-radius: 20px;
+}
+
+.addForm[data-many="true"] {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.addForm[data-many="true"] .addActions {
+  justify-content: space-between;
+}
+
+.addForm[data-many="true"] textarea {
+  border-radius: 12px;
+  text-align: left;
+}
+
+/* ---------- sections ---------- */
+.section {
+  padding-block: 88px;
+}
+
+/* ---------- how it works ---------- */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 40px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.steps h3 {
+  font-size: 20px;
+  margin: 8px 0 12px;
+}
+
+.steps p {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.stepNum {
+  font-family: var(--font-display);
+  font-size: 150px;
+  line-height: 1;
+  color: var(--moss);
+}
+
+.stepNum[data-step="1"] {
+  color: #7f9a3a;
+}
+
+.stepNum[data-step="2"] {
+  color: var(--lime);
+}

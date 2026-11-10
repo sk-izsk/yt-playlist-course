@@ -1,0 +1,120 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--lime-soft);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  margin-bottom: 40px;
+  scroll-margin-top: 96px;
+}
+
+.heading h2 {
+  font-size: clamp(30px, 4vw, 44px);
+  line-height: 1.1;
+}
+
+.heading em {
+  color: var(--moss);
+}
+
+/* "+3 new" — videos detected in the playlist, click to add */
+.updateChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--dusk);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 2px 8px -2px #445eb280;
+  transition: filter 0.15s;
+}
+
+.updateChip:hover {
+  filter: brightness(1.12);
+}
+
+/* ---------- breadcrumbs ---------- */
+.crumbs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.crumbBack {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.crumbBack:hover {
+  border-color: var(--moss);
+  color: var(--moss);
+}
+
+.crumbLink,
+.crumbCurrent {
+  display: inline-block;
+  max-width: 34ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.crumbLink {
+  color: var(--ink-soft) !important;
+}
+
+.crumbLink:hover {
+  color: var(--moss) !important;
+}
+
+.crumbCurrent {
+  color: var(--ink);
+}
+
+.token {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px dashed var(--line);
+  border-radius: 999px;
+  background: var(--muted);
+  color: var(--ink-soft);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.token:hover {
+  border-color: var(--moss);
+  color: var(--moss);
+}
