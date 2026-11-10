@@ -20,7 +20,7 @@
 
 .head h3 {
   margin-right: auto;
-  font-family: var(--font-body);
+  font-family: var(--font-sans);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.06em;
@@ -58,8 +58,8 @@
 .updateCount {
   padding: 2px 8px;
   border-radius: 999px;
-  background: var(--lime-soft);
-  color: var(--moss);
+  background: var(--tint);
+  color: var(--primary);
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
@@ -81,7 +81,7 @@
 }
 
 .event[data-unread="true"] {
-  background: var(--lime-soft);
+  background: var(--tint);
 }
 
 .icon {
@@ -98,7 +98,7 @@
 }
 
 .icon[data-kind="update"] {
-  color: var(--dusk);
+  color: var(--accent);
 }
 
 .icon[data-kind="info"] {

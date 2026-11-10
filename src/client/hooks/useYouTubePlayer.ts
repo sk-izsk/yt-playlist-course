@@ -1,73 +1,80 @@
 import { useCallback, useEffect, useRef } from "react";
-
-// Minimal surface of the IFrame Player API we actually use.
-interface YTPlayer {
-  seekTo(sec: number, allowSeekAhead: boolean): void;
-  playVideo(): void;
-  getCurrentTime(): number;
-  destroy(): void;
-}
-interface YTNamespace {
-  Player: new (el: HTMLElement, opts: object) => YTPlayer;
-  PlayerState: { ENDED: number };
-}
-declare global {
-  interface Window {
-    YT?: YTNamespace;
-    onYouTubeIframeAPIReady?: () => void;
-  }
-}
-
-let apiPromise: Promise<YTNamespace> | undefined;
-const loadApi = (): Promise<YTNamespace> => {
-  apiPromise ??= new Promise((resolve) => {
-    if (window.YT?.Player) return resolve(window.YT);
-    window.onYouTubeIframeAPIReady = () => resolve(window.YT!);
-    const s = document.createElement("script");
-    s.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(s);
-  });
-  return apiPromise;
-}
+import { clearPos, readPos, resumeAt, savePos } from "../lib/resume";
+import { loadApi, type YTPlayer } from "../lib/youtube-api";
 
 interface Options {
   videoId: string;
+  /** Lesson UUID: resume position is saved per lesson. */
+  resumeKey: string;
   startSec?: number | null;
   endSec?: number | null;
+  speed: number;
   onEnded?: () => void;
+  /** Speed changed from YouTube's own menu, so the app remembers it too. */
+  onSpeedChange?: (rate: number) => void;
 }
 
-/** Mounts a YouTube player into `ref` and exposes seek / currentTime for notes, quiz and summary links. */
-export const useYouTubePlayer = ({ videoId, startSec, endSec, onEnded }: Options) => {
+const useLatest = <T,>(value: T) => {
+  const r = useRef(value);
+  useEffect(() => {
+    r.current = value;
+  }, [value]);
+  return r;
+};
+
+/** Mounts a YouTube player into `ref`: resumes where you stopped, keeps your speed, exposes controls. */
+export const useYouTubePlayer = ({ videoId, resumeKey, startSec, endSec, speed, onEnded, onSpeedChange }: Options) => {
   const ref = useRef<HTMLDivElement>(null);
   const player = useRef<YTPlayer | null>(null);
-  const endedRef = useRef(onEnded);
-  useEffect(() => {
-    endedRef.current = onEnded;
-  }, [onEnded]);
+  const ready = useRef(false);
+  const endedRef = useLatest(onEnded);
+  const speedRef = useLatest(speed);
+  const speedChangeRef = useLatest(onSpeedChange);
 
   useEffect(() => {
     let cancelled = false;
+    let timer: ReturnType<typeof setInterval> | undefined;
     loadApi().then((YT) => {
       if (cancelled || !ref.current) return;
       const mount = document.createElement("div"); // YT replaces the node it's given
       ref.current.replaceChildren(mount);
-      player.current = new YT.Player(mount, {
+      const start = resumeAt(readPos(resumeKey), startSec, endSec) ?? startSec ?? undefined;
+      const p = new YT.Player(mount, {
         videoId,
         width: "100%",
         height: "100%",
-        playerVars: { start: startSec ?? undefined, end: endSec ?? undefined, rel: 0, modestbranding: 1 },
+        playerVars: { start, end: endSec ?? undefined, rel: 0, modestbranding: 1 },
         events: {
-          onStateChange: (e: { data: number }) => e.data === YT.PlayerState.ENDED && endedRef.current?.(),
+          onReady: () => {
+            ready.current = true;
+            p.setPlaybackRate(speedRef.current);
+          },
+          onStateChange: (e: { data: number }) => {
+            if (e.data !== YT.PlayerState.ENDED) return;
+            clearPos(resumeKey);
+            endedRef.current?.();
+          },
+          onPlaybackRateChange: (e: { data: number }) => speedChangeRef.current?.(e.data),
         },
       });
+      player.current = p;
+      // ponytail: polls every 5s; at worst you resume 5s early.
+      timer = setInterval(() => {
+        if (ready.current && p.getPlayerState() === YT.PlayerState.PLAYING) savePos(resumeKey, p.getCurrentTime());
+      }, 5000);
     });
     return () => {
       cancelled = true;
+      clearInterval(timer);
+      ready.current = false;
       player.current?.destroy();
       player.current = null;
     };
-  }, [videoId, startSec, endSec]);
+  }, [videoId, resumeKey, startSec, endSec, endedRef, speedRef, speedChangeRef]);
+
+  useEffect(() => {
+    if (ready.current) player.current?.setPlaybackRate(speed);
+  }, [speed]);
 
   const seek = useCallback((sec: number) => {
     player.current?.seekTo(sec, true);
@@ -77,7 +84,19 @@ export const useYouTubePlayer = ({ videoId, startSec, endSec, onEnded }: Options
 
   const currentTime = useCallback(() => Math.floor(player.current?.getCurrentTime() ?? 0), []);
 
-  return { ref, seek, currentTime };
-}
+  const togglePlay = useCallback(() => {
+    const p = player.current;
+    if (!ready.current || !p) return;
+    if (p.getPlayerState() === 1) p.pauseVideo();
+    else p.playVideo();
+  }, []);
+
+  const skip = useCallback((delta: number) => {
+    const p = player.current;
+    if (ready.current && p) p.seekTo(Math.max(0, p.getCurrentTime() + delta), true);
+  }, []);
+
+  return { ref, seek, currentTime, togglePlay, skip };
+};
 
 export type PlayerControls = Pick<ReturnType<typeof useYouTubePlayer>, "seek" | "currentTime">;

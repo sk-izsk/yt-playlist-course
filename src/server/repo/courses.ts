@@ -27,6 +27,7 @@ const summaryQuery = () => {
       lastSyncedAt: courses.lastSyncedAt,
       pinned: courses.pinned,
       availableUpdates: courses.availableUpdates,
+      line: courses.line,
       ...stats,
     })
     .from(courses)

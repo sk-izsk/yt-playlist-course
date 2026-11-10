@@ -2,8 +2,46 @@
   aspect-ratio: 16 / 9;
   border-radius: 16px;
   overflow: hidden;
-  background: var(--night);
+  background: var(--deep);
   box-shadow: var(--shadow);
+}
+
+/* Theater: break out of the 1000px column, as wide as fits without scrolling past the video. */
+.stage[data-theater="true"] {
+  --w: min(calc(100vw - 48px), calc((100vh - 140px) * 16 / 9));
+  width: var(--w);
+  margin-inline: calc(50% - var(--w) / 2);
+}
+
+.playerBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.autoNext {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.keys td {
+  padding: 4px 12px 4px 0;
+  font-size: 14px;
+}
+
+.keys kbd {
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 12px;
 }
 
 .header {
@@ -24,13 +62,14 @@
 .position {
   padding: 3px 10px;
   border-radius: 999px;
-  background: var(--lime-soft);
-  color: var(--ink);
+  background: var(--route);
+  color: #fff;
+  font-weight: 600;
 }
 
 .title {
-  font-size: clamp(24px, 3vw, 34px);
-  line-height: 1.15;
+  font-size: 30px;
+  line-height: 36px;
 }
 
 .actions {
@@ -57,15 +96,15 @@
   padding: 1px 8px;
   border: 0;
   border-radius: 999px;
-  background: var(--lime-soft);
-  color: var(--moss);
+  background: var(--tint);
+  color: var(--primary);
   font-size: 12px;
   cursor: pointer;
 }
 
 .stamp:hover {
-  background: var(--moss);
-  color: var(--on-moss);
+  background: var(--primary);
+  color: var(--on-primary);
 }
 
 /* ---------- practice ---------- */
@@ -137,7 +176,7 @@
 }
 
 .problemHead a {
-  color: var(--moss);
+  color: var(--primary);
   font-size: 14px;
   white-space: nowrap;
 }
@@ -185,7 +224,7 @@
 }
 
 .option:hover:not(:disabled) {
-  border-color: var(--moss);
+  border-color: var(--primary);
 }
 
 .option:disabled {
@@ -209,7 +248,7 @@
   height: 26px;
   flex-shrink: 0;
   border-radius: 50%;
-  background: var(--lime-soft);
+  background: var(--tint);
   font-size: 12px;
   font-weight: 600;
 }
@@ -237,7 +276,7 @@
   justify-content: space-between;
   padding: 16px 20px;
   border-radius: 16px;
-  background: var(--lime-soft);
+  background: var(--tint);
   font-size: 18px;
 }
 

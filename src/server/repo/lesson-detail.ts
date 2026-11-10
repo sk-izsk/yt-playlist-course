@@ -19,7 +19,7 @@ export const getLessonDetail = (token: string): LessonDetail | null => {
     startSec: lesson.startSec,
     endSec: lesson.endSec,
     summary: lesson.summary,
-    course: { token: course.token, title: course.title, channel: course.channel },
+    course: { token: course.token, title: course.title, channel: course.channel, line: course.line },
     prevToken: siblings[idx - 1]?.token ?? null,
     nextToken: siblings[idx + 1]?.token ?? null,
     practice: practiceOf(lesson.id),

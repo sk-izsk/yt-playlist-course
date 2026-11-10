@@ -1,4 +1,4 @@
-# CourseIt — common tasks. Run `make` (or `make help`) to list them.
+# Tubewise — common tasks. Run `make` (or `make help`) to list them.
 # Package manager is bun; Next and the agent CLI run on Node (better-sqlite3 is a Node addon).
 
 .DEFAULT_GOAL := help

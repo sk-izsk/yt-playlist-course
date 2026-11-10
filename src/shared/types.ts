@@ -22,6 +22,8 @@ export interface CourseSummary {
   availableUpdates: number;
   pinned: boolean;
   lastSyncedAt: number | null;
+  /** Line colour index (shared/lines.ts), stored so courses don't share a colour. */
+  line: number;
 }
 
 export interface LessonRow {
@@ -70,7 +72,7 @@ export interface LessonDetail extends LessonRow {
   startSec: number | null;
   endSec: number | null;
   summary: string | null;
-  course: { token: string; title: string; channel: string };
+  course: { token: string; title: string; channel: string; line: number };
   prevToken: string | null;
   nextToken: string | null;
   practice: PracticeItem[];

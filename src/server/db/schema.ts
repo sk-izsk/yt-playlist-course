@@ -17,6 +17,9 @@ export const courses = sqliteTable("courses", {
   sortOrder: integer("sort_order").notNull().default(0),
   // New playlist videos detected by a check but not added yet (you choose when to "Update").
   availableUpdates: integer("available_updates").notNull().default(0),
+  // Index into shared/lines.ts LINES, picked once on import so courses don't share a colour.
+  // Nullable in SQL only until migrate() backfills it; every insert sets it.
+  line: integer("line").notNull().default(0),
 });
 
 /** Activity feed behind the notification center: updates found, videos added, failures. */

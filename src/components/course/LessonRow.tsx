@@ -2,30 +2,42 @@ import { CheckOutlined, LoadingOutlined, PlayCircleOutlined } from "@ant-design/
 import Link from "next/link";
 import { displayId, humanDuration } from "@/shared/format";
 import type { LessonRow as Lesson } from "@/shared/types";
-import styles from "./course.module.css";
+import styles from "./stations.module.css";
 
 const Status = ({ lesson: l }: { lesson: Lesson }) => {
-  if (l.transcriptStatus === "pending") return <span className={styles.statusMuted}><LoadingOutlined /> Transcript</span>;
-  if (l.kind === "light") return <span className={styles.statusMuted}><CheckOutlined /> Light notes</span>;
-  if (l.hasNotes) return <span className={styles.statusOk}><CheckOutlined /> Notes and quiz</span>;
-  return <span className={styles.statusWarn}>Needs notes</span>;
+  if (l.transcriptStatus === "pending")
+    return <span className={styles.status} data-tone="muted"><LoadingOutlined /> Fetching transcript</span>;
+  if (l.kind === "light") return <span className={styles.status} data-tone="muted">Light notes</span>;
+  if (l.hasNotes) return <span className={styles.status} data-tone="ok">Notes and quiz</span>;
+  return <span className={styles.status} data-tone="warn">Needs notes</span>;
 };
 
-export const LessonRow = ({ lesson: l }: { lesson: Lesson }) => (
-  <Link href={`/lessons/${l.token}`} className={styles.row} data-done={l.completed} data-kind={l.kind}>
-    <span className={styles.num}>{l.completed ? <CheckOutlined /> : l.position}</span>
-    <div className={styles.rowBody}>
-      <span className={styles.rowTitle}>
+/** One station on the course line. `next` marks where you are. */
+export const LessonRow = ({ lesson: l, next = false }: { lesson: Lesson; next?: boolean }) => (
+  <Link
+    href={`/lessons/${l.token}`}
+    className={styles.row}
+    data-done={l.completed}
+    data-next={next}
+    data-kind={l.kind}
+    aria-current={next ? "step" : undefined}
+  >
+    <span className={styles.stop} aria-hidden>
+      {l.completed && <CheckOutlined />}
+    </span>
+    <div className={styles.body}>
+      <span className={styles.title}>
         {l.title}
-        {l.isNew && <span className={styles.newDot}>new</span>}
-        {l.kind === "light" && <span className={styles.optional}>optional</span>}
+        {l.isNew && <span className={styles.tag} data-tone="new">new</span>}
+        {l.kind === "light" && <span className={styles.tag}>optional</span>}
       </span>
-      <span className={`${styles.rowToken} mono`}>{displayId(l.token)}</span>
+      <span className={styles.sub}>
+        <span>Lesson {l.position}</span>
+        <span className="mono">{displayId(l.token)}</span>
+      </span>
     </div>
-    <div className={styles.rowMeta}>
-      <span className="mono">{humanDuration(l.durationSec)}</span>
-      <Status lesson={l} />
-    </div>
+    <Status lesson={l} />
+    <span className={`${styles.duration} mono`}>{humanDuration(l.durationSec)}</span>
     <PlayCircleOutlined className={styles.play} />
   </Link>
 );

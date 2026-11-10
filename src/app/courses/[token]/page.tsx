@@ -3,6 +3,7 @@
 import { Result, Skeleton } from "antd";
 import { use } from "react";
 import { useCourse } from "@/client/hooks/useCourse";
+import { routeStyle } from "@/shared/lines";
 import { Crumbs } from "@/components/common/Crumbs";
 import { CourseProgress } from "@/components/course/CourseProgress";
 import { CourseUpdateBanner } from "@/components/course/CourseUpdateBanner";
@@ -14,7 +15,7 @@ const CoursePage = ({ params }: PageProps<"/courses/[token]">) => {
   const { data: course, isLoading, error } = useCourse(token);
 
   return (
-    <div className="container" style={{ paddingBlock: "48px 96px" }}>
+    <div className="container" style={{ paddingBlock: "40px 96px", ...(course && routeStyle(course.line)) }}>
       {isLoading && <Skeleton active avatar paragraph={{ rows: 8 }} />}
       {error && <Result status="404" title="Course not found" subTitle={token} />}
       {course && (

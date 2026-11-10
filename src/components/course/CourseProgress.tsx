@@ -31,7 +31,7 @@ export const CourseProgress = ({ course }: { course: CourseDetail }) => {
         <Bar label="AI notes" done={noted} total={total} />
         {nextUp && (
           <span className={styles.muted}>
-            {noted ? `Notes done up to lesson ${nextUp.position - 1}. ` : ""}
+            {nextUp.position > 1 ? `Notes done up to lesson ${nextUp.position - 1}. ` : ""}
             Ask your agent: <b className="mono">Fill notes for course {displayId(course.token)}</b>
           </span>
         )}

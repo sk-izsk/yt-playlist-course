@@ -1,0 +1,88 @@
+/* ---------- route progress bar ---------- */
+.route {
+  position: relative;
+  height: 14px;
+  min-width: 80px;
+  flex: 1;
+}
+
+.track,
+.travelled {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 4px;
+  border-radius: 2px;
+  transform: translateY(-50%);
+}
+
+.track {
+  right: 0;
+  background: color-mix(in srgb, var(--route) 22%, transparent);
+}
+
+.travelled {
+  background: var(--route);
+  transition: width 0.5s var(--ease);
+}
+
+.stop,
+.here {
+  position: absolute;
+  top: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.stop {
+  width: 8px;
+  height: 8px;
+  background: var(--surface);
+  border: 2px solid color-mix(in srgb, var(--route) 45%, transparent);
+}
+
+.stop[data-passed="true"] {
+  border-color: var(--route);
+  background: var(--route);
+}
+
+.here {
+  width: 14px;
+  height: 14px;
+  background: var(--surface);
+  border: 3px solid var(--route);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--route) 20%, transparent);
+}
+
+/* ---------- line roundel ---------- */
+.badge {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: var(--route);
+  color: #fff;
+  font-family: var(--font-mono), monospace;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.badge[data-size="sm"] {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.badge[data-size="md"] {
+  width: 36px;
+  height: 36px;
+  font-size: 14px;
+}
+
+.badge[data-size="lg"] {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  font-size: 20px;
+}

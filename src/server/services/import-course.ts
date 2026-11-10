@@ -1,6 +1,6 @@
 import { db, schema } from "../db/client";
 import { findCourseByYoutubeId } from "../repo/courses";
-import { topSortOrder } from "../repo/course-order";
+import { nextLine, topSortOrder } from "../repo/course-order";
 import { insertLessons, type LessonDraft } from "../repo/lessons";
 import { newId } from "../tokens";
 import { fetchPlaylist, fetchVideo } from "../youtube/fetch-course";
@@ -50,9 +50,10 @@ export const importCourse = async (input: string): Promise<ImportResult> => {
   if (existing) return { token: existing.token, created: false, transcripts: Promise.resolve() };
 
   const { drafts, ...meta } = await fetchMeta(input);
+  const token = newId();
   const course = db
     .insert(schema.courses)
-    .values({ ...meta, token: newId(), lastSyncedAt: Date.now(), sortOrder: topSortOrder() })
+    .values({ ...meta, token, line: nextLine(token), lastSyncedAt: Date.now(), sortOrder: topSortOrder() })
     .returning()
     .get();
   insertLessons(course, drafts);

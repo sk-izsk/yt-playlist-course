@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckOutlined } from "@ant-design/icons";
 import { Button, Segmented } from "antd";
 import { useMemo, useState } from "react";
 import { splitIntoDays, todayIndex } from "@/client/lib/plan";
@@ -8,6 +9,7 @@ import { humanDuration } from "@/shared/format";
 import type { LessonRow as Lesson } from "@/shared/types";
 import { LessonRow } from "./LessonRow";
 import styles from "./course.module.css";
+import stations from "./stations.module.css";
 
 export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
   const { dailyMinutes, setDailyMinutes } = usePrefs();
@@ -15,12 +17,13 @@ export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
   const today = todayIndex(days);
   const [picked, setPicked] = useState<number | null>(null);
   const active = days[Math.min(picked ?? today, days.length - 1)];
+  const nextToken = lessons.find((l) => !l.completed)?.token;
 
   if (!active) return null;
   return (
     <section>
       <div className={styles.planHead}>
-        <h2>The plan</h2>
+        <h2>Your route</h2>
         <span className={styles.muted}>
           {days.length} days at {dailyMinutes} min a day
         </span>
@@ -31,29 +34,35 @@ export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
         />
       </div>
 
-      <div className={styles.days}>
-        {days.map((d) => (
-          <Button
-            key={d.index}
-            type={d.index === active.index ? "primary" : "default"}
-            onClick={() => setPicked(d.index)}
-          >
-            Day {d.index + 1}
-            {d.done ? " ✓" : d.index === today ? " •" : ""}
-          </Button>
-        ))}
+      <div className={styles.days} role="tablist" aria-label="Days">
+        {days.map((d) => {
+          const progress = d.done ? "done" : d.lessons.some((l) => l.completed) ? "partial" : undefined;
+          return (
+            <Button
+              key={d.index}
+              role="tab"
+              aria-selected={d.index === active.index}
+              aria-label={`Day ${d.index + 1}${progress ? ` (${progress === "done" ? "completed" : "in progress"})` : ""}`}
+              data-progress={progress}
+              className={styles.day}
+              icon={d.done ? <CheckOutlined /> : undefined}
+              onClick={() => setPicked(d.index)}
+            >
+              Day {d.index + 1}
+            </Button>
+          );
+        })}
       </div>
 
       <div className={styles.dayHead}>
         <h3>Day {active.index + 1}</h3>
-        <span className="mono">
-          {active.lessons.length} lessons · {humanDuration(active.totalSec)}
-        </span>
+        <span>{active.lessons.length} lessons</span>
+        <span className="mono">{humanDuration(active.totalSec)}</span>
         {active.index === today && <span className={styles.today}>Today</span>}
       </div>
-      <div className={styles.lessonList}>
-        {active.lessons.map((l) => <LessonRow key={l.token} lesson={l} />)}
+      <div className={stations.list}>
+        {active.lessons.map((l) => <LessonRow key={l.token} lesson={l} next={l.token === nextToken} />)}
       </div>
     </section>
   );
-}
+};

@@ -1,30 +1,60 @@
+/* ---------- header: line roundel · title · cover ---------- */
 .header {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) 200px;
   gap: 24px;
-  align-items: flex-start;
-  margin-bottom: 28px;
-}
-
-.cover {
-  width: 180px;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  border-radius: 12px;
-  flex-shrink: 0;
+  align-items: start;
+  margin-bottom: 32px;
 }
 
 .headerBody {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: 12px;
-  flex: 1;
   min-width: 0;
 }
 
 .title {
-  font-size: clamp(28px, 3.4vw, 40px);
-  line-height: 1.12;
+  font-size: 36px;
+  line-height: 40px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.headerRoute {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 560px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.cover {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cover img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.cover::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 6px;
+  background: var(--route);
 }
 
 .actions {
@@ -34,26 +64,28 @@
   gap: 8px;
 }
 
+/* ---------- banners ---------- */
 .banner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 16px 16px 22px;
-  margin-bottom: 36px;
+  padding: 16px 16px 16px 24px;
+  margin-bottom: 32px;
+  border: 1px solid var(--line);
   border-radius: 16px;
-  background: var(--lime-soft);
+  background: var(--surface);
 }
 
 .updateBanner {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px 14px 20px;
+  padding: 12px 16px 12px 24px;
   margin-bottom: 16px;
-  border: 1px solid color-mix(in srgb, var(--dusk) 35%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
   border-radius: 16px;
-  background: color-mix(in srgb, var(--dusk) 10%, var(--surface));
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
 }
 
 .updateBanner > span {
@@ -62,13 +94,13 @@
 
 .updateIcon {
   font-size: 20px;
-  color: var(--dusk);
+  color: var(--accent);
 }
 
 .bars {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
   min-width: 0;
 }
@@ -84,27 +116,23 @@
   margin: 0;
 }
 
+.bar :global(.ant-progress-track) {
+  background: var(--route) !important;
+}
+
 .barLabel {
   width: 88px;
   flex-shrink: 0;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-.optional {
-  margin-left: 8px;
-  padding: 1px 8px;
-  border-radius: 999px;
-  background: var(--muted);
+.muted {
   color: var(--ink-soft);
-  font-size: 11px;
-  vertical-align: middle;
+  font-size: 14px;
 }
 
-.row[data-kind="light"] .rowTitle {
-  color: var(--ink-soft);
-}
-
+/* ---------- plan ---------- */
 .planHead {
   display: flex;
   flex-wrap: wrap;
@@ -114,13 +142,8 @@
 }
 
 .planHead h2 {
-  font-size: 24px;
   margin-right: auto;
-}
-
-.muted {
-  color: var(--ink-soft);
-  font-size: 14px;
+  font-size: 24px;
 }
 
 .days {
@@ -130,12 +153,42 @@
   margin-bottom: 24px;
 }
 
+/* Day pills: done = filled in the line colour, partial = line-coloured outline,
+   selected = ink ring so it still reads on top of either state. */
+.days .day[data-progress="partial"] {
+  border-color: var(--route);
+  color: var(--ink);
+}
+
+.days .day[data-progress="done"] {
+  border-color: var(--route);
+  background: var(--route);
+  color: #fff;
+}
+
+.days .day[data-progress="done"]:hover {
+  border-color: var(--route) !important;
+  background: color-mix(in srgb, var(--route) 85%, #000) !important;
+  color: #fff !important;
+}
+
+.days .day[aria-selected="true"] {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.days .day[aria-selected="true"]:not([data-progress="done"]) {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
 .dayHead {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 12px;
-  margin-bottom: 12px;
-  font-size: 13px;
+  margin-bottom: 8px;
+  font-size: 14px;
   color: var(--ink-soft);
 }
 
@@ -144,125 +197,29 @@
   color: var(--ink);
 }
 
-.today {
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: var(--moss);
-  color: var(--on-moss);
-  font-size: 12px;
-}
-
-.lessonList {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--surface);
-  color: var(--ink);
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-/* `color` pinned: antd's global a:hover would turn the whole row green. */
-.row:hover {
-  color: var(--ink);
-  border-color: var(--moss);
-  box-shadow: var(--shadow);
-}
-
-.num {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--lime-soft);
-  font-weight: 500;
-}
-
-.row[data-done="true"] .num {
-  background: var(--moss);
-  color: var(--on-moss);
-}
-
-.rowBody {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 0;
-}
-
-.rowTitle {
-  font-size: 16px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.row[data-done="true"] .rowTitle {
-  color: var(--ink-soft);
-}
-
-.rowToken {
-  font-size: 11px;
-  color: var(--ink-soft);
-}
-
-.newDot {
-  margin-left: 8px;
-  padding: 1px 8px;
-  border-radius: 999px;
-  background: var(--warn-bg);
-  color: var(--warn-fg);
-  font-size: 11px;
-  vertical-align: middle;
-}
-
-.rowMeta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  font-size: 12px;
-  color: var(--ink-soft);
-  white-space: nowrap;
-}
-
-.statusOk {
-  color: var(--ok-fg);
-}
-
-.statusWarn {
-  color: var(--warn-fg);
-}
-
-.statusMuted {
-  color: var(--ink-soft);
-}
-
-.play {
-  font-size: 22px;
-  color: var(--moss);
-}
-
-@media (max-width: 640px) {
+@media (max-width: 760px) {
   .header {
-    flex-direction: column;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .cover {
+    display: none;
+  }
+  .title {
+    font-size: 30px;
+    line-height: 36px;
   }
   .banner {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
-  .rowMeta {
-    display: none;
-  }
+}
+
+.today {
+  align-self: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--signal);
+  color: #101826;
+  font-size: 12px;
+  font-weight: 600;
 }

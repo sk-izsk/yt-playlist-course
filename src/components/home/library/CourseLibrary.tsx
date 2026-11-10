@@ -37,8 +37,8 @@ export const CourseLibrary = () => {
 
   return (
     <section className={`container ${styles.library}`}>
-      <SectionHeading eyebrow="Your library" id="courses">
-        Courses you are <em>taking right now.</em>
+      <SectionHeading title="Your lines" id="courses">
+        Every course is a line. Pick one up where you left off.
       </SectionHeading>
       {isLoading ? (
         <Skeleton active paragraph={{ rows: 6 }} />

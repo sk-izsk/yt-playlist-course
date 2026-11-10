@@ -1,32 +1,21 @@
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: var(--lime-soft);
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 500;
-}
-
 .heading {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  text-align: center;
-  margin-bottom: 40px;
-  scroll-margin-top: 96px;
+  gap: 8px;
+  margin-bottom: 32px;
+  scroll-margin-top: 88px;
 }
 
 .heading h2 {
-  font-size: clamp(30px, 4vw, 44px);
-  line-height: 1.1;
+  font-size: 36px;
+  line-height: 40px;
 }
 
-.heading em {
-  color: var(--moss);
+.heading p {
+  max-width: 60ch;
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 24px;
 }
 
 /* "+3 new" — videos detected in the playlist, click to add */
@@ -37,14 +26,14 @@
   padding: 3px 10px;
   border: 0;
   border-radius: 999px;
-  background: var(--dusk);
+  background: var(--accent);
   color: #fff;
   font: inherit;
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
-  box-shadow: 0 2px 8px -2px #445eb280;
+  box-shadow: 0 2px 8px -2px color-mix(in srgb, var(--accent) 50%, transparent);
   transition: filter 0.15s;
 }
 
@@ -74,8 +63,8 @@
 }
 
 .crumbBack:hover {
-  border-color: var(--moss);
-  color: var(--moss);
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .crumbLink,
@@ -93,7 +82,7 @@
 }
 
 .crumbLink:hover {
-  color: var(--moss) !important;
+  color: var(--primary) !important;
 }
 
 .crumbCurrent {
@@ -115,6 +104,6 @@
 }
 
 .token:hover {
-  border-color: var(--moss);
-  color: var(--moss);
+  border-color: var(--primary);
+  color: var(--primary);
 }

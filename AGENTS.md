@@ -8,7 +8,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# CourseIt (personal) — agent guide
+# Tubewise (personal) — agent guide
 
 Local, single-user app that turns YouTube videos and playlists into courses. The user adds courses in the app; **you** write each lesson's notes, practice and quiz through the CLI. Two kinds of work happen here: **content work** (filling notes; see Part B) and **code work** (changing the app; see Part A).
 
@@ -60,7 +60,8 @@ Data flow: component → hook (TanStack Query) → `client/api.ts` (ky) → `app
 - **Transcripts run in-process.** Stopping the server mid-load leaves lessons `pending`. `POST /api/sync` (called on app open) resumes them, and the loop stops if its course gets deleted.
 - **New videos are detect-then-add.** `check-updates` only counts them (`courses.available_updates` drives the "+N new" chip, banner and bell), and `sync-course` actually adds them.
 - **Ids:** every course and lesson has a full **UUID v4**. The UI *shows* only the part before the first dash (`displayId()`), and every copy action copies the full UUID.
-- Verify UI changes in the browser, not just with tsc. The user cares about the look, which follows courseit.xyz: moss/lime palette, Familjen Grotesk headings, pill buttons.
+- Verify UI changes in the browser, not just with tsc. The look is the **Transit** system: Geist / Geist Mono, ink on cool white (dark = night map), and each course is a "line" whose colour is stored in `courses.line` (picked once on import by `pickLine` in `shared/lines.ts` so courses don't clash; exposed as `--route`). Progress is drawn as metro stops (`RouteBar`). Never reuse courseit.xyz styling.
+- The app is named **Tubewise**; `~/.courseit/` and the `courseit-prefs` storage key keep the old name on purpose, because renaming them orphans existing data.
 
 ---
 

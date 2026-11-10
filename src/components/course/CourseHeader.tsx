@@ -1,12 +1,14 @@
 "use client";
 
 import { DeleteOutlined, YoutubeOutlined } from "@ant-design/icons";
-import { Button, Popconfirm, Progress } from "antd";
+import { Button, Popconfirm } from "antd";
 import { useRouter } from "next/navigation";
 import { useDeleteCourse } from "@/client/hooks/useCourse";
 import { humanDuration } from "@/shared/format";
+import { lineFor } from "@/shared/lines";
 import type { CourseDetail } from "@/shared/types";
-import { Pill } from "../common/SectionHeading";
+import { LineBadge } from "../common/LineBadge";
+import { RouteBar } from "../common/RouteBar";
 import { TokenChip } from "../common/TokenChip";
 import { SyncButton } from "./SyncButton";
 import styles from "./course.module.css";
@@ -19,17 +21,24 @@ const youtubeUrl = (c: CourseDetail) =>
 export const CourseHeader = ({ course: c }: { course: CourseDetail }) => {
   const router = useRouter();
   const del = useDeleteCourse(c.token);
-  const pct = c.lessonCount ? Math.round((c.completedCount / c.lessonCount) * 100) : 0;
 
   return (
     <header className={styles.header}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img className={styles.cover} src={c.thumbnail} alt="" />
+      <LineBadge title={c.title} size="lg" />
       <div className={styles.headerBody}>
-        <Pill>
-          {c.channel} · {humanDuration(c.totalSec)} · {c.lessonCount} lessons
-        </Pill>
-        <h1 className={`${styles.title} accent`}>{c.title}</h1>
+        <h1 className={styles.title}>{c.title}</h1>
+        <div className={styles.meta}>
+          <span>{c.channel}</span>
+          <span className="mono">{humanDuration(c.totalSec)}</span>
+          <span>{c.lessonCount} lessons</span>
+          <span>{lineFor(c.line).name} line</span>
+        </div>
+        <div className={styles.headerRoute}>
+          <RouteBar done={c.completedCount} total={c.lessonCount} maxStops={14} />
+          <span className="mono">
+            {c.completedCount}/{c.lessonCount}
+          </span>
+        </div>
         <div className={styles.actions}>
           <TokenChip token={c.token} />
           {c.kind === "playlist" && <SyncButton token={c.token} />}
@@ -45,8 +54,11 @@ export const CourseHeader = ({ course: c }: { course: CourseDetail }) => {
             <Button type="text" danger icon={<DeleteOutlined />} aria-label="Delete course" />
           </Popconfirm>
         </div>
-        <Progress percent={pct} format={() => `${c.completedCount}/${c.lessonCount} done`} />
+      </div>
+      <div className={styles.cover}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={c.thumbnail} alt="" />
       </div>
     </header>
   );
-}
+};

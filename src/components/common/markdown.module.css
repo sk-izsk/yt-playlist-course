@@ -27,14 +27,14 @@
   content: "";
   width: 4px;
   height: 22px;
-  border-radius: 4px;
-  background: var(--moss);
+  border-radius: 3px;
+  background: var(--route);
 }
 
 .md h2[data-key] {
   padding: 10px 14px;
   border-radius: 12px;
-  background: var(--lime-soft);
+  background: var(--tint);
 }
 
 .md h2[data-key]::before {
@@ -42,19 +42,19 @@
   width: auto;
   height: auto;
   background: none;
-  color: var(--moss);
+  color: var(--route);
 }
 
 .md h3 {
   margin: 1.4em 0 0.4em;
   font-size: 18px;
-  color: var(--moss);
+  color: var(--ink);
 }
 
 /* ---------- inline ---------- */
 .md strong {
   font-weight: 600;
-  background: linear-gradient(transparent 62%, var(--lime-soft) 62%);
+  background: linear-gradient(transparent 62%, color-mix(in srgb, var(--signal) 32%, transparent) 62%);
 }
 
 .md em {
@@ -62,7 +62,7 @@
 }
 
 .md a {
-  color: var(--moss);
+  color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -97,7 +97,7 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: var(--moss);
+  background: var(--route);
 }
 
 .md ol {
@@ -115,7 +115,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--lime-soft);
+  background: var(--tint);
   font-size: 11px;
   font-weight: 600;
   line-height: 1;
@@ -130,16 +130,17 @@
   position: absolute;
   left: 4px;
   top: 0.5em;
-  accent-color: var(--moss);
+  accent-color: var(--route);
 }
 
 /* ---------- blocks ---------- */
 .md blockquote {
   margin: 1em 0;
   padding: 12px 16px;
-  border-left: 4px solid var(--moss);
-  border-radius: 0 12px 12px 0;
-  background: var(--lime-soft);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--tint);
+  box-shadow: inset 4px 0 0 var(--route);
 }
 
 .md blockquote p {
@@ -150,7 +151,7 @@
   margin: 1em 0;
   padding: 14px 16px;
   border-radius: 12px;
-  background: var(--night);
+  background: var(--deep);
   color: #e8ecf8;
   overflow-x: auto;
   font-size: 13px;
@@ -207,8 +208,8 @@
   padding: 0 8px;
   border: 0;
   border-radius: 999px;
-  background: var(--lime-soft);
-  color: var(--moss);
+  background: var(--tint);
+  color: var(--ink);
   font-size: 12px;
   line-height: 1.7;
   cursor: pointer;
@@ -216,8 +217,8 @@
 }
 
 .stamp:hover {
-  background: var(--moss);
-  color: var(--on-moss);
+  background: var(--route);
+  color: #fff;
 }
 
 /* Personal notes: same look, tighter. */

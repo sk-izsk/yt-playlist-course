@@ -1,4 +1,4 @@
-# CourseIt (personal)
+# Tubewise (personal)
 
 Turn any YouTube video or playlist into a course you actually finish. Local-only and single-user.
 

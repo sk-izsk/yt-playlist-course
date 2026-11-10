@@ -1,12 +1,13 @@
 "use client";
 
 import { PushpinFilled } from "@ant-design/icons";
-import { Progress } from "antd";
 import Link from "next/link";
 import { humanDuration } from "@/shared/format";
+import { routeStyle } from "@/shared/lines";
 import type { CourseSummary } from "@/shared/types";
+import { LineBadge } from "../../common/LineBadge";
+import { RouteBar } from "../../common/RouteBar";
 import { UpdateChip } from "../../common/UpdateChip";
-import { progressPct } from "./CourseCard";
 import { CourseMenu } from "./CourseMenu";
 import { DragHandle } from "./DragHandle";
 import { SelectMark, useSelectableClick } from "./SelectMark";
@@ -14,24 +15,25 @@ import type { HandleProps } from "./SortableItem";
 import { TranscriptBadge } from "./TranscriptBadge";
 import styles from "./library.module.css";
 
-/** Compact list view row: handle · thumb · title/channel · progress · menu. */
+/** Compact list view row: handle, line badge, title and route, menu. */
 export const CourseListRow = ({ course: c, handle }: { course: CourseSummary; handle: HandleProps | null }) => {
   const { selecting, selected, onClick } = useSelectableClick(c.token);
 
   return (
-    <div className={styles.row} data-selected={selected}>
+    <div className={styles.row} data-selected={selected} style={routeStyle(c.line)}>
       {selecting ? <SelectMark token={c.token} /> : <DragHandle handle={handle} />}
       <Link href={`/courses/${c.token}`} className={styles.rowLink} onClick={onClick}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img className={styles.rowThumb} src={c.thumbnail} alt="" loading="lazy" />
+        <LineBadge title={c.title} />
         <div className={styles.rowBody}>
           <span className={styles.rowTitle}>
-            {c.pinned && <PushpinFilled className={styles.pin} />}
+            {c.pinned && <PushpinFilled className={styles.pin} aria-label="Pinned" />}
             {c.title}
             {c.newCount > 0 && <span className={styles.newPill}>{c.newCount} unseen</span>}
           </span>
-          <span className={styles.channel}>
-            {c.channel} · {humanDuration(c.totalSec)} · {c.lessonCount} lessons
+          <span className={styles.rowMeta}>
+            <span>{c.channel}</span>
+            <span className="mono">{humanDuration(c.totalSec)}</span>
+            <span>{c.lessonCount} lessons</span>
           </span>
           <span className={styles.rowBadges}>
             <UpdateChip course={c} />
@@ -39,10 +41,10 @@ export const CourseListRow = ({ course: c, handle }: { course: CourseSummary; ha
           </span>
         </div>
         <div className={styles.rowProgress}>
-          <span>
+          <RouteBar done={c.completedCount} total={c.lessonCount} maxStops={7} />
+          <span className="mono">
             {c.completedCount}/{c.lessonCount}
           </span>
-          <Progress percent={progressPct(c)} size="small" showInfo={false} style={{ width: 110, margin: 0 }} />
         </div>
       </Link>
       {!selecting && <CourseMenu course={c} />}

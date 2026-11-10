@@ -1,53 +1,59 @@
-/* Design tokens — palette modelled on courseit.xyz, light + dark. */
+/*
+ * Design tokens — "Transit map".
+ * Neutral signage UI (ink on cool white) so the colour belongs to the courses:
+ * every course is a metro line with its own --route colour (see src/shared/lines.ts).
+ */
 :root {
-  --paper: #fcfcfa;
+  --paper: #f7f9fa;
   --surface: #ffffff;
-  --ink: #0f1611;
-  --ink-soft: #4c4c3d;
-  --line: #0f161117;
-  --moss: #4b5e1e;
-  --moss-dark: #3c4c16;
-  --on-moss: #f6f8ec;
-  --lime: #b8c460;
-  --lime-soft: #e4e9c6;
-  --muted: #f1f2ea;
-  --dusk: #445eb2;
-  --night: #16315c;
-  --peach: #e6a26c;
-  --rose: #caa2a4;
-  --glass: #ffffff9e;
-  --ok-bg: #eef2da;
-  --ok-fg: #4b5e1e;
-  --warn-bg: #f7e9da;
-  --warn-fg: #9a5a22;
-  --err-bg: #f6e1dd;
-  --err-fg: #a0473b;
+  --ink: #101826;
+  --ink-soft: #4a5565;
+  --line: #10182619; /* hairline borders */
+  --primary: #101826; /* signage black: primary buttons, active states */
+  --primary-hover: #26324a;
+  --on-primary: #ffffff;
+  --tint: #eef2f6; /* quiet fills: pills, hover rows, highlights */
+  --muted: #f0f3f6;
+  --accent: #2563eb; /* links, focus, "new videos" */
+  --signal: #f2a60c; /* platform-sign amber: "today", now playing */
+  --deep: #101826; /* player + code backgrounds */
+  --route: var(--accent); /* overridden per course */
+  --glass: #f7f9fac7;
+  --ok-bg: #e6f4ec;
+  --ok-fg: #17803f;
+  --warn-bg: #fdf3dc;
+  --warn-fg: #9a6408;
+  --err-bg: #fce9e7;
+  --err-fg: #c2352b;
   --radius: 12px;
-  --shadow: 0 1px 2px #0f16110a, 0 8px 24px -12px #0f16111f;
+  --shadow: 0 1px 2px #1018260d, 0 10px 28px -14px #10182633;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
 }
 
+/* Night map: the same lines glowing on a dark board. */
 :root.dark {
-  --paper: #0e1311;
-  --surface: #161d18;
-  --ink: #f1f3ea;
-  --ink-soft: #b3b7a3;
-  --line: #f1f3ea1c;
-  --moss: #b8c460;
-  --moss-dark: #a6b24f;
-  --on-moss: #0f1611;
-  --lime-soft: #283117;
-  --muted: #1c231e;
-  --dusk: #7d93e0;
-  --night: #0b1a33;
-  --glass: #161d189e;
-  --ok-bg: #24301a;
-  --ok-fg: #c9d57a;
-  --warn-bg: #3a2a18;
-  --warn-fg: #f0b47c;
-  --err-bg: #3a1e1a;
-  --err-fg: #f0a497;
-  --shadow: 0 1px 2px #0000004d, 0 8px 24px -12px #00000080;
+  --paper: #181818;
+  --surface: #1f1f1f;
+  --ink: #f2f4f7;
+  --ink-soft: #a3acb9;
+  --line: #f2f4f71f;
+  --primary: #f2f4f7;
+  --primary-hover: #d5dae1;
+  --on-primary: #181818;
+  --tint: #272727;
+  --muted: #232323;
+  --accent: #6e9bff;
+  --signal: #f5b544;
+  --deep: #000000;
+  --glass: #181818c7;
+  --ok-bg: #1d2b22;
+  --ok-fg: #5ad08a;
+  --warn-bg: #2e2716;
+  --warn-fg: #f5b544;
+  --err-bg: #331c1a;
+  --err-fg: #ff7a70;
+  --shadow: 0 1px 2px #0000004d, 0 10px 28px -14px #000000a6;
   color-scheme: dark;
 }
 
@@ -60,7 +66,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-body), "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-sans), "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -68,10 +74,14 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-display), var(--font-body), sans-serif;
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
   margin: 0;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 a {
@@ -79,9 +89,9 @@ a {
   text-decoration: none;
 }
 
-.accent {
-  color: var(--moss);
-  font-style: italic;
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .mono {
@@ -91,4 +101,13 @@ a {
 .container {
   width: min(1160px, 100% - 32px);
   margin-inline: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

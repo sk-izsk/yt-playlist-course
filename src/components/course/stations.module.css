@@ -1,0 +1,144 @@
+/* Lessons as stations on a vertical line in the course colour (var(--route)). */
+.list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The line itself: runs through the centre of every station. */
+.list::before {
+  content: "";
+  position: absolute;
+  top: 28px;
+  bottom: 28px;
+  left: 23px;
+  width: 6px;
+  border-radius: 3px;
+  background: var(--route);
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 12px;
+  border-radius: 12px;
+  color: var(--ink);
+  transition: background 0.3s var(--ease);
+}
+
+/* `color` pinned: antd's global a:hover would recolour the row. */
+.row:hover {
+  color: var(--ink);
+  background: var(--tint);
+}
+
+.stop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: 4px solid var(--route);
+  border-radius: 50%;
+  background: var(--surface);
+  font-size: 12px;
+}
+
+.row[data-done="true"] .stop {
+  background: var(--route);
+  color: #fff;
+}
+
+/* You are here: the next lesson to watch. */
+.row[data-next="true"] .stop {
+  border-color: var(--signal);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--signal) 30%, transparent);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row[data-done="true"] .title,
+.row[data-kind="light"] .title {
+  color: var(--ink-soft);
+}
+
+.sub {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.tag {
+  margin-left: 8px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--muted);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.tag[data-tone="new"] {
+  background: var(--warn-bg);
+  color: var(--warn-fg);
+}
+
+.status {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.status[data-tone="ok"] {
+  color: var(--ok-fg);
+}
+
+.status[data-tone="warn"] {
+  color: var(--warn-fg);
+}
+
+.status[data-tone="muted"] {
+  color: var(--ink-soft);
+}
+
+.duration {
+  width: 48px;
+  text-align: right;
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+.play {
+  font-size: 20px;
+  color: var(--ink-soft);
+  transition: color 0.3s var(--ease);
+}
+
+.row:hover .play {
+  color: var(--ink);
+}
+
+@media (max-width: 640px) {
+  .status,
+  .duration {
+    display: none;
+  }
+}

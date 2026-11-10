@@ -1,10 +1,13 @@
 "use client";
 
 import { PushpinFilled } from "@ant-design/icons";
-import { Progress, Tag } from "antd";
+import { Tag } from "antd";
 import Link from "next/link";
 import { humanDuration } from "@/shared/format";
+import { routeStyle } from "@/shared/lines";
 import type { CourseSummary } from "@/shared/types";
+import { LineBadge } from "../../common/LineBadge";
+import { RouteBar } from "../../common/RouteBar";
 import { UpdateChip } from "../../common/UpdateChip";
 import { CourseMenu } from "./CourseMenu";
 import { DragHandle } from "./DragHandle";
@@ -13,15 +16,12 @@ import type { HandleProps } from "./SortableItem";
 import { TranscriptBadge } from "./TranscriptBadge";
 import styles from "./library.module.css";
 
-export const progressPct = (c: CourseSummary) =>
-  c.lessonCount ? Math.round((c.completedCount / c.lessonCount) * 100) : 0;
-
-/** Grid view card. The tools (drag + menu) sit outside the link so they don't navigate. */
+/** Grid view card, painted in the course's line colour. Tools sit outside the link so they don't navigate. */
 export const CourseCard = ({ course: c, handle }: { course: CourseSummary; handle: HandleProps | null }) => {
   const { selecting, selected, onClick } = useSelectableClick(c.token);
 
   return (
-    <div className={styles.card} data-selected={selected}>
+    <div className={styles.card} data-selected={selected} style={routeStyle(c.line)}>
       <Link href={`/courses/${c.token}`} className={styles.cardLink} onClick={onClick}>
         <div className={styles.thumb}>
           {/* eslint-disable-next-line @next/next/no-img-element -- remote YouTube thumbs, no optimisation needed locally */}
@@ -34,9 +34,10 @@ export const CourseCard = ({ course: c, handle }: { course: CourseSummary; handl
         </div>
         <div className={styles.cardBody}>
           <div className={styles.cardMeta}>
+            <LineBadge title={c.title} size="sm" />
             <div className={styles.cardText}>
               <h3 className={styles.cardTitle}>
-                {c.pinned && <PushpinFilled className={styles.pin} />}
+                {c.pinned && <PushpinFilled className={styles.pin} aria-label="Pinned" />}
                 {c.title}
               </h3>
               <span className={styles.channel}>{c.channel}</span>
@@ -44,10 +45,10 @@ export const CourseCard = ({ course: c, handle }: { course: CourseSummary; handl
             <TranscriptBadge course={c} />
           </div>
           <div className={styles.cardFoot}>
-            <span>
-              {c.completedCount}/{c.lessonCount} lessons
+            <RouteBar done={c.completedCount} total={c.lessonCount} />
+            <span className="mono">
+              {c.completedCount}/{c.lessonCount}
             </span>
-            <Progress percent={progressPct(c)} size="small" showInfo={false} style={{ width: 90, margin: 0 }} />
           </div>
         </div>
       </Link>

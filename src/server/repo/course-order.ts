@@ -1,4 +1,5 @@
 import { eq, min } from "drizzle-orm";
+import { pickLine } from "@/shared/lines";
 import { db, schema } from "../db/client";
 
 const { courses } = schema;
@@ -8,6 +9,10 @@ export const topSortOrder = () => {
   const row = db.select({ m: min(courses.sortOrder) }).from(courses).get();
   return (row?.m ?? 0) - 1;
 };
+
+/** Line colour for a new course: the least-used one (see pickLine). */
+export const nextLine = (token: string) =>
+  pickLine(token, db.select({ line: courses.line }).from(courses).all().map((r) => r.line));
 
 /** Persists drag & drop order: each token's index becomes its sort value. */
 export const reorderCourses = (tokens: string[]) => {
