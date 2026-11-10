@@ -13,8 +13,8 @@ export const POST = async (req: Request) => {
     const { url } = await readJson<{ url?: string }>(req);
     if (!url?.trim()) throw new HttpError(400, "Paste a YouTube video or playlist link");
     try {
-      const { token, created } = await importCourse(url);
-      return { token, created };
+      const { token, title, created } = await importCourse(url);
+      return { token, title, created };
     } catch (err) {
       // Bad link, private playlist or YouTube hiccup — log it for the notification center, answer 422.
       addEvent({ kind: "error", title: "Couldn't add course", body: `${url} — ${(err as Error).message}` });

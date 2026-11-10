@@ -3,6 +3,7 @@ import { App } from "antd";
 import type { CourseSummary } from "@/shared/types";
 import { api, errorMessage } from "../api";
 import { qk } from "../query-keys";
+import { useCourseAddedToasts } from "./useCourseAddedToasts";
 
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
@@ -41,6 +42,7 @@ export const useBulkDelete = () => {
 export const useBulkAdd = () => {
   const qc = useQueryClient();
   const { message } = App.useApp();
+  const announce = useCourseAddedToasts();
   return useMutation({
     meta: { silentError: true },
     mutationFn: async (urls: string[]) => {
@@ -49,7 +51,11 @@ export const useBulkAdd = () => {
       for (const [i, url] of urls.entries()) {
         message.open({ key: "bulk-add", type: "loading", content: `Adding ${i + 1} of ${urls.length}…`, duration: 0 });
         try {
-          if ((await api.addCourse(url)).created) created++;
+          const res = await api.addCourse(url);
+          if (res.created) {
+            created++;
+            announce(res);
+          }
           qc.invalidateQueries({ queryKey: qk.courses }); // cards appear as each one lands
         } catch (err) {
           failures.push(`${url} — ${await errorMessage(err)}`);

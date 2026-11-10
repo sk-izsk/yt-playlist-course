@@ -21,7 +21,7 @@ export const errorMessage = async (err: unknown): Promise<string> => {
 export const api = {
   courses: () => http.get("courses").json<CourseSummary[]>(),
   course: (token: string) => http.get(`courses/${token}`).json<CourseDetail>(),
-  addCourse: (url: string) => http.post("courses", { json: { url } }).json<{ token: string; created: boolean }>(),
+  addCourse: (url: string) => http.post("courses", { json: { url } }).json<{ token: string; title: string; created: boolean }>(),
   deleteCourse: (token: string) => http.delete(`courses/${token}`).json(),
   setPinned: (token: string, pinned: boolean) => http.patch(`courses/${token}`, { json: { pinned } }).json(),
   reorderCourses: (tokens: string[]) => http.put("courses/order", { json: { tokens } }).json(),
