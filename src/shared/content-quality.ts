@@ -9,6 +9,8 @@ export interface QualityContext {
   segmentStarts: number[];
   /** Summaries already saved for the other lessons of the same course. */
   otherSummaries: string[];
+  /** Correct-answer order of each other lesson's quiz, e.g. "2,0,3,1". */
+  otherAnswerOrders: string[];
 }
 
 const TS = /\(#t=(\d+)\)/g;
@@ -26,8 +28,9 @@ const bulletBodies = (summary: string) =>
 
 /**
  * Catches the shortcuts of notes generated from a template instead of a transcript: every answer
- * at the same position, the longest option always right, timestamps on a 20%/25% grid or matching
- * no transcript line, options copied from the summary, sentences reused across lessons.
+ * at the same position or in one order reused across lessons, the longest option always right,
+ * timestamps on a 20%/25% grid or matching no transcript line, options copied from the summary,
+ * sentences reused across lessons.
  * ponytail: these are tells, not proof of quality; shallow hand-written notes still pass.
  */
 export const qualityIssues = (c: LessonContent, ctx: QualityContext): string[] => {
@@ -37,6 +40,11 @@ export const qualityIssues = (c: LessonContent, ctx: QualityContext): string[] =
 
   if (quiz.length >= 3 && new Set(quiz.map((q) => q.answerIndex)).size === 1) {
     issues.push(`quiz: every correct answer is option ${quiz[0].answerIndex}; spread them across positions`);
+  }
+  const order = quiz.map((q) => q.answerIndex).join(",");
+  const sameOrder = ctx.otherAnswerOrders.filter((o) => o === order).length;
+  if (quiz.length >= 3 && sameOrder >= 2) {
+    issues.push(`quiz: answer order ${order} is already used by ${sameOrder} other lessons; reorder the options`);
   }
   const longestRight = quiz.filter((q) => {
     const len = q.options.map((o) => o.length);

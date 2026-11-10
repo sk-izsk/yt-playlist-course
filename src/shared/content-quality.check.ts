@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import type { LessonContent } from "./content-schema";
 import { qualityIssues } from "./content-quality";
 
-const ctx = { startSec: 0, endSec: 1000, segmentStarts: [0, 120, 200, 333, 400, 517, 600, 742, 800, 901], otherSummaries: [] };
+const ctx = { startSec: 0, endSec: 1000, segmentStarts: [0, 120, 200, 333, 400, 517, 600, 742, 800, 901], otherSummaries: [], otherAnswerOrders: [] };
 const has = (issues: string[], word: string) => issues.some((i) => i.includes(word));
 const q = (answerIndex: number, options: string[], atSec?: number) => ({ question: "Why?", options, answerIndex, atSec });
 const points = (ts: number[]) =>
@@ -34,5 +34,7 @@ assert.ok(has(qualityIssues(good, { ...ctx, segmentStarts: [0] }), "no transcrip
 const filler = "\n\nFirst identify the inputs, then check each intermediate result before trusting the final answer.";
 const withFiller = { ...good, summary: good.summary + filler };
 assert.ok(has(qualityIssues(withFiller, { ...ctx, otherSummaries: [filler] }), "another lesson"), "reused sentence");
+assert.ok(has(qualityIssues(good, { ...ctx, otherAnswerOrders: ["1,2,0", "1,2,0"] }), "answer order"), "reused order");
+assert.deepEqual(qualityIssues(good, { ...ctx, otherAnswerOrders: ["1,2,0"] }), []); // one reuse is chance
 assert.deepEqual(qualityIssues({ ...lazy, kind: "light" }, ctx), []); // light lessons are exempt
 console.log("content-quality ok");

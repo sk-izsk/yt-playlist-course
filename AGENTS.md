@@ -127,7 +127,7 @@ An earlier pass generated 37 lessons from one template, and the output passed ev
 
 - **Write each lesson by hand from its own transcript.** Never generate notes with a script, loop or template. Scripts may only read data or check your own JSON.
 - **Timestamps come from real transcript lines** where that idea is explained. Never place them at evenly spaced fractions of the video.
-- **Quiz questions test understanding** (why, when, what happens if), preferably as scenarios, not "which description fits X". Spread correct answers across positions. Wrong options are mistakes a learner would plausibly make, about as long and specific as the right one. The explanation says *why*, not the answer again.
+- **Quiz questions test understanding** (why, when, what happens if), preferably as scenarios, not "which description fits X". Spread correct answers across positions, and vary the order between lessons (no fixed C, A, D, B rotation). Wrong options are mistakes a learner would plausibly make, about as long and specific as the right one. The explanation says *why*, not the answer again.
 - **Be specific to the video**: the functions, libraries, numbers, examples and analogies the teacher actually used. Never reuse a sentence from another lesson.
 - **Partial transcript?** Say so on the first line of the summary, and only cite timestamps inside the part you have.
 - **Many lessons to fill? Do them all in one run**, without pausing for approval. The user prefers one strict pass to check-ins. That makes these rules stricter, not looser:
@@ -136,7 +136,7 @@ An earlier pass generated 37 lessons from one template, and the output passed ev
   - Stop early only when `save` rejects the same lesson 3 times or a transcript is missing or broken. Report it, then continue with the next lesson.
   - At the end, print one row per lesson: kind, summary length, timestamp count, practice count, quiz count, answerIndex values, save rejections. Then list any lessons you're unsure about.
 
-`save` enforces the mechanical part (`src/shared/content-quality.ts`, which applies even with `--force`). It refuses notes where every answer is at the same position, the longest option is always correct, timestamps sit on a 20%/25% grid or match no transcript line, options are copied from "Important points", or a sentence repeats another lesson. Passing those checks is the floor, not the goal.
+`save` enforces the mechanical part (`src/shared/content-quality.ts`, which applies even with `--force`). It refuses notes where every answer is at the same position, the answer order (e.g. `2,0,3,1`) repeats one that 2+ other lessons already use, the longest option is always correct, timestamps sit on a 20%/25% grid or match no transcript line, options are copied from "Important points", or a sentence repeats another lesson. Passing those checks is the floor, not the goal.
 
 ## Content JSON (`src/shared/content-schema.ts` is the source of truth)
 
