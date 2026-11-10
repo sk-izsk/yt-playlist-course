@@ -130,7 +130,11 @@ An earlier pass generated 37 lessons from one template, and the output passed ev
 - **Quiz questions test understanding** (why, when, what happens if), preferably as scenarios, not "which description fits X". Spread correct answers across positions. Wrong options are mistakes a learner would plausibly make, about as long and specific as the right one. The explanation says *why*, not the answer again.
 - **Be specific to the video**: the functions, libraries, numbers, examples and analogies the teacher actually used. Never reuse a sentence from another lesson.
 - **Partial transcript?** Say so on the first line of the summary, and only cite timestamps inside the part you have.
-- **Many lessons to fill?** Do 5, show the user, then continue only after they approve.
+- **Many lessons to fill? Do them all in one run**, without pausing for approval. The user prefers one strict pass to check-ins. That makes these rules stricter, not looser:
+  - Read every transcript in full before writing; no skimming in later lessons.
+  - Keep quality flat to the end: the last lesson gets the same depth (length, timestamps, code, practice, quiz) as the first. If you notice yourself shortening lessons to finish faster, stop and tell the user instead.
+  - Stop early only when `save` rejects the same lesson 3 times or a transcript is missing or broken. Report it, then continue with the next lesson.
+  - At the end, print one row per lesson: kind, summary length, timestamp count, practice count, quiz count, answerIndex values, save rejections. Then list any lessons you're unsure about.
 
 `save` enforces the mechanical part (`src/shared/content-quality.ts`, which applies even with `--force`). It refuses notes where every answer is at the same position, the longest option is always correct, timestamps sit on a 20%/25% grid or match no transcript line, options are copied from "Important points", or a sentence repeats another lesson. Passing those checks is the floor, not the goal.
 
