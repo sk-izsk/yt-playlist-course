@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireAgent } from "./auth/agent-tokens";
 import { requireUser } from "./auth/require-user";
 import type { AuthUser } from "./auth/tokens";
 import { HttpError } from "./http-error";
@@ -24,6 +25,10 @@ export const handlePublic = async <T>(fn: () => T | Promise<T>, status = 200) =>
 /** Every app route: 401 unless the access cookie holds a valid token. */
 export const handle = <T>(fn: (user: AuthUser) => T | Promise<T>, status = 200) =>
   handlePublic(async () => fn(await requireUser()), status);
+
+/** /api/agent/* only: `Authorization: Bearer tw_…` (an agent token), never the login cookie. */
+export const handleAgent = <T>(req: Request, fn: (user: AuthUser) => T | Promise<T>, status = 200) =>
+  handlePublic(async () => fn(await requireAgent(req)), status);
 
 export const readJson = async <T = Record<string, unknown>>(req: Request): Promise<T> => {
   try {

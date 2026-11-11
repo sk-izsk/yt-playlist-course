@@ -50,7 +50,7 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 | 1 ✅ 2026-11-11 | **Postgres**: drizzle pg-core schema, async repo (~54 sync call sites: `.all()/.get()/.run()/transaction`), drizzle-kit migrations instead of migrate-on-load, one-time copy script SQLite → Neon | `make check` passes; app + CLI work against Neon with the user's real data |
 | 2 ✅ 2026-11-11 | **Login** (see decisions) + `users`, `sessions`, `login_attempts` tables + `user:create` CLI | idle logout, refresh, token reuse revocation verified in the browser |
 | 3 ⏳ code done, deploy waits on env vars | **Vercel deploy**: env vars, cron for `check-updates`, transcripts left `pending` online | app live behind login |
-| 4 | **Agent API** `/api/agent/*` + `agent_tokens` table + Settings page | token can save a lesson; can't delete |
+| 4 ✅ 2026-11-11 | **Agent API** `/api/agent/*` + `agent_tokens` table + Settings page | token can save a lesson; can't delete |
 | 5 | **Custom MCP** (`mcp/server.ts`, stdio): `fetch_transcripts`, `list_pending`, `get_lesson`, `save_notes`, `course_report`; writing rules from `docs/notes-guide.md` (move AGENTS.md Part B there) | Claude Code fills one real lesson through MCP |
 | 6 | **CLI remote mode**: `scripts/agent` uses the API when `TUBEWISE_URL`/`TUBEWISE_TOKEN` are set; `make fill` unchanged | `make fill MAX=1` works online |
 | 7 | **Backups**: Mac mirror (launchd pull every 15 min + 14 dated dumps + local/Neon toggle, read-only local) + nightly `pg_dump` via GitHub Actions + soft delete with a 7-day trash | local mirror matches Neon; a dump restores into a scratch DB |
@@ -92,6 +92,18 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
   `bunx vercel env add DATABASE_URL production`, `… JWT_SECRET production` (a new `openssl rand -base64 48`, not the
   local one), `… CRON_SECRET production` (`openssl rand -hex 24`), then `bunx vercel deploy --prod`, then
   `make user NAME=<you>` (same Neon DB, so the login works locally and online). Then tick this phase.
+
+## Phase 4 notes (done 2026-11-11)
+
+- `agent_tokens` (`drizzle/0002`): `tw_` + 32 random bytes, SHA-256 stored, prefix for display, revoke = soft.
+- `Authorization: Bearer tw_…` only (`handleAgent`); the login cookie is not accepted there and the token is not accepted
+  on app routes. Routes under `/api/agent/`: `GET courses`, `GET courses/:id`, `GET courses/:id/report`,
+  `GET courses/:id/transcripts` (video id + chapter range + status), `GET pending?course=`, `GET resolve?id=`,
+  `GET lessons/:id?mode=compact|full|head`, `PUT lessons/:id/transcript`, `PUT lessons/:id/notes` (`save-content`
+  checks + shuffle; 422 lists problems). No DELETE handlers exist (405).
+- Shared formatting `src/shared/agent-format.ts` + `server/services/agent-context.ts`; CLI `show`/`report` use them.
+- Settings page `/settings` (owner only): create (shown once), list, revoke.
+- Verified with curl: every route, bad transcript 400, overwrite refused 422, DELETE 405, revoked token 401 at once.
 
 ## Needed from the user
 

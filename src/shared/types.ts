@@ -96,3 +96,12 @@ export interface AppEvent {
 export interface SyncResult {
   added: LessonRow[];
 }
+
+/** A personal agent token as listed on Settings (the secret itself is only in the create response). */
+export interface AgentToken {
+  id: number;
+  name: string;
+  prefix: string;
+  createdAt: number;
+  lastUsedAt?: number | null;
+}

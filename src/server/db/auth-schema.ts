@@ -34,6 +34,21 @@ export const refreshTokens = pgTable("refresh_tokens", {
   createdAt: ms("created_at").notNull().$defaultFn(now),
 });
 
+/**
+ * Personal tokens for the agent API (MCP / CLI on the Mac). Shown once; only the SHA-256 is kept.
+ * `prefix` (first chars of the token) lets the Settings page tell tokens apart.
+ */
+export const agentTokens = pgTable("agent_tokens", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  hash: text("hash").notNull().unique(),
+  prefix: text("prefix").notNull(),
+  createdAt: ms("created_at").notNull().$defaultFn(now),
+  lastUsedAt: ms("last_used_at"),
+  revokedAt: ms("revoked_at"),
+});
+
 /** Failed logins per submitted username: 5 failures lock it for 15 minutes. */
 export const loginAttempts = pgTable("login_attempts", {
   username: text("username").primaryKey(),
