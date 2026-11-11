@@ -11,14 +11,19 @@ import { importCourse } from "@/server/services/import-course";
 import { saveLessonContent } from "@/server/services/save-content";
 import { syncCourse } from "@/server/services/sync-course";
 import { fillTranscripts } from "@/server/services/transcripts";
+import { reportCourse } from "./report";
 import { showId } from "./show";
 
 const HELP = `Commands (ids = full UUID v4 from the app):
   list                          all courses with ids and progress
   pending [course-id]           lessons that still need notes (only these — never redo finished ones)
-  show <course-id|lesson-id>    full context for a course or lesson (incl. transcript)
+  show <course-id|lesson-id> [--full|--head]
+                                context for a course or lesson; lessons print a compact transcript
+                                (--full: every caption line, --head: first 3 minutes only)
+  report <course-id>            per-lesson table: kind, length, timestamps, practice, quiz, answers
   save <lesson-id> <file|-> [--force]
-                                store kind/summary/practice/quiz JSON; --force overwrites existing notes
+                                store kind/summary/practice/quiz JSON (- reads stdin); answer
+                                positions are shuffled on save; --force overwrites existing notes
   add <youtube-url>             import a video or playlist and fetch transcripts
   sync <course-id>              pull new videos from the playlist
   transcripts <course-id>       retry missing/failed transcripts`;
@@ -49,7 +54,8 @@ const commands: Record<string, (args: string[]) => Promise<void> | void> = {
       ),
     );
   },
-  show: ([id]) => showId(required(id, "id")),
+  show: ([id, ...flags]) => showId(required(id, "id"), flags),
+  report: ([id]) => reportCourse(resolveAs("course", required(id, "course id"))),
   save: ([id, file, flag]) => {
     const token = resolveAs("lesson", required(id, "lesson id"));
     const raw = readFileSync(file === "-" || !file ? 0 : file, "utf8");

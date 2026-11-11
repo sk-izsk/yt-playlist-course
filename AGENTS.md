@@ -72,9 +72,12 @@ Never edit the DB directly; use the CLI. Ids are full UUIDs (the user copies the
 ## Workflows
 
 **"Fill notes for course <id>"** (the usual request):
-1. `bun run agent show <id>` prints the course plus **"Work only on these N: #…"**.
-2. `bun run agent pending <id>` lists exactly the lessons that still need notes.
-3. For each of them, in order: `bun run agent show <lesson-id>`, write the JSON to a temp file (not in the repo), then `bun run agent save <lesson-id> /tmp/x.json`.
+- **Many lessons: the user runs `make fill ID=<course-id> [AGENT=codex|claude] [MAX=n]`** (`scripts/fill-course.sh`). It starts one fresh agent session per lesson, so earlier transcripts never pile up in context: cost stays linear and the last lesson is as careful as the first. Stop it any time; rerunning resumes from `pending`. `AGENT=echo` is a free dry run.
+- **One lesson, or inside a session:**
+  1. `bun run agent pending <id>` lists exactly the lessons that still need notes.
+  2. `bun run agent show <lesson-id>` prints a **compact transcript** (captions merged into ~12 s blocks, exact repeats removed; `--full` for every line) and a **target summary length** scaled to the video.
+  3. Save from stdin, no temp file: `bun run agent save <lesson-id> - <<'JSON'` … `JSON`.
+- `bun run agent report <course-id>` prints the per-lesson table (kind, length, timestamps, practice, quiz, answer order). Use it instead of writing one.
 
 **Never redo finished lessons.** Lessons with notes are done. `save` refuses to overwrite them unless you pass `--force`, which you only pass when the user explicitly asks to redo a lesson. When new videos drop, `pending` returns only those, so you spend tokens only on new content.
 
@@ -89,7 +92,7 @@ Never edit the DB directly; use the CLI. Ids are full UUIDs (the user copies the
 | `core` | Real teaching: concepts, code, worked examples | Full formatted notes, **≥3 practice**, **≥3 quiz** (enforced) |
 | `light` | Intro / trailer, chit-chat, Q&A banter, promo, "what's next" recap | 3–6 line honest summary saying it's light and whether it's worth watching. Practice and quiz are optional; don't invent them |
 
-Judge by the transcript, not the title.
+Judge by the transcript, not the title. For an intro, roadmap or revision video, `show <id> --head` prints only the first 3 minutes: if it's clearly light **and** the video is under 15 minutes, write light notes from that. Otherwise read the whole transcript, because longer "roadmap" videos sometimes teach.
 
 ## Step 2 — formatted summary (markdown, rendered with styling)
 
@@ -113,6 +116,7 @@ fenced code with a language, **bold** key terms.
 ```
 
 - `## Important points` is required for core lessons (validated) and is shown highlighted.
+- Aim for the target length `show` prints (about 1,200 characters for a 10-minute video, up to 3,500 for 30+ minutes). A dense short video may need more; don't pad a light one to reach it.
 - Include 4–10 timestamp links `[mm:ss](#t=SECONDS)`. The seconds come from the `[mm:ss|seconds]` transcript lines and are absolute video time.
 - Write in English even if the transcript isn't. Cut filler, jokes and sponsor reads.
 
@@ -127,16 +131,16 @@ An earlier pass generated 37 lessons from one template, and the output passed ev
 
 - **Write each lesson by hand from its own transcript.** Never generate notes with a script, loop or template. Scripts may only read data or check your own JSON.
 - **Timestamps come from real transcript lines** where that idea is explained. Never place them at evenly spaced fractions of the video.
-- **Quiz questions test understanding** (why, when, what happens if), preferably as scenarios, not "which description fits X". Spread correct answers across positions, and vary the order between lessons (no fixed C, A, D, B rotation). Wrong options are mistakes a learner would plausibly make, about as long and specific as the right one. The explanation says *why*, not the answer again.
+- **Quiz questions test understanding** (why, when, what happens if), preferably as scenarios, not "which description fits X". Put the correct answer wherever you like: **`save` shuffles every question's options**, so never refer to positions or letters ("option A", "the first one") in questions or explanations. Wrong options are mistakes a learner would plausibly make, about as long and specific as the right one. The explanation says *why*, not the answer again.
 - **Be specific to the video**: the functions, libraries, numbers, examples and analogies the teacher actually used. Never reuse a sentence from another lesson.
 - **Partial transcript?** Say so on the first line of the summary, and only cite timestamps inside the part you have.
-- **Many lessons to fill? Do them all in one run**, without pausing for approval. The user prefers one strict pass to check-ins. That makes these rules stricter, not looser:
+- **Many lessons to fill in one session** (when `make fill` isn't used)? Do them all without pausing for approval. The user prefers one strict pass to check-ins. That makes these rules stricter, not looser:
   - Read every transcript in full before writing; no skimming in later lessons.
   - Keep quality flat to the end: the last lesson gets the same depth (length, timestamps, code, practice, quiz) as the first. If you notice yourself shortening lessons to finish faster, stop and tell the user instead.
   - Stop early only when `save` rejects the same lesson 3 times or a transcript is missing or broken. Report it, then continue with the next lesson.
-  - At the end, print one row per lesson: kind, summary length, timestamp count, practice count, quiz count, answerIndex values, save rejections. Then list any lessons you're unsure about.
+  - At the end, run `bun run agent report <course-id>` and add only what it can't show: save rejections and any lessons you're unsure about.
 
-`save` enforces the mechanical part (`src/shared/content-quality.ts`, which applies even with `--force`). It refuses notes where every answer is at the same position, the answer order (e.g. `2,0,3,1`) repeats one that 2+ other lessons already use, the longest option is always correct, timestamps sit on a 20%/25% grid or match no transcript line, options are copied from "Important points", or a sentence repeats another lesson. Passing those checks is the floor, not the goal.
+`save` enforces the mechanical part (`src/shared/content-quality.ts`, which applies even with `--force`). It shuffles answer positions (no all-A, straight A–D runs, or an order 2+ other lessons use), then refuses notes where the longest option is always correct, timestamps sit on a 20%/25% grid or match no transcript line, options are copied from "Important points", or a sentence repeats another lesson. Passing those checks is the floor, not the goal.
 
 ## Content JSON (`src/shared/content-schema.ts` is the source of truth)
 

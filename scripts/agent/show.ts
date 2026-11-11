@@ -4,11 +4,17 @@ import { getTranscript } from "@/server/repo/lesson-content";
 import { findLesson } from "@/server/repo/lessons";
 import { resolveId } from "@/server/repo/resolve";
 import { clock, humanDuration, watchUrl } from "@/shared/format";
+import { compactTranscript } from "@/shared/transcript-compact";
 
-/** Prints everything an LLM needs to reason about a course or lesson. */
-export const showId = (input: string) => {
+const HEAD_SEC = 180;
+
+/**
+ * Prints everything an LLM needs to reason about a course or lesson. Lessons print a compact
+ * transcript by default; `--full` prints every caption line, `--head` only the first 3 minutes.
+ */
+export const showId = (input: string, flags: string[] = []) => {
   const { type, token } = resolveId(input);
-  return type === "course" ? showCourse(token) : showLesson(token);
+  return type === "course" ? showCourse(token) : showLesson(token, flags);
 };
 
 const showCourse = (token: string) => {
@@ -28,7 +34,7 @@ const showCourse = (token: string) => {
   }
 };
 
-const showLesson = (token: string) => {
+const showLesson = (token: string, flags: string[]) => {
   const l = getLessonDetail(token)!;
   const record = findLesson(token)!;
 
@@ -48,7 +54,16 @@ const showLesson = (token: string) => {
     console.log(`No transcript (status: ${l.transcriptStatus}). Work from the title and your knowledge, and say so in the summary.`);
     return;
   }
-  console.log(`## Transcript (${t.lang}${t.lang !== "en" ? " — write notes in English" : ""})`);
+  // Short videos get shorter notes; padding a 10-minute video to 3,500 characters invites nitpicks.
+  const target = Math.min(3500, Math.max(1200, Math.round((l.durationSec / 60) * 1.1) * 100));
+  console.log(`Target summary for a core lesson: about ${target} characters (a guide, not a cap).`);
+
+  const head = flags.includes("--head");
+  const lines = head ? t.segments.filter(([sec]) => sec < start + HEAD_SEC) : t.segments;
+  const out = flags.includes("--full") ? lines : compactTranscript(lines);
+  const label = flags.includes("--full") ? "full" : "compact: merged ~12s blocks, exact repeats removed";
+  console.log(`## Transcript (${t.lang}${t.lang !== "en" ? " — write notes in English" : ""}; ${label})`);
   // Format: [mm:ss|seconds] — seconds are absolute video time; use them for #t= links and atSec.
-  for (const [sec, text] of t.segments) console.log(`[${clock(sec)}|${Math.floor(sec)}] ${text}`);
+  for (const [sec, text] of out) console.log(`[${clock(sec)}|${Math.floor(sec)}] ${text}`);
+  if (head) console.log(`\n(First ${HEAD_SEC / 60} minutes only. Clearly light? Write light notes. Otherwise run show without --head.)`);
 };

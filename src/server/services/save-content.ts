@@ -1,5 +1,6 @@
 import { lessonContentSchema } from "@/shared/content-schema";
 import { qualityIssues } from "@/shared/content-quality";
+import { shuffleQuiz } from "@/shared/shuffle-quiz";
 import { findLesson, lessonsOfCourse } from "../repo/lessons";
 import { getTranscript, quizOf, replaceLessonContent } from "../repo/lesson-content";
 
@@ -20,20 +21,24 @@ export const saveLessonContent = (token: string, raw: unknown, opts: { force?: b
     throw new Error(`Invalid content for ${token}:\n${issues.join("\n")}`);
   }
 
-  // Template-shaped notes (all answers at A, grid timestamps, reused filler) are refused even with --force.
   const startSec = lesson.startSec ?? 0;
   const others = lessonsOfCourse(lesson.courseId).filter((l) => l.id !== lesson.id);
-  const issues = qualityIssues(parsed.data, {
+  const otherAnswerOrders = others.map((l) => quizOf(l.id).map((q) => q.answerIndex).join(",")).filter(Boolean);
+  // Answer positions are code's job, not the agent's: shuffle so no habit (all A, C,A,D,B…) survives.
+  const content = { ...parsed.data, quiz: shuffleQuiz(parsed.data.quiz, otherAnswerOrders) };
+
+  // Template-shaped notes (grid timestamps, reused filler, copied options) are refused even with --force.
+  const issues = qualityIssues(content, {
     startSec,
     endSec: lesson.endSec ?? startSec + lesson.durationSec,
     segmentStarts: (getTranscript(lesson.id)?.segments ?? []).map(([sec]) => sec),
     otherSummaries: others.flatMap((l) => (l.summary ? [l.summary] : [])),
-    otherAnswerOrders: others.map((l) => quizOf(l.id).map((q) => q.answerIndex).join(",")).filter(Boolean),
+    otherAnswerOrders,
   });
   if (issues.length) {
     throw new Error(`Notes for ${token} look template-generated; fix and save again:\n${issues.map((i) => `  - ${i}`).join("\n")}`);
   }
 
-  replaceLessonContent(lesson.id, parsed.data);
-  return { kind: parsed.data.kind, practice: parsed.data.practice.length, quiz: parsed.data.quiz.length };
+  replaceLessonContent(lesson.id, content);
+  return { kind: content.kind, practice: content.practice.length, quiz: content.quiz.length };
 };

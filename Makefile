@@ -3,7 +3,7 @@
 
 .DEFAULT_GOAL := help
 .PHONY: help install dev build start stop lint typecheck selfcheck check clean \
-        list pending show add sync transcripts db-path db-backup db-shell
+        list pending show add sync fill report transcripts db-path db-backup db-shell
 
 DB ?= $(HOME)/.courseit/app.db
 PORT ?= 3000
@@ -63,6 +63,13 @@ add: ## Import a video/playlist (URL="…")
 sync: ## Add new videos from a playlist (ID=course-id)
 	@test -n "$(ID)" || (echo "usage: make sync ID=<course-id>" && exit 1)
 	bun run --silent agent sync $(ID)
+
+fill: ## Fill all pending lessons, one fresh agent session each (ID=course-id AGENT=codex|claude|echo MAX=n)
+	@test -n "$(ID)" || (echo "usage: make fill ID=<course-id> [AGENT=codex] [MAX=5]"; exit 1)
+	scripts/fill-course.sh $(ID) $(or $(AGENT),codex) $(or $(MAX),1000)
+
+report: ## Per-lesson notes table for a course (ID=course-id)
+	bun run --silent agent report $(ID)
 
 transcripts: ## Retry missing/failed transcripts (ID=course-id)
 	@test -n "$(ID)" || (echo "usage: make transcripts ID=<course-id>" && exit 1)
