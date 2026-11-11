@@ -131,7 +131,7 @@ An earlier pass generated 37 lessons from one template, and the output passed ev
 
 - **Write each lesson by hand from its own transcript.** Never generate notes with a script, loop or template. Scripts may only read data or check your own JSON.
 - **Timestamps come from real transcript lines** where that idea is explained. Never place them at evenly spaced fractions of the video.
-- **Quiz questions test understanding** (why, when, what happens if), preferably as scenarios, not "which description fits X". Put the correct answer wherever you like: **`save` shuffles every question's options**, so never refer to positions or letters ("option A", "the first one") in questions or explanations. Wrong options are mistakes a learner would plausibly make, about as long and specific as the right one. The explanation says *why*, not the answer again.
+- **Quiz questions test understanding** (why, when, what happens if), preferably as scenarios, not "which description fits X". Put the correct answer wherever you like: **`save` shuffles every question's options**, so never refer to positions or letters ("option A", "the first one") in questions or explanations. Wrong options are mistakes a learner would plausibly make, about as long and specific as the right one (positions are shuffled, so length is the only giveaway left). The explanation says *why*, not the answer again.
 - **Be specific to the video**: the functions, libraries, numbers, examples and analogies the teacher actually used. Never reuse a sentence from another lesson.
 - **Partial transcript?** Say so on the first line of the summary, and only cite timestamps inside the part you have.
 - **Many lessons to fill in one session** (when `make fill` isn't used)? Do them all without pausing for approval. The user prefers one strict pass to check-ins. That makes these rules stricter, not looser:
@@ -140,7 +140,7 @@ An earlier pass generated 37 lessons from one template, and the output passed ev
   - Stop early only when `save` rejects the same lesson 3 times or a transcript is missing or broken. Report it, then continue with the next lesson.
   - At the end, run `bun run agent report <course-id>` and add only what it can't show: save rejections and any lessons you're unsure about.
 
-`save` enforces the mechanical part (`src/shared/content-quality.ts`, which applies even with `--force`). It shuffles answer positions (no all-A, straight A–D runs, or an order 2+ other lessons use), then refuses notes where the longest option is always correct, timestamps sit on a 20%/25% grid or match no transcript line, options are copied from "Important points", or a sentence repeats another lesson. Passing those checks is the floor, not the goal.
+`save` enforces the mechanical part (`src/shared/content-quality.ts`, which applies even with `--force`). It shuffles answer positions (no all-A, straight A–D runs, or an order 2+ other lessons use), then refuses notes where the longest option is the correct one in more than half the questions (all of them, for a 3-question quiz), timestamps sit on a 20%/25% grid or match no transcript line, options are copied from "Important points", or a sentence repeats another lesson. Passing those checks is the floor, not the goal.
 
 ## Content JSON (`src/shared/content-schema.ts` is the source of truth)
 

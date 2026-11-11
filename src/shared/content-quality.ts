@@ -28,7 +28,7 @@ const bulletBodies = (summary: string) =>
 
 /**
  * Catches the shortcuts of notes generated from a template instead of a transcript: every answer
- * at the same position or in one order reused across lessons, the longest option always right,
+ * at the same position or in one order reused across lessons, the longest option usually right,
  * timestamps on a 20%/25% grid or matching no transcript line, options copied from the summary,
  * sentences reused across lessons.
  * ponytail: these are tells, not proof of quality; shallow hand-written notes still pass.
@@ -50,8 +50,12 @@ export const qualityIssues = (c: LessonContent, ctx: QualityContext): string[] =
     const len = q.options.map((o) => o.length);
     return len.every((l, i) => i === q.answerIndex || l < len[q.answerIndex]);
   }).length;
-  if (quiz.length >= 3 && longestRight === quiz.length) {
-    issues.push("quiz: the correct option is the longest one in every question; make wrong options as specific");
+  // Positions are shuffled on save, so length is the giveaway left: allow it in at most half the questions.
+  const longestLimit = quiz.length >= 4 ? Math.floor(quiz.length / 2) : quiz.length - 1;
+  if (quiz.length >= 3 && longestRight > longestLimit) {
+    issues.push(
+      `quiz: the correct option is the longest in ${longestRight} of ${quiz.length} questions (max ${longestLimit}); make wrong options as long and specific`,
+    );
   }
 
   const summaryTs = [...c.summary.matchAll(TS)].map((m) => Number(m[1]));

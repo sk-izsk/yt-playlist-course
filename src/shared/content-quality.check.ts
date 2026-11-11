@@ -36,5 +36,11 @@ const withFiller = { ...good, summary: good.summary + filler };
 assert.ok(has(qualityIssues(withFiller, { ...ctx, otherSummaries: [filler] }), "another lesson"), "reused sentence");
 assert.ok(has(qualityIssues(good, { ...ctx, otherAnswerOrders: ["1,2,0", "1,2,0"] }), "answer order"), "reused order");
 assert.deepEqual(qualityIssues(good, { ...ctx, otherAnswerOrders: ["1,2,0"] }), []); // one reuse is chance
+// 4+ questions: the longest option may be right in at most half of them.
+const rightIsLongest = q(0, ["the right answer, written out in full", "wrong", "wrong too", "nope"]);
+const rightIsShort = q(0, ["right", "a wrong answer that is much longer", "wrong too", "nope"]);
+const four = (longCount: number) => ({ ...good, quiz: [0, 1, 2, 3].map((i) => (i < longCount ? rightIsLongest : rightIsShort)) });
+assert.ok(has(qualityIssues(four(3), ctx), "longest in 3 of 4"), "3 of 4 longest fails");
+assert.ok(!has(qualityIssues(four(2), ctx), "longest"), "2 of 4 longest passes");
 assert.deepEqual(qualityIssues({ ...lazy, kind: "light" }, ctx), []); // light lessons are exempt
 console.log("content-quality ok");
