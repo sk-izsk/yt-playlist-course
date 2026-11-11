@@ -6,7 +6,7 @@ import { findLesson } from "@/server/repo/lessons";
 export const POST = async (req: Request, ctx: RouteContext<"/api/lessons/[token]/notes">) => {
   const { token } = await ctx.params;
   return handle(async () => {
-    const lesson = findLesson(token);
+    const lesson = await findLesson(token);
     if (!lesson) throw notFound("Lesson");
     const { atSec, text } = await readJson<{ atSec?: number; text?: string }>(req);
     if (!text?.trim()) throw new HttpError(400, "Note is empty");

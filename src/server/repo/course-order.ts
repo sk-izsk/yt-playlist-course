@@ -1,27 +1,26 @@
 import { eq, min } from "drizzle-orm";
 import { pickLine } from "@/shared/lines";
-import { db, schema } from "../db/client";
+import { db, first, schema } from "../db/client";
 
 const { courses } = schema;
 
 /** Sort value that places a new course above every existing one. */
-export const topSortOrder = () => {
-  const row = db.select({ m: min(courses.sortOrder) }).from(courses).get();
+export const topSortOrder = async () => {
+  const row = await first(db.select({ m: min(courses.sortOrder) }).from(courses));
   return (row?.m ?? 0) - 1;
 };
 
 /** Line colour for a new course: the least-used one (see pickLine). */
-export const nextLine = (token: string) =>
-  pickLine(token, db.select({ line: courses.line }).from(courses).all().map((r) => r.line));
+export const nextLine = async (token: string) =>
+  pickLine(token, (await db.select({ line: courses.line }).from(courses)).map((r) => r.line));
 
 /** Persists drag & drop order: each token's index becomes its sort value. */
-export const reorderCourses = (tokens: string[]) => {
-  db.transaction((tx) => {
-    tokens.forEach((token, i) => {
-      tx.update(courses).set({ sortOrder: i }).where(eq(courses.token, token)).run();
-    });
+export const reorderCourses = (tokens: string[]) =>
+  db.transaction(async (tx) => {
+    for (const [i, token] of tokens.entries()) {
+      await tx.update(courses).set({ sortOrder: i }).where(eq(courses.token, token));
+    }
   });
-};
 
-export const setPinned = (token: string, pinned: boolean) =>
-  db.update(courses).set({ pinned }).where(eq(courses.token, token)).run().changes > 0;
+export const setPinned = async (token: string, pinned: boolean) =>
+  (await db.update(courses).set({ pinned }).where(eq(courses.token, token)).returning({ id: courses.id })).length > 0;

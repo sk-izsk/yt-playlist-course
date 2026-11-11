@@ -7,13 +7,13 @@ export const GET = () => handle(() => listEvents());
 
 /** Marks everything read (opening the notification center). */
 export const POST = () =>
-  handle(() => {
-    markEventsRead();
+  handle(async () => {
+    await markEventsRead();
     return { ok: true };
   });
 
 export const DELETE = () =>
-  handle(() => {
-    clearEvents();
+  handle(async () => {
+    await clearEvents();
     return { ok: true };
   });

@@ -25,7 +25,7 @@ Local, single-user app that turns YouTube videos and playlists into courses. The
 
 ## Conventions (the user asked for these, so follow them)
 
-- **bun** is the package manager (`bun install`, `bun add`, `bunx`), never npm or npx. `next` and the CLI (`tsx`) still *run on Node*, because better-sqlite3 is a Node native addon. Bun only installs and launches them.
+- **bun** is the package manager (`bun install`, `bun add`, `bunx`), never npm or npx. `next` and the CLI (`tsx`) still *run on Node* (node-postgres, `node:sqlite` in the copy script). Bun only installs and launches them.
 - **Arrow functions only** (`export const fn = () => {}`). The exception is code that needs `this` (classes like `HttpError`). Pages use `const Page = () => …; export default Page;`.
 - **Small files**, about 100–120 lines max. Split UI into components plus custom hooks rather than growing a file.
 - Comment *why*, not what. A deliberate shortcut gets a `ponytail:` comment that names its limit.
@@ -37,7 +37,8 @@ Local, single-user app that turns YouTube videos and playlists into courses. The
 src/
   app/                  Next routes. Pages are thin client components; api/ = JSON routes
   server/               Node-only
-    db/                 client.ts (connection + migrate on load), schema.ts (drizzle), migrate.ts, path.ts
+    db/                 client.ts (pg Pool + drizzle, `first()` helper), schema.ts (drizzle pg-core)
+drizzle/                generated SQL migrations (drizzle-kit)
     repo/               queries: courses, lessons, lesson-content, events, course-order, resolve
     services/           import-course, sync-course (add new videos), check-updates (detect only),
                         sync-stale (on app open), transcripts (background fetch loop), save-content
@@ -49,12 +50,12 @@ src/
 scripts/agent/          the CLI agents use (index.ts, show.ts)
 ```
 
-Data flow: component → hook (TanStack Query) → `client/api.ts` (ky) → `app/api/*` → `server/services|repo` → SQLite.
+Data flow: component → hook (TanStack Query) → `client/api.ts` (ky) → `app/api/*` → `server/services|repo` → Postgres (Neon).
 
 ## Things that will bite you
 
-- **The DB lives at `~/.courseit/app.db`, outside the repo**, and `DB_PATH` overrides it. If it were inside the project, `next dev`'s file watcher would see SQLite's WAL change on every write and reload-loop the page. Don't move it back.
-- **Schema changes:** edit `schema.ts`, add the column to `bootstrap.sql.ts` (fresh DBs), and add an idempotent `addColumn` in `migrate.ts` (existing DBs). Migration runs on every module load. **Restart the dev server** afterwards, because a hot-reloaded server can keep a stale drizzle schema and fail with "Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')".
+- **The DB is Postgres on Neon**, via `DATABASE_URL` in `.env.local` (never commit it). Every repo function is async: await it, and use `first()` instead of SQLite's `.get()`. Timestamps are epoch-ms `bigint` columns read as JS numbers. `~/.courseit/app.db` is the frozen SQLite archive, copied once with `make db-copy`.
+- **Schema changes:** edit `schema.ts`, run `make db-generate`, read the new SQL in `drizzle/`, then `make db-migrate`. Nothing migrates on load. **Restart the dev server** afterwards, because a hot-reloaded server can keep a stale drizzle schema and fail with "Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')".
 - **ky 2** reads error bodies into `err.data`, and `err.response.json()` throws. Use `errorMessage()` from `client/api.ts`, which never throws.
 - **Errors surface automatically:** `useErrorToasts` toasts any failed query or mutation. A mutation that shows its own error sets `meta: { silentError: true }` to avoid a double toast. Server failures go to the `events` table and show in the 🔔 notification center.
 - **Transcripts run in-process.** Stopping the server mid-load leaves lessons `pending`. `POST /api/sync` (called on app open) resumes them, and the loop stops if its course gets deleted.

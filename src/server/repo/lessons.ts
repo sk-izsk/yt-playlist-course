@@ -1,5 +1,5 @@
 import { and, asc, eq, isNull, max } from "drizzle-orm";
-import { db, schema } from "../db/client";
+import { db, first, schema } from "../db/client";
 import { newId } from "../tokens";
 
 const { lessons, courses } = schema;
@@ -13,21 +13,19 @@ export interface LessonDraft {
   endSec?: number;
 }
 
-export const findLesson = (token: string) => {
-  return db.select().from(lessons).where(eq(lessons.token, token)).get();
-}
+export const findLesson = (token: string) =>
+  first(db.select().from(lessons).where(eq(lessons.token, token)).limit(1));
 
-export const lessonsOfCourse = (courseId: number) => {
-  return db.select().from(lessons).where(eq(lessons.courseId, courseId)).orderBy(asc(lessons.position)).all();
-}
+export const lessonsOfCourse = (courseId: number) =>
+  db.select().from(lessons).where(eq(lessons.courseId, courseId)).orderBy(asc(lessons.position));
 
-export const maxPosition = (courseId: number): number => {
-  const row = db.select({ m: max(lessons.position) }).from(lessons).where(eq(lessons.courseId, courseId)).get();
+export const maxPosition = async (courseId: number): Promise<number> => {
+  const row = await first(db.select({ m: max(lessons.position) }).from(lessons).where(eq(lessons.courseId, courseId)));
   return row?.m ?? 0;
-}
+};
 
 /** Appends drafts after `afterPosition`, each with a fresh UUID. */
-export const insertLessons = (
+export const insertLessons = async (
   course: { id: number },
   drafts: LessonDraft[],
   opts: { afterPosition?: number; isNew?: boolean } = {},
@@ -45,23 +43,21 @@ export const insertLessons = (
         isNew: opts.isNew ?? false,
       })),
     )
-    .returning()
-    .all();
-}
+    .returning();
+};
 
-export const setCompleted = (token: string, done: boolean) => {
-  return db
-    .update(lessons)
-    .set({ completedAt: done ? Date.now() : null })
-    .where(eq(lessons.token, token))
-    .run().changes > 0;
-}
+export const setCompleted = async (token: string, done: boolean) =>
+  (
+    await db
+      .update(lessons)
+      .set({ completedAt: done ? Date.now() : null })
+      .where(eq(lessons.token, token))
+      .returning({ id: lessons.id })
+  ).length > 0;
 
 /** Lessons still waiting for an agent to write notes, optionally scoped to one course. */
 export const pendingLessons = (courseToken?: string) => {
-  const where = courseToken
-    ? and(isNull(lessons.summary), eq(courses.token, courseToken))
-    : isNull(lessons.summary);
+  const where = courseToken ? and(isNull(lessons.summary), eq(courses.token, courseToken)) : isNull(lessons.summary);
   return db
     .select({
       token: lessons.token,
@@ -73,6 +69,5 @@ export const pendingLessons = (courseToken?: string) => {
     .from(lessons)
     .innerJoin(courses, eq(lessons.courseId, courses.id))
     .where(where)
-    .orderBy(asc(courses.id), asc(lessons.position))
-    .all();
-}
+    .orderBy(asc(courses.id), asc(lessons.position));
+};

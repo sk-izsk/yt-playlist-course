@@ -17,7 +17,7 @@ export const POST = async (req: Request) => {
       return { token, title, created };
     } catch (err) {
       // Bad link, private playlist or YouTube hiccup — log it for the notification center, answer 422.
-      addEvent({ kind: "error", title: "Couldn't add course", body: `${url} — ${(err as Error).message}` });
+      await addEvent({ kind: "error", title: "Couldn't add course", body: `${url} — ${(err as Error).message}` });
       throw new HttpError(422, (err as Error).message);
     }
   }, 201);

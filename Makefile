@@ -1,11 +1,10 @@
 # Tubewise — common tasks. Run `make` (or `make help`) to list them.
-# Package manager is bun; Next and the agent CLI run on Node (better-sqlite3 is a Node addon).
+# Package manager is bun; Next and the agent CLI run on Node.
 
 .DEFAULT_GOAL := help
 .PHONY: help install dev build start stop lint typecheck selfcheck check clean \
-        list pending show add sync fill report transcripts db-path db-backup db-shell
+        list pending show add sync fill report transcripts db-generate db-migrate db-copy db-studio
 
-DB ?= $(HOME)/.courseit/app.db
 PORT ?= 3000
 
 help: ## Show this list
@@ -75,14 +74,15 @@ transcripts: ## Retry missing/failed transcripts (ID=course-id)
 	@test -n "$(ID)" || (echo "usage: make transcripts ID=<course-id>" && exit 1)
 	bun run --silent agent transcripts $(ID)
 
-# ---------------------------------------------------------------- data
-db-path: ## Where the SQLite database lives
-	@echo $(DB)
+# ---------------------------------------------------------------- data (Postgres via DATABASE_URL in .env.local; bun loads it)
+db-generate: ## After editing schema.ts: write a new SQL migration into drizzle/
+	bunx drizzle-kit generate
 
-db-backup: ## Copy the database to ~/.courseit/backups/ (safe while the app runs)
-	@mkdir -p $(dir $(DB))backups
-	sqlite3 $(DB) ".backup '$(dir $(DB))backups/app-$$(date +%Y%m%d-%H%M%S).db'"
-	@ls -t $(dir $(DB))backups | head -1
+db-migrate: ## Apply pending migrations to DATABASE_URL
+	bunx drizzle-kit migrate
 
-db-shell: ## Open the database in sqlite3 (read it; write through the CLI)
-	sqlite3 $(DB)
+db-copy: ## One-time copy of the old SQLite DB (~/.courseit/app.db) into an empty Postgres
+	bunx tsx scripts/copy-sqlite-to-pg.ts
+
+db-studio: ## Browse the database in drizzle studio (read it; write through the CLI)
+	bunx drizzle-kit studio

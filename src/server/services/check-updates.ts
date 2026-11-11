@@ -14,17 +14,17 @@ type Course = typeof schema.courses.$inferSelect;
 export const checkCourseUpdates = async (course: Course) => {
   if (course.kind !== "playlist") return 0;
   const remote = await fetchPlaylist(course.youtubeId);
-  const known = new Set(lessonsOfCourse(course.id).map((l) => l.videoId));
+  const known = new Set((await lessonsOfCourse(course.id)).map((l) => l.videoId));
   const available = remote.videos.filter((v) => !known.has(v.videoId)).length;
 
-  db.update(schema.courses)
+  await db
+    .update(schema.courses)
     .set({ availableUpdates: available, lastSyncedAt: Date.now() })
-    .where(eq(schema.courses.id, course.id))
-    .run();
+    .where(eq(schema.courses.id, course.id));
 
   // Only announce when the number grows, so re-checks don't spam the feed.
   if (available > course.availableUpdates) {
-    addEvent({
+    await addEvent({
       kind: "update",
       title: `${available} new video${available > 1 ? "s" : ""} available`,
       body: course.title,
@@ -35,12 +35,12 @@ export const checkCourseUpdates = async (course: Course) => {
 };
 
 export const checkCourseUpdatesByToken = async (token: string) => {
-  const course = findCourse(token);
+  const course = await findCourse(token);
   if (!course) throw new Error(`Unknown course ${token}`);
   try {
     return await checkCourseUpdates(course);
   } catch (err) {
-    addEvent({ kind: "error", title: "Update check failed", body: `${course.title}: ${(err as Error).message}`, courseToken: token });
+    await addEvent({ kind: "error", title: "Update check failed", body: `${course.title}: ${(err as Error).message}`, courseToken: token });
     throw err;
   }
 };

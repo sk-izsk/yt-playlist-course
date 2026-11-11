@@ -16,12 +16,11 @@ export interface StaleCheckResult {
  * Transcript fetching runs in-process, so stopping the dev server mid-load leaves lessons "pending"
  * forever. Restart those loops (fire-and-forget; fillTranscripts skips courses already running).
  */
-const resumePendingTranscripts = () => {
-  const ids = db
+const resumePendingTranscripts = async () => {
+  const ids = await db
     .selectDistinct({ id: schema.lessons.courseId })
     .from(schema.lessons)
-    .where(eq(schema.lessons.transcriptStatus, "pending"))
-    .all();
+    .where(eq(schema.lessons.transcriptStatus, "pending"));
   ids.forEach(({ id }) => fillTranscripts(id).catch((e) => console.error("[resume]", e)));
 };
 
@@ -30,13 +29,12 @@ const resumePendingTranscripts = () => {
  * not checked recently. Nothing is added — courses get an "N new videos" badge you can act on.
  */
 export const checkStaleCourses = async (): Promise<StaleCheckResult[]> => {
-  resumePendingTranscripts();
+  await resumePendingTranscripts();
   const c = schema.courses;
-  const stale = db
+  const stale = await db
     .select()
     .from(c)
-    .where(and(eq(c.kind, "playlist"), or(isNull(c.lastSyncedAt), lt(c.lastSyncedAt, Date.now() - STALE_MS))))
-    .all();
+    .where(and(eq(c.kind, "playlist"), or(isNull(c.lastSyncedAt), lt(c.lastSyncedAt, Date.now() - STALE_MS))));
 
   const results: StaleCheckResult[] = [];
   for (const course of stale) {
@@ -45,7 +43,7 @@ export const checkStaleCourses = async (): Promise<StaleCheckResult[]> => {
       if (available > course.availableUpdates) results.push({ token: course.token, title: course.title, available });
     } catch (err) {
       // One broken playlist (deleted / private) shouldn't block the others — but you should hear about it.
-      addEvent({ kind: "error", title: "Update check failed", body: `${course.title}: ${(err as Error).message}`, courseToken: course.token });
+      await addEvent({ kind: "error", title: "Update check failed", body: `${course.title}: ${(err as Error).message}`, courseToken: course.token });
     }
   }
   return results;

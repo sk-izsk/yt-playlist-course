@@ -14,7 +14,7 @@ make install   # bun install
 make dev       # http://localhost:3000
 ```
 
-Requirements: **bun**, **Node ≥ 22** (Next and the CLI run on Node), and `sqlite3` for the `db-*` targets. No API keys.
+Requirements: **bun**, **Node ≥ 22** (Next and the CLI run on Node), and a Postgres URL (`DATABASE_URL` in `.env.local`, e.g. Neon free tier; then `make db-migrate`). No API keys.
 
 ## Everyday commands
 
@@ -43,11 +43,11 @@ The app never calls an LLM. Notes are written by your coding agent through a sma
 
 | What | Where |
 |---|---|
-| Your data (SQLite) | `~/.courseit/app.db`, outside the repo on purpose (see AGENTS.md); override with `DB_PATH` |
+| Your data (Postgres) | `DATABASE_URL` in `.env.local`; schema migrations in `drizzle/` |
 | Agent instructions | [AGENTS.md](AGENTS.md) (also loaded by Claude Code via `CLAUDE.md`) |
 | Server code | `src/server/` (db, repo, services, youtube) |
 | API routes | `src/app/api/` |
 | UI | `src/components/` + `src/client/` (hooks, store, api) |
 | Agent CLI | `scripts/agent/` |
 
-Stack: Next.js 16 (App Router) · TypeScript · antd 6 · TanStack Query · zustand · ky · SQLite (better-sqlite3 + drizzle) · youtubei.js · youtube-transcript-plus · dnd-kit.
+Stack: Next.js 16 (App Router) · TypeScript · antd 6 · TanStack Query · zustand · ky · Postgres on Neon (node-postgres + drizzle) · youtubei.js · youtube-transcript-plus · dnd-kit.

@@ -4,6 +4,7 @@
  * Ids: full UUID v4 as shown in the app (a unique prefix also works).
  */
 import { readFileSync } from "node:fs";
+import { pool } from "@/server/db/client";
 import { findCourse, listCourses } from "@/server/repo/courses";
 import { pendingLessons } from "@/server/repo/lessons";
 import { resolveAs } from "@/server/repo/resolve";
@@ -34,18 +35,16 @@ const required = (v: string | undefined, name: string): string => {
 };
 
 const commands: Record<string, (args: string[]) => Promise<void> | void> = {
-  list: () => {
-    for (const c of listCourses()) {
+  list: async () => {
+    for (const c of await listCourses()) {
       const notes = `${c.lessonCount - c.pendingNotes}/${c.lessonCount} notes`;
       console.log(
         `${c.token}  ${c.completedCount}/${c.lessonCount} watched  ${notes}  ${c.title}`,
       );
     }
   },
-  pending: ([course]) => {
-    const rows = pendingLessons(
-      course ? resolveAs("course", course) : undefined,
-    );
+  pending: async ([course]) => {
+    const rows = await pendingLessons(course ? await resolveAs("course", course) : undefined);
     if (!rows.length)
       return console.log("Nothing pending — every lesson has notes.");
     rows.forEach((r) =>
@@ -55,11 +54,11 @@ const commands: Record<string, (args: string[]) => Promise<void> | void> = {
     );
   },
   show: ([id, ...flags]) => showId(required(id, "id"), flags),
-  report: ([id]) => reportCourse(resolveAs("course", required(id, "course id"))),
-  save: ([id, file, flag]) => {
-    const token = resolveAs("lesson", required(id, "lesson id"));
+  report: async ([id]) => reportCourse(await resolveAs("course", required(id, "course id"))),
+  save: async ([id, file, flag]) => {
+    const token = await resolveAs("lesson", required(id, "lesson id"));
     const raw = readFileSync(file === "-" || !file ? 0 : file, "utf8");
-    const res = saveLessonContent(token, JSON.parse(raw), {
+    const res = await saveLessonContent(token, JSON.parse(raw), {
       force: flag === "--force",
     });
     console.log(
@@ -79,7 +78,7 @@ const commands: Record<string, (args: string[]) => Promise<void> | void> = {
   },
   sync: async ([id]) => {
     const res = await syncCourse(
-      resolveAs("course", required(id, "course id")),
+      await resolveAs("course", required(id, "course id")),
     );
     console.log(
       res.added.length
@@ -92,7 +91,7 @@ const commands: Record<string, (args: string[]) => Promise<void> | void> = {
     await res.transcripts;
   },
   transcripts: async ([id]) => {
-    const course = findCourse(resolveAs("course", required(id, "course id")))!;
+    const course = (await findCourse(await resolveAs("course", required(id, "course id"))))!;
     await fillTranscripts(course.id, { retryErrors: true });
     console.log("Transcripts refreshed.");
   },
@@ -109,5 +108,7 @@ Promise.resolve()
   .then(() => run(args))
   .catch((err: Error) => {
     console.error(err.message);
-    process.exit(1);
-  });
+    process.exitCode = 1;
+  })
+  // The pg pool keeps the process alive; close it so the command exits.
+  .finally(() => pool.end());

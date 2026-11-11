@@ -12,13 +12,13 @@ const HEAD_SEC = 180;
  * Prints everything an LLM needs to reason about a course or lesson. Lessons print a compact
  * transcript by default; `--full` prints every caption line, `--head` only the first 3 minutes.
  */
-export const showId = (input: string, flags: string[] = []) => {
-  const { type, token } = resolveId(input);
+export const showId = async (input: string, flags: string[] = []) => {
+  const { type, token } = await resolveId(input);
   return type === "course" ? showCourse(token) : showLesson(token, flags);
 };
 
-const showCourse = (token: string) => {
-  const c = getCourseDetail(token)!;
+const showCourse = async (token: string) => {
+  const c = (await getCourseDetail(token))!;
   const done = c.lessons.filter((l) => l.hasNotes);
   const todo = c.lessons.filter((l) => !l.hasNotes);
   console.log(`# ${c.title}\n${c.token} · ${c.kind} · ${c.channel} · ${humanDuration(c.totalSec)}`);
@@ -34,9 +34,9 @@ const showCourse = (token: string) => {
   }
 };
 
-const showLesson = (token: string, flags: string[]) => {
-  const l = getLessonDetail(token)!;
-  const record = findLesson(token)!;
+const showLesson = async (token: string, flags: string[]) => {
+  const l = (await getLessonDetail(token))!;
+  const record = (await findLesson(token))!;
 
   const start = l.startSec ?? 0;
   const range = l.startSec != null ? `, ${clock(start)}–${clock(l.endSec ?? 0)} of the video` : "";
@@ -49,7 +49,7 @@ const showLesson = (token: string, flags: string[]) => {
       : "Notes: MISSING\n",
   );
 
-  const t = getTranscript(record.id);
+  const t = await getTranscript(record.id);
   if (!t) {
     console.log(`No transcript (status: ${l.transcriptStatus}). Work from the title and your knowledge, and say so in the summary.`);
     return;
