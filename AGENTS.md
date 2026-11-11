@@ -21,7 +21,7 @@ Local, single-user app that turns YouTube videos and playlists into courses. The
 - `make dev`: dev server at http://localhost:3000.
 - `make check`: typecheck, lint and the `*.check.ts` self-tests. **Run it before saying you're done.**
 - `make build`: production build; catches broken imports that dev mode tolerates.
-- `make list | pending | show | add | sync | transcripts`: the agent CLI (Part B).
+- `make list | pending | show | add | sync | transcripts`: the agent CLI (Part B). Local mode uses `DATABASE_URL`; with `TUBEWISE_URL` + `TUBEWISE_TOKEN` set it goes through the app's agent API instead (`scripts/agent/remote.ts`). The MCP server is `mcp/server.ts` (see `docs/mcp.md`).
 
 ## Conventions (the user asked for these, so follow them)
 

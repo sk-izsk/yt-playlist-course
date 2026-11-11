@@ -57,7 +57,7 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 | 3 ⏳ code done, deploy waits on env vars | **Vercel deploy**: env vars, cron for `check-updates`, transcripts left `pending` online | app live behind login |
 | 4 ✅ 2026-11-11 | **Agent API** `/api/agent/*` + `agent_tokens` table + Settings page | token can save a lesson; can't delete |
 | 5 ✅ 2026-11-11 | **Custom MCP** (`mcp/server.ts`, stdio): `fetch_transcripts`, `list_pending`, `get_lesson`, `save_notes`, `course_report`; writing rules from `docs/notes-guide.md` (move AGENTS.md Part B there) | Claude Code fills one real lesson through MCP |
-| 6 | **CLI remote mode**: `scripts/agent` uses the API when `TUBEWISE_URL`/`TUBEWISE_TOKEN` are set; `make fill` unchanged | `make fill MAX=1` works online |
+| 6 ✅ 2026-11-11 | **CLI remote mode**: `scripts/agent` uses the API when `TUBEWISE_URL`/`TUBEWISE_TOKEN` are set; `make fill` unchanged | `make fill MAX=1` works online |
 | 7 | **Backups**: Mac mirror (launchd pull every 15 min + 14 dated dumps + local/Neon toggle, read-only local) + nightly `pg_dump` via GitHub Actions + soft delete with a 7-day trash | local mirror matches Neon; a dump restores into a scratch DB |
 | 8 | **Demo** | visitor can browse, every write returns 403 |
 | 9 | **AI tutor** (optional): "Ask this lesson", `claude-haiku-5-5`, notes+transcript as cached prefix, daily caps; demo gets notes-only context | streams an answer within caps |
@@ -118,6 +118,14 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
   `course_report`. Writing rules moved to `docs/notes-guide.md`; AGENTS.md Part B now points there.
 - Verified by an MCP client over stdio from outside the repo (see `docs/mcp.md`). **Left for the user:** register it
   in Claude Code with `make mcp-add URL=… TOKEN=…` (it edits your user-level Claude config, so I didn't).
+
+## Phase 6 notes (done 2026-11-11)
+
+- `scripts/agent/index.ts` picks `remote.ts` when `TUBEWISE_URL` + `TUBEWISE_TOKEN` are set, else `local.ts`
+  (loaded lazily, so remote mode never needs `DATABASE_URL`). Same commands and output; `add`/`sync` are local-only
+  (add courses on the website); `transcripts` downloads on the Mac and uploads.
+- Verified: `TUBEWISE_URL=… TUBEWISE_TOKEN=… make fill ID=<test course> AGENT=claude MAX=1` → a fresh Claude session
+  wrote and saved a lesson through the API; report printed.
 
 ## Needed from the user
 

@@ -38,7 +38,7 @@ while [ "$done_count" -lt "$max" ]; do
   if [ -z "$id" ]; then echo "All lessons have notes."; break; fi
   echo "=== lesson $id ($((done_count + 1))/$max)"
   case "$agent" in
-    codex) codex exec --ephemeral -s workspace-write --add-dir "$HOME/.courseit" "$(prompt_for "$id")" ;;
+    codex) codex exec --ephemeral -s workspace-write "$(prompt_for "$id")" ;;
     claude) claude -p --allowedTools "Bash(bun run agent:*)" -- "$(prompt_for "$id")" ;;
     echo) prompt_for "$id"; echo "(dry run)"; break ;;
     *) echo "Unknown agent '$agent' (codex|claude|echo)"; exit 1 ;;
