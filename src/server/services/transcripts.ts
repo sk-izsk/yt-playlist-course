@@ -3,7 +3,7 @@ import { addEvent } from "../repo/events";
 import { lessonsOfCourse } from "../repo/lessons";
 import { saveTranscript } from "../repo/lesson-content";
 import { sleep } from "../youtube/client";
-import { fetchBestTranscript, sliceSegments } from "../youtube/transcript";
+import { canFetchTranscripts, fetchBestTranscript, sliceSegments } from "../youtube/transcript";
 
 // ponytail: in-process guard; fine for one local server. A second process (CLI) may overlap
 // with the dev server — harmless, the upsert just runs twice.
@@ -29,7 +29,7 @@ const reportRun = async (courseId: number, total: number, failed: number) => {
 
 /** Fetches transcripts for every lesson still `pending`, one video at a time. */
 export const fillTranscripts = async (courseId: number, opts: { retryErrors?: boolean } = {}) => {
-  if (running.has(courseId)) return;
+  if (running.has(courseId) || !canFetchTranscripts()) return;
   running.add(courseId);
   try {
     const rows = await lessonsOfCourse(courseId);

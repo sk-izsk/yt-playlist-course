@@ -49,7 +49,7 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 |---|---|---|
 | 1 ✅ 2026-11-11 | **Postgres**: drizzle pg-core schema, async repo (~54 sync call sites: `.all()/.get()/.run()/transaction`), drizzle-kit migrations instead of migrate-on-load, one-time copy script SQLite → Neon | `make check` passes; app + CLI work against Neon with the user's real data |
 | 2 ✅ 2026-11-11 | **Login** (see decisions) + `users`, `sessions`, `login_attempts` tables + `user:create` CLI | idle logout, refresh, token reuse revocation verified in the browser |
-| 3 | **Vercel deploy**: env vars, cron for `check-updates`, transcripts left `pending` online | app live behind login |
+| 3 ⏳ code done, deploy waits on env vars | **Vercel deploy**: env vars, cron for `check-updates`, transcripts left `pending` online | app live behind login |
 | 4 | **Agent API** `/api/agent/*` + `agent_tokens` table + Settings page | token can save a lesson; can't delete |
 | 5 | **Custom MCP** (`mcp/server.ts`, stdio): `fetch_transcripts`, `list_pending`, `get_lesson`, `save_notes`, `course_report`; writing rules from `docs/notes-guide.md` (move AGENTS.md Part B there) | Claude Code fills one real lesson through MCP |
 | 6 | **CLI remote mode**: `scripts/agent` uses the API when `TUBEWISE_URL`/`TUBEWISE_TOKEN` are set; `make fill` unchanged | `make fill MAX=1` works online |
@@ -79,6 +79,19 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
   with body); old refresh token after the 30 s grace → all sessions revoked; idle-expired session → 401; logout → 401.
 - **Deferred to Phase 8:** scoping every query by `user_id` (only one real user exists until the demo user can log in).
 - `make user NAME=<you>` creates the owner login (prompts for the password). No users exist yet.
+
+## Phase 3 notes (code done 2026-11-11, not deployed)
+
+- `vercel.json`: region `iad1`, daily cron (Hobby allows once a day) → `GET /api/cron/check-updates`, guarded by
+  `Authorization: Bearer $CRON_SECRET` (constant-time compare), not by login. Verified locally: 401 without/with a wrong
+  secret, 200 with the right one.
+- `canFetchTranscripts()` (`src/server/youtube/transcript.ts`) is false when `VERCEL` is set, so online imports keep
+  lessons `pending`; `PROXY_URL` is documented there as the unwired hook.
+- `.vercelignore` keeps `.env*` out of uploads. The Vercel project `tubewise` is created and linked (`.vercel/`, gitignored).
+- **Left for the user** (adding secrets to Vercel was blocked for the agent):
+  `bunx vercel env add DATABASE_URL production`, `… JWT_SECRET production` (a new `openssl rand -base64 48`, not the
+  local one), `… CRON_SECRET production` (`openssl rand -hex 24`), then `bunx vercel deploy --prod`, then
+  `make user NAME=<you>` (same Neon DB, so the login works locally and online). Then tick this phase.
 
 ## Needed from the user
 
