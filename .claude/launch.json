@@ -6,6 +6,12 @@
       "runtimeExecutable": "bun",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "next-dev-short-ttl",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["AUTH_ACCESS_TTL_SEC=5", "bun", "run", "dev", "--port", "3001"],
+      "port": 3001
     }
   ]
 }

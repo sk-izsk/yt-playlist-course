@@ -1,0 +1,37 @@
+.page {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: 16px;
+}
+
+.card {
+  width: min(380px, 100%);
+  padding: 32px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.title {
+  margin: 24px 0 16px;
+  color: var(--ink);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.alert {
+  margin-bottom: 16px;
+}

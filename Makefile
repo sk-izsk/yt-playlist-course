@@ -84,5 +84,9 @@ db-migrate: ## Apply pending migrations to DATABASE_URL
 db-copy: ## One-time copy of the old SQLite DB (~/.courseit/app.db) into an empty Postgres
 	bunx tsx scripts/copy-sqlite-to-pg.ts
 
+user: ## Create a login or reset its password (NAME=… ROLE=owner|demo); prompts for the password
+	@test -n "$(NAME)" || (echo "usage: make user NAME=<username> [ROLE=owner|demo]"; exit 1)
+	@read -s -p "Password for $(NAME): " P; echo; PASSWORD="$$P" bunx tsx scripts/user-create.ts $(NAME) $(or $(ROLE),owner)
+
 db-studio: ## Browse the database in drizzle studio (read it; write through the CLI)
 	bunx drizzle-kit studio

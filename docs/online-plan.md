@@ -48,7 +48,7 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 | # | Phase | Done when |
 |---|---|---|
 | 1 ✅ 2026-11-11 | **Postgres**: drizzle pg-core schema, async repo (~54 sync call sites: `.all()/.get()/.run()/transaction`), drizzle-kit migrations instead of migrate-on-load, one-time copy script SQLite → Neon | `make check` passes; app + CLI work against Neon with the user's real data |
-| 2 | **Login** (see decisions) + `users`, `sessions`, `login_attempts` tables + `user:create` CLI | idle logout, refresh, token reuse revocation verified in the browser |
+| 2 ✅ 2026-11-11 | **Login** (see decisions) + `users`, `sessions`, `login_attempts` tables + `user:create` CLI | idle logout, refresh, token reuse revocation verified in the browser |
 | 3 | **Vercel deploy**: env vars, cron for `check-updates`, transcripts left `pending` online | app live behind login |
 | 4 | **Agent API** `/api/agent/*` + `agent_tokens` table + Settings page | token can save a lesson; can't delete |
 | 5 | **Custom MCP** (`mcp/server.ts`, stdio): `fetch_transcripts`, `list_pending`, `get_lesson`, `save_notes`, `course_report`; writing rules from `docs/notes-guide.md` (move AGENTS.md Part B there) | Claude Code fills one real lesson through MCP |
@@ -66,6 +66,19 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 - Repo is async everywhere (`first()` replaces `.get()`); the CLI closes the pg pool on exit.
 - Verified: `make check`, `make build`, CLI `list`/`pending`, browser + API: course/lesson pages, complete toggle,
   note add/delete, pin, reorder (transaction), `/api/sync`.
+
+## Phase 2 notes (done 2026-11-11)
+
+- Tables `users`, `sessions`, `refresh_tokens` (every issued hash, so reuse of *any* older token is caught),
+  `login_attempts` (`drizzle/0001_auth.sql`). Code in `src/server/auth/`, routes `/api/auth/{login,refresh,logout}`,
+  `src/proxy.ts`, login page `/login`, pages moved into the `src/app/(app)/` route group (URLs unchanged).
+- Client: ky `afterResponse` → on `401 token_expired` one shared refresh, then `ky.retry()` (retry limit 1 with no
+  methods/status codes, so ky keeps an unread body copy; plain `retry: 0` would replay POST/PATCH with an empty body).
+- Verified (dev server with `AUTH_ACCESS_TTL_SEC`): no cookie → 401 / redirect with `next`; wrong password 401;
+  5 failures → 429 for 15 min; expired access → `token_expired` → refresh rotates → request replayed (GET and PATCH
+  with body); old refresh token after the 30 s grace → all sessions revoked; idle-expired session → 401; logout → 401.
+- **Deferred to Phase 8:** scoping every query by `user_id` (only one real user exists until the demo user can log in).
+- `make user NAME=<you>` creates the owner login (prompts for the password). No users exist yet.
 
 ## Needed from the user
 

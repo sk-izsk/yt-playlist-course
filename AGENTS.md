@@ -37,7 +37,8 @@ Local, single-user app that turns YouTube videos and playlists into courses. The
 src/
   app/                  Next routes. Pages are thin client components; api/ = JSON routes
   server/               Node-only
-    db/                 client.ts (pg Pool + drizzle, `first()` helper), schema.ts (drizzle pg-core)
+    auth/               tokens (jose JWT), sessions (refresh rotation), login (argon2 + lockout), require-user, cookies
+    db/                 client.ts (pg Pool + drizzle, `first()` helper), schema.ts + auth-schema.ts (drizzle pg-core)
 drizzle/                generated SQL migrations (drizzle-kit)
     repo/               queries: courses, lessons, lesson-content, events, course-order, resolve
     services/           import-course, sync-course (add new videos), check-updates (detect only),
@@ -55,6 +56,7 @@ Data flow: component → hook (TanStack Query) → `client/api.ts` (ky) → `app
 ## Things that will bite you
 
 - **The DB is Postgres on Neon**, via `DATABASE_URL` in `.env.local` (never commit it). Every repo function is async: await it, and use `first()` instead of SQLite's `.get()`. Timestamps are epoch-ms `bigint` columns read as JS numbers. `~/.courseit/app.db` is the frozen SQLite archive, copied once with `make db-copy`.
+- **Login:** every API route uses `handle()`, which calls `requireUser()` (JWT in the `tw_at` cookie, 15 min). `handlePublic()` is only for `/api/auth/*`. `src/proxy.ts` just redirects pages without a cookie to `/login`. The refresh token (`tw_rt`, path `/api/auth`) rotates on every refresh with a 24 h sliding idle expiry; presenting a rotated-away token revokes all of that user's sessions. Pages behind login live in the `src/app/(app)/` route group. Create users with `make user NAME=…` (no signup). `JWT_SECRET` lives in `.env.local`.
 - **Schema changes:** edit `schema.ts`, run `make db-generate`, read the new SQL in `drizzle/`, then `make db-migrate`. Nothing migrates on load. **Restart the dev server** afterwards, because a hot-reloaded server can keep a stale drizzle schema and fail with "Cannot read properties of undefined (reading 'Symbol(drizzle:Columns)')".
 - **ky 2** reads error bodies into `err.data`, and `err.response.json()` throws. Use `errorMessage()` from `client/api.ts`, which never throws.
 - **Errors surface automatically:** `useErrorToasts` toasts any failed query or mutation. A mutation that shows its own error sets `meta: { silentError: true }` to avoid a double toast. Server failures go to the `events` table and show in the 🔔 notification center.

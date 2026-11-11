@@ -1,7 +1,39 @@
-import ky, { HTTPError } from "ky";
+import ky, { HTTPError, type AfterResponseHook } from "ky";
 import type { AppEvent, CourseDetail, CourseSummary, LessonDetail, Note, SyncResult } from "@/shared/types";
 
-const http = ky.create({ prefix: "/api", timeout: 120_000, retry: 0 });
+// One refresh at a time: parallel 401s must share it, or the second rotation looks like token reuse.
+let refreshing: Promise<boolean> | null = null;
+const refreshOnce = () =>
+  (refreshing ??= fetch("/api/auth/refresh", { method: "POST" })
+    .then((r) => r.ok, () => false)
+    .finally(() => {
+      refreshing = null;
+    }));
+
+const toLogin = () => {
+  if (window.location.pathname === "/login") return;
+  const next = window.location.pathname + window.location.search;
+  // Full load on purpose: drops every cached query of the dead session. No router outside React here.
+  // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+  window.location.assign(`/login?next=${encodeURIComponent(next)}`);
+};
+
+/** 401 token_expired → refresh → replay the request once; any other 401 → login page. */
+const authRetry: AfterResponseHook = async ({ response, retryCount }) => {
+  if (response.status !== 401) return;
+  const { error } = (await response.clone().json().catch(() => ({}))) as { error?: string };
+  if (error === "token_expired" && retryCount === 0 && (await refreshOnce())) return ky.retry({ delay: 0 });
+  toLogin();
+};
+
+const http = ky.create({
+  prefix: "/api",
+  timeout: 120_000,
+  // limit 1 makes ky keep an unread copy of the body for the auth replay; with no methods/status codes,
+  // ordinary automatic retries never fire (a forced ky.retry() skips those checks).
+  retry: { limit: 1, methods: [], statusCodes: [] },
+  hooks: { afterResponse: [authRetry] },
+});
 
 /**
  * Surfaces the server's `{ error }` message instead of "Request failed with status 400".
@@ -19,6 +51,9 @@ export const errorMessage = async (err: unknown): Promise<string> => {
 };
 
 export const api = {
+  login: (username: string, password: string) => http.post("auth/login", { json: { username, password } }).json(),
+  logout: () => http.post("auth/logout").json(),
+
   courses: () => http.get("courses").json<CourseSummary[]>(),
   course: (token: string) => http.get(`courses/${token}`).json<CourseDetail>(),
   addCourse: (url: string) => http.post("courses", { json: { url } }).json<{ token: string; title: string; created: boolean }>(),

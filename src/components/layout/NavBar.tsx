@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoutButton } from "../auth/LogoutButton";
 import { NotificationBell } from "../notifications/NotificationBell";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "./ThemeToggle";
@@ -17,6 +18,7 @@ export const NavBar = () => (
       </div>
       <NotificationBell />
       <ThemeToggle />
+      <LogoutButton />
       <Link href="/#add" className={styles.cta}>
         Add a course
       </Link>
