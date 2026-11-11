@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAgent } from "./auth/agent-tokens";
-import { requireUser } from "./auth/require-user";
+import { optionalUser, requireUser } from "./auth/require-user";
 import type { AuthUser } from "./auth/tokens";
 import { HttpError } from "./http-error";
 import { addEvent } from "./repo/events";
@@ -22,7 +22,11 @@ export const handlePublic = async <T>(fn: () => T | Promise<T>, status = 200) =>
   }
 };
 
-/** Every app route: 401 unless the access cookie holds a valid token. */
+/** Public reads: `user` is null for visitors. Anything that writes must use `handle` instead. */
+export const handleRead = <T>(fn: (user: AuthUser | null) => T | Promise<T>, status = 200) =>
+  handlePublic(async () => fn(await optionalUser()), status);
+
+/** Every write: 401 unless the access cookie holds a valid token. */
 export const handle = <T>(fn: (user: AuthUser) => T | Promise<T>, status = 200) =>
   handlePublic(async () => fn(await requireUser()), status);
 

@@ -5,6 +5,7 @@ import { Button } from "antd";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { useToggleComplete } from "@/client/hooks/useLesson";
+import { useSession } from "@/client/hooks/useSession";
 import { humanDuration, watchUrl } from "@/shared/format";
 import type { LessonDetail } from "@/shared/types";
 import { TokenChip } from "../common/TokenChip";
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export const LessonHeader = ({ lesson: l, toggle }: Props) => {
+  const { canEdit } = useSession(); // progress is the owner's; visitors just watch
   return (
     <div className={styles.header}>
       <div className={styles.titleRow}>
@@ -27,14 +29,16 @@ export const LessonHeader = ({ lesson: l, toggle }: Props) => {
       <h1 className={styles.title}>{l.title}</h1>
 
       <div className={styles.actions}>
-        <Button
-          type={l.completed ? "default" : "primary"}
-          icon={<CheckOutlined />}
-          loading={toggle.isPending}
-          onClick={() => toggle.mutate(!l.completed)}
-        >
-          {l.completed ? "Completed — undo" : "Mark complete"}
-        </Button>
+        {canEdit && (
+          <Button
+            type={l.completed ? "default" : "primary"}
+            icon={<CheckOutlined />}
+            loading={toggle.isPending}
+            onClick={() => toggle.mutate(!l.completed)}
+          >
+            {l.completed ? "Completed — undo" : "Mark complete"}
+          </Button>
+        )}
         <Button icon={<YoutubeOutlined />} href={watchUrl(l.videoId, l.startSec ?? 0)} target="_blank">
           Open on YouTube
         </Button>

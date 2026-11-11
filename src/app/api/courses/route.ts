@@ -1,11 +1,11 @@
-import { handle, HttpError, readJson } from "@/server/http";
+import { handle, handleRead, HttpError, readJson } from "@/server/http";
 import { listCourses } from "@/server/repo/courses";
 import { addEvent } from "@/server/repo/events";
 import { importCourse } from "@/server/services/import-course";
 
 export const dynamic = "force-dynamic";
 
-export const GET = () => handle(() => listCourses());
+export const GET = () => handleRead(() => listCourses());
 
 /** Body: { url } — returns as soon as lessons exist; transcripts keep filling in the background. */
 export const POST = async (req: Request) => {

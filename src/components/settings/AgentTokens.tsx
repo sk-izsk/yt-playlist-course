@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Button, Input, List, Popconfirm, Space, Typography } from "antd";
+import { Alert, Button, Input, Popconfirm, Space, Typography } from "antd";
 import { useState } from "react";
 import { useAgentTokens } from "@/client/hooks/useAgentTokens";
 
@@ -19,7 +19,7 @@ export const AgentTokens = () => {
   };
 
   return (
-    <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+    <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
       <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
         Agent tokens let the MCP server and CLI on your Mac read lessons, upload transcripts and save notes. They can
         never delete anything. Put one in the MCP config as <code>TUBEWISE_TOKEN</code>.
@@ -30,7 +30,7 @@ export const AgentTokens = () => {
           showIcon
           closable
           onClose={() => setFresh(null)}
-          message="Copy this token now. It won't be shown again."
+          title="Copy this token now. It won't be shown again."
           description={<Typography.Text copyable code>{fresh}</Typography.Text>}
         />
       )}
@@ -40,26 +40,22 @@ export const AgentTokens = () => {
           Create token
         </Button>
       </Space.Compact>
-      <List
-        bordered
-        loading={list.isLoading}
-        dataSource={list.data ?? []}
-        locale={{ emptyText: "No tokens yet" }}
-        renderItem={(t) => (
-          <List.Item
-            actions={[
-              <Popconfirm key="revoke" title={`Revoke "${t.name}"?`} description="Anything using it stops working." onConfirm={() => revoke.mutate(t.id)}>
-                <Button danger size="small">Revoke</Button>
-              </Popconfirm>,
-            ]}
-          >
-            <List.Item.Meta
-              title={t.name}
-              description={<span style={{ fontFamily: "var(--font-mono)" }}>{t.prefix}… · created {when(t.createdAt)} · last used {when(t.lastUsedAt)}</span>}
-            />
-          </List.Item>
-        )}
-      />
+      <div style={{ border: "1px solid var(--line)", borderRadius: "var(--radius)" }}>
+        {!list.isLoading && !list.data?.length && <p style={{ margin: 0, padding: 16, color: "var(--muted)" }}>No tokens yet</p>}
+        {list.data?.map((t, i) => (
+          <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderTop: i ? "1px solid var(--line)" : 0 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 600 }}>{t.name}</div>
+              <div className="mono" style={{ fontSize: 12, color: "var(--ink-soft)" }}>
+                {t.prefix}… · created {when(t.createdAt)} · last used {when(t.lastUsedAt)}
+              </div>
+            </div>
+            <Popconfirm title={`Revoke "${t.name}"?`} description="Anything using it stops working." onConfirm={() => revoke.mutate(t.id)}>
+              <Button danger size="small">Revoke</Button>
+            </Popconfirm>
+          </div>
+        ))}
+      </div>
     </Space>
   );
 };

@@ -1,4 +1,4 @@
-import { handle, notFound, readJson } from "@/server/http";
+import { handle, handleRead, notFound, readJson } from "@/server/http";
 import { setPinned } from "@/server/repo/course-order";
 import { deleteCourse, findCourse, getCourseDetail, markCourseSeen } from "@/server/repo/courses";
 
@@ -8,11 +8,11 @@ type Ctx = RouteContext<"/api/courses/[token]">;
 
 export const GET = async (_: Request, ctx: Ctx) => {
   const { token } = await ctx.params;
-  return handle(async () => {
+  return handleRead(async (user) => {
     const detail = await getCourseDetail(token);
     if (!detail) throw notFound("Course");
-    // Badges show on this visit, then clear for the next one.
-    if (detail.newCount) await markCourseSeen((await findCourse(token))!.id);
+    // Badges show on this visit, then clear for the next one (only the owner's visit counts).
+    if (user && detail.newCount) await markCourseSeen((await findCourse(token))!.id);
     return detail;
   });
 }

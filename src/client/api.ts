@@ -10,20 +10,17 @@ const refreshOnce = () =>
       refreshing = null;
     }));
 
-const toLogin = () => {
-  if (window.location.pathname === "/login") return;
-  const next = window.location.pathname + window.location.search;
-  // Full load on purpose: drops every cached query of the dead session. No router outside React here.
-  // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-  window.location.assign(`/login?next=${encodeURIComponent(next)}`);
-};
-
-/** 401 token_expired → refresh → replay the request once; any other 401 → login page. */
+/**
+ * 401 token_expired → refresh → replay the request once. If the session is over (idle 24 h, revoked) the server
+ * has cleared the cookies, so reload into the public visitor view. Other 401s ("Log in to make changes") surface
+ * as normal errors: reading never needs login.
+ */
 const authRetry: AfterResponseHook = async ({ response, retryCount }) => {
-  if (response.status !== 401) return;
+  if (response.status !== 401 || retryCount > 0) return;
   const { error } = (await response.clone().json().catch(() => ({}))) as { error?: string };
-  if (error === "token_expired" && retryCount === 0 && (await refreshOnce())) return ky.retry({ delay: 0 });
-  toLogin();
+  if (error !== "token_expired") return;
+  if (await refreshOnce()) return ky.retry({ delay: 0 });
+  window.location.reload();
 };
 
 const http = ky.create({
@@ -53,6 +50,7 @@ export const errorMessage = async (err: unknown): Promise<string> => {
 export const api = {
   login: (username: string, password: string) => http.post("auth/login", { json: { username, password } }).json(),
   logout: () => http.post("auth/logout").json(),
+  me: () => http.get("auth/me").json<{ username: string; role: "owner" | "demo" } | null>(),
   agentTokens: () => http.get("agent-tokens").json<AgentToken[]>(),
   createAgentToken: (name: string) => http.post("agent-tokens", { json: { name } }).json<AgentToken & { token: string }>(),
   revokeAgentToken: (id: number) => http.delete(`agent-tokens/${id}`).json(),

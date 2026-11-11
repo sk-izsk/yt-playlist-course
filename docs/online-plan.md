@@ -13,7 +13,12 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
   The same video gave 675 lines from the user's Mac. So: **adding a course online saves metadata only; lessons stay
   `transcript pending`; the Mac downloads transcripts and uploads them through the agent API.**
   Leave a disabled `PROXY_URL` hook in the transcript fetcher for later; don't build anything else for it.
-- **Login: single owner user + a demo user.** No signup page; create the user with a CLI command.
+- **Changed 2026-11-11 (user): the app is public to read.** Anyone can browse courses, lessons, notes, practice and
+  quizzes without logging in. Login only unlocks writes: add/sync/delete courses, progress, pin/reorder, personal notes,
+  agent tokens. Reads use `handleRead()` (optional user), writes `handle()` (401 "Log in to make changes"); the UI hides
+  write controls via `useSession()`. Owner credentials may live in `.env.local` (`OWNER_USERNAME`/`OWNER_PASSWORD`,
+  applied with `make owner`; only the argon2 hash goes to the DB).
+- **Login: single owner user.** No signup page; create the user with a CLI command.
   - Access token: JWT HS256 via `jose`, 15 min, claims `{sub, role, sid}`, httpOnly Secure SameSite=Lax cookie.
   - Session token: 32 random bytes, only its SHA-256 stored, cookie scoped to `/api/auth`. **24 h sliding** idle expiry,
     rotated on every refresh; reuse of an old one revokes all sessions.

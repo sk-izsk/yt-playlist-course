@@ -1,4 +1,4 @@
-import { handle, notFound, readJson } from "@/server/http";
+import { handle, handleRead, notFound, readJson } from "@/server/http";
 import { getLessonDetail } from "@/server/repo/lesson-detail";
 import { setCompleted } from "@/server/repo/lessons";
 
@@ -8,7 +8,7 @@ type Ctx = RouteContext<"/api/lessons/[token]">;
 
 export const GET = async (_: Request, ctx: Ctx) => {
   const { token } = await ctx.params;
-  return handle(async () => {
+  return handleRead(async () => {
     const detail = await getLessonDetail(token);
     if (!detail) throw notFound("Lesson");
     return detail;

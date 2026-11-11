@@ -3,7 +3,7 @@
 
 .DEFAULT_GOAL := help
 .PHONY: help install dev build start stop lint typecheck selfcheck check clean \
-        list pending show add sync fill report transcripts db-generate db-migrate db-copy db-studio
+        list pending show add sync fill report transcripts db-generate db-migrate db-copy db-studio user owner
 
 PORT ?= 3000
 
@@ -87,6 +87,9 @@ db-copy: ## One-time copy of the old SQLite DB (~/.courseit/app.db) into an empt
 user: ## Create a login or reset its password (NAME=… ROLE=owner|demo); prompts for the password
 	@test -n "$(NAME)" || (echo "usage: make user NAME=<username> [ROLE=owner|demo]"; exit 1)
 	@read -s -p "Password for $(NAME): " P; echo; PASSWORD="$$P" bunx tsx scripts/user-create.ts $(NAME) $(or $(ROLE),owner)
+
+owner: ## Create/update the owner login from OWNER_USERNAME + OWNER_PASSWORD in .env.local
+	bunx tsx scripts/user-create.ts
 
 db-studio: ## Browse the database in drizzle studio (read it; write through the CLI)
 	bunx drizzle-kit studio

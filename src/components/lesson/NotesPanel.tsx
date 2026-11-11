@@ -11,12 +11,18 @@ import { NoteEditor } from "./NoteEditor";
 import styles from "./lesson.module.css";
 
 /** Notes pinned to the moment you wrote them; click a time to jump back there. */
+import { useSession } from "@/client/hooks/useSession";
+
 export const NotesPanel = ({ lesson, player }: { lesson: LessonDetail; player: PlayerControls }) => {
   const { add, remove } = useNoteMutations(lesson.token);
+  const { canEdit } = useSession(); // visitors can read notes, not write them
 
   return (
     <div className={styles.notes}>
-      <NoteEditor saving={add.isPending} onSave={(text) => add.mutateAsync({ atSec: player.currentTime(), text })} />
+      {canEdit && (
+        <NoteEditor saving={add.isPending} onSave={(text) => add.mutateAsync({ atSec: player.currentTime(), text })} />
+      )}
+      {!canEdit && !lesson.notes.length && <p className={styles.noteBody}>No notes on this lesson.</p>}
 
       {lesson.notes.map((n) => (
         <div key={n.id} className={styles.note}>
@@ -26,13 +32,15 @@ export const NotesPanel = ({ lesson, player }: { lesson: LessonDetail; player: P
           <div className={styles.noteBody}>
             <MarkdownView compact onSeek={player.seek}>{n.text}</MarkdownView>
           </div>
-          <Button
-            type="text"
-            size="small"
-            icon={<DeleteOutlined />}
-            aria-label="Delete note"
-            onClick={() => remove.mutate(n.id)}
-          />
+          {canEdit && (
+            <Button
+              type="text"
+              size="small"
+              icon={<DeleteOutlined />}
+              aria-label="Delete note"
+              onClick={() => remove.mutate(n.id)}
+            />
+          )}
         </div>
       ))}
     </div>

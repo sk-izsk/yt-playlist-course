@@ -1,8 +1,6 @@
 import Link from "next/link";
-import { LogoutButton } from "../auth/LogoutButton";
-import { NotificationBell } from "../notifications/NotificationBell";
 import { Logo } from "./Logo";
-import { ThemeToggle } from "./ThemeToggle";
+import { NavActions } from "./NavActions";
 import styles from "./NavBar.module.css";
 
 export const NavBar = () => (
@@ -16,12 +14,7 @@ export const NavBar = () => (
         <Link href="/#courses">Library</Link>
         <Link href="/#how">How it works</Link>
       </div>
-      <NotificationBell />
-      <ThemeToggle />
-      <LogoutButton />
-      <Link href="/#add" className={styles.cta}>
-        Add a course
-      </Link>
+      <NavActions />
     </nav>
   </header>
 );

@@ -4,6 +4,7 @@ import { DeleteOutlined, YoutubeOutlined } from "@ant-design/icons";
 import { Button, Popconfirm } from "antd";
 import { useRouter } from "next/navigation";
 import { useDeleteCourse } from "@/client/hooks/useCourse";
+import { useSession } from "@/client/hooks/useSession";
 import { humanDuration } from "@/shared/format";
 import { lineFor } from "@/shared/lines";
 import type { CourseDetail } from "@/shared/types";
@@ -21,6 +22,7 @@ const youtubeUrl = (c: CourseDetail) =>
 export const CourseHeader = ({ course: c }: { course: CourseDetail }) => {
   const router = useRouter();
   const del = useDeleteCourse(c.token);
+  const { canEdit } = useSession();
 
   return (
     <header className={styles.header}>
@@ -45,14 +47,16 @@ export const CourseHeader = ({ course: c }: { course: CourseDetail }) => {
           <Button href={youtubeUrl(c)} target="_blank" icon={<YoutubeOutlined />}>
             YouTube
           </Button>
-          <Popconfirm
-            title="Delete this course?"
-            description="Progress, notes and quizzes are removed too."
-            okButtonProps={{ danger: true, loading: del.isPending }}
-            onConfirm={() => del.mutateAsync().then(() => router.push("/"))}
-          >
-            <Button type="text" danger icon={<DeleteOutlined />} aria-label="Delete course" />
-          </Popconfirm>
+          {canEdit && (
+            <Popconfirm
+              title="Delete this course?"
+              description="Progress, notes and quizzes are removed too."
+              okButtonProps={{ danger: true, loading: del.isPending }}
+              onConfirm={() => del.mutateAsync().then(() => router.push("/"))}
+            >
+              <Button type="text" danger icon={<DeleteOutlined />} aria-label="Delete course" />
+            </Popconfirm>
+          )}
         </div>
       </div>
       <div className={styles.cover}>

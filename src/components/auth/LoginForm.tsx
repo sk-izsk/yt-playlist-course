@@ -1,6 +1,7 @@
 "use client";
 
 import { Alert, Button, Form, Input } from "antd";
+import Link from "next/link";
 import { useState } from "react";
 import { api, errorMessage } from "@/client/api";
 import { Logo } from "../layout/Logo";
@@ -39,7 +40,7 @@ export const LoginForm = () => {
           Tubewise
         </div>
         <h1 className={styles.title}>Log in</h1>
-        {error && <Alert type="error" message={error} showIcon className={styles.alert} />}
+        {error && <Alert type="error" title={error} showIcon className={styles.alert} />}
         <Form<Fields> layout="vertical" onFinish={submit} requiredMark={false} disabled={busy}>
           <Form.Item name="username" label="Username" rules={[{ required: true, message: "Enter your username" }]}>
             <Input autoComplete="username" autoFocus size="large" />
@@ -51,6 +52,9 @@ export const LoginForm = () => {
             Log in
           </Button>
         </Form>
+        <p className={styles.hint}>
+          Logging in lets you add, sync and delete courses and write notes. <Link href="/">Browse without logging in</Link>
+        </p>
       </div>
     </div>
   );
