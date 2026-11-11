@@ -56,7 +56,7 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 | 2 ✅ 2026-11-11 | **Login** (see decisions) + `users`, `sessions`, `login_attempts` tables + `user:create` CLI | idle logout, refresh, token reuse revocation verified in the browser |
 | 3 ⏳ code done, deploy waits on env vars | **Vercel deploy**: env vars, cron for `check-updates`, transcripts left `pending` online | app live behind login |
 | 4 ✅ 2026-11-11 | **Agent API** `/api/agent/*` + `agent_tokens` table + Settings page | token can save a lesson; can't delete |
-| 5 | **Custom MCP** (`mcp/server.ts`, stdio): `fetch_transcripts`, `list_pending`, `get_lesson`, `save_notes`, `course_report`; writing rules from `docs/notes-guide.md` (move AGENTS.md Part B there) | Claude Code fills one real lesson through MCP |
+| 5 ✅ 2026-11-11 | **Custom MCP** (`mcp/server.ts`, stdio): `fetch_transcripts`, `list_pending`, `get_lesson`, `save_notes`, `course_report`; writing rules from `docs/notes-guide.md` (move AGENTS.md Part B there) | Claude Code fills one real lesson through MCP |
 | 6 | **CLI remote mode**: `scripts/agent` uses the API when `TUBEWISE_URL`/`TUBEWISE_TOKEN` are set; `make fill` unchanged | `make fill MAX=1` works online |
 | 7 | **Backups**: Mac mirror (launchd pull every 15 min + 14 dated dumps + local/Neon toggle, read-only local) + nightly `pg_dump` via GitHub Actions + soft delete with a 7-day trash | local mirror matches Neon; a dump restores into a scratch DB |
 | 8 | **Demo** | visitor can browse, every write returns 403 |
@@ -109,6 +109,15 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 - Shared formatting `src/shared/agent-format.ts` + `server/services/agent-context.ts`; CLI `show`/`report` use them.
 - Settings page `/settings` (owner only): create (shown once), list, revoke.
 - Verified with curl: every route, bad transcript 400, overwrite refused 422, DELETE 405, revoked token 401 at once.
+
+## Phase 5 notes (done 2026-11-11)
+
+- `mcp/server.ts` (stdio) + `src/agent-client/` (HTTP client, Mac-side transcript fetch → upload). Relative imports
+  only and CommonJS-safe (no top-level await / import.meta) because it starts from any folder via the repo's tsx.
+- Tools: `notes_guide`, `list_courses`, `get_course`, `fetch_transcripts`, `list_pending`, `get_lesson`, `save_notes`,
+  `course_report`. Writing rules moved to `docs/notes-guide.md`; AGENTS.md Part B now points there.
+- Verified by an MCP client over stdio from outside the repo (see `docs/mcp.md`). **Left for the user:** register it
+  in Claude Code with `make mcp-add URL=… TOKEN=…` (it edits your user-level Claude config, so I didn't).
 
 ## Needed from the user
 

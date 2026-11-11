@@ -17,7 +17,7 @@ cli() { bunx tsx scripts/agent/index.ts "$@"; }
 # The fixed part comes first and the lesson id last, so the CLIs' prompt caching reuses the prefix.
 prompt_for() {
   cat <<EOF
-You are filling notes for ONE lesson in the Tubewise repo. Follow AGENTS.md Part B and its Quality bar exactly.
+You are filling notes for ONE lesson in the Tubewise repo. Follow docs/notes-guide.md and its Quality bar exactly.
 1. Run \`bun run agent show <lesson-id>\`. It prints a compact transcript and a target summary length.
    For an intro, roadmap or revision video you may run it with --head first; write light notes from that
    only if the video is clearly light and under 15 minutes, otherwise read the whole transcript.
