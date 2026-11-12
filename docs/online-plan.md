@@ -61,7 +61,7 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 | 7 ✅ 2026-11-11 | **Backups**: Mac mirror (launchd pull every 15 min + 14 dated dumps + local/Neon toggle, read-only local) + nightly `pg_dump` via GitHub Actions + soft delete with a 7-day trash | local mirror matches Neon; a dump restores into a scratch DB |
 | 8 ✅ 2026-11-11 (by public read) | **Demo** | visitor can browse, every write returns 403 |
 | 9 ✅ 2026-11-11 (off until a key is added) | **AI tutor** (optional): "Ask this lesson", `claude-haiku-5-5`, notes+transcript as cached prefix, daily caps; demo gets notes-only context | streams an answer within caps |
-| 10 | **README / portfolio** | architecture diagram, screenshots, demo link |
+| 10 ✅ 2026-11-11 (live link after deploy) | **README / portfolio** | architecture diagram, screenshots, demo link |
 
 ## Phase 1 notes (done 2026-11-11)
 
