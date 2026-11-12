@@ -2,7 +2,7 @@
 # Package manager is bun; Next and the agent CLI run on Node.
 
 .DEFAULT_GOAL := help
-.PHONY: help install dev build start stop lint typecheck selfcheck check clean \
+.PHONY: help install dev build start stop lint fmt fmt-check typecheck selfcheck check clean \
         list pending show add sync fill report transcripts db-generate db-migrate db-copy db-studio user mcp-add db-backup backup-install backup-uninstall
 
 PORT ?= 3000
@@ -27,8 +27,17 @@ stop: ## Stop whatever is listening on the dev port
 	@lsof -ti tcp:$(PORT) | xargs kill 2>/dev/null && echo "stopped :$(PORT)" || echo "nothing on :$(PORT)"
 
 # ---------------------------------------------------------------- quality
-lint: ## ESLint
-	bunx eslint src scripts mcp
+# oxlint + oxfmt (Oxc, Rust): no ESLint/Prettier. Config in .oxlintrc.json / .oxfmtrc.json.
+SRC := src scripts mcp
+
+lint: ## Lint with oxlint (warnings fail too, so they get fixed instead of piling up)
+	bunx oxlint --deny-warnings $(SRC)
+
+fmt: ## Format with oxfmt (writes files)
+	bunx oxfmt $(SRC)
+
+fmt-check: ## Fail if any file isn't formatted (run `make fmt` to fix)
+	bunx oxfmt --check $(SRC)
 
 typecheck: ## TypeScript, no emit
 	bunx next typegen >/dev/null 2>&1; bunx tsc --noEmit
@@ -36,7 +45,7 @@ typecheck: ## TypeScript, no emit
 selfcheck: ## Run the small *.check.ts self-tests
 	@for f in $$(find src -name '*.check.ts'); do bunx tsx $$f || exit 1; done
 
-check: typecheck lint selfcheck ## Everything an agent should run before saying "done"
+check: typecheck lint fmt-check selfcheck ## Everything an agent should run before saying "done"
 
 clean: ## Remove build caches (keeps your data)
 	rm -rf .next tsconfig.tsbuildinfo

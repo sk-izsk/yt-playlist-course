@@ -1,29 +1,40 @@
-import { and, asc, eq, isNull, max } from "drizzle-orm";
-import { db, first, schema } from "../db/client";
-import { newId } from "../tokens";
-import { live, liveLesson } from "./courses";
+import { and, asc, eq, isNull, max } from "drizzle-orm"
+import { db, first, schema } from "../db/client"
+import { newId } from "../tokens"
+import { live, liveLesson } from "./courses"
 
-const { lessons, courses } = schema;
+const { lessons, courses } = schema
 
 export interface LessonDraft {
-  videoId: string;
-  title: string;
-  durationSec: number;
-  thumbnail: string;
-  startSec?: number;
-  endSec?: number;
+  videoId: string
+  title: string
+  durationSec: number
+  thumbnail: string
+  startSec?: number
+  endSec?: number
 }
 
 export const findLesson = (token: string) =>
-  first(db.select().from(lessons).where(and(eq(lessons.token, token), liveLesson)).limit(1));
+  first(
+    db
+      .select()
+      .from(lessons)
+      .where(and(eq(lessons.token, token), liveLesson))
+      .limit(1),
+  )
 
 export const lessonsOfCourse = (courseId: number) =>
-  db.select().from(lessons).where(eq(lessons.courseId, courseId)).orderBy(asc(lessons.position));
+  db.select().from(lessons).where(eq(lessons.courseId, courseId)).orderBy(asc(lessons.position))
 
 export const maxPosition = async (courseId: number): Promise<number> => {
-  const row = await first(db.select({ m: max(lessons.position) }).from(lessons).where(eq(lessons.courseId, courseId)));
-  return row?.m ?? 0;
-};
+  const row = await first(
+    db
+      .select({ m: max(lessons.position) })
+      .from(lessons)
+      .where(eq(lessons.courseId, courseId)),
+  )
+  return row?.m ?? 0
+}
 
 /** Appends drafts after `afterPosition`, each with a fresh UUID. */
 export const insertLessons = async (
@@ -31,8 +42,10 @@ export const insertLessons = async (
   drafts: LessonDraft[],
   opts: { afterPosition?: number; isNew?: boolean } = {},
 ) => {
-  const start = opts.afterPosition ?? 0;
-  if (!drafts.length) return [];
+  const start = opts.afterPosition ?? 0
+  if (!drafts.length) {
+    return []
+  }
   return db
     .insert(lessons)
     .values(
@@ -44,8 +57,8 @@ export const insertLessons = async (
         isNew: opts.isNew ?? false,
       })),
     )
-    .returning();
-};
+    .returning()
+}
 
 export const setCompleted = async (token: string, done: boolean) =>
   (
@@ -54,12 +67,12 @@ export const setCompleted = async (token: string, done: boolean) =>
       .set({ completedAt: done ? Date.now() : null })
       .where(eq(lessons.token, token))
       .returning({ id: lessons.id })
-  ).length > 0;
+  ).length > 0
 
 /** Lessons still waiting for an agent to write notes, optionally scoped to one course. */
 export const pendingLessons = (courseToken?: string) => {
-  const base = and(isNull(lessons.summary), live);
-  const where = courseToken ? and(base, eq(courses.token, courseToken)) : base;
+  const base = and(isNull(lessons.summary), live)
+  const where = courseToken ? and(base, eq(courses.token, courseToken)) : base
   return db
     .select({
       token: lessons.token,
@@ -71,5 +84,5 @@ export const pendingLessons = (courseToken?: string) => {
     .from(lessons)
     .innerJoin(courses, eq(lessons.courseId, courses.id))
     .where(where)
-    .orderBy(asc(courses.id), asc(lessons.position));
-};
+    .orderBy(asc(courses.id), asc(lessons.position))
+}

@@ -19,7 +19,7 @@ Local, single-user app that turns YouTube videos and playlists into courses. The
 ## Commands (see `Makefile`; run `make` to list them)
 
 - `make dev`: dev server at http://localhost:3000.
-- `make check`: typecheck, lint and the `*.check.ts` self-tests. **Run it before saying you're done.**
+- `make check`: typecheck, lint (**oxlint**, warnings fail too), format check (**oxfmt**) and the `*.check.ts` self-tests. **Run it before saying you're done.** `make fmt` formats; config in `.oxlintrc.json` / `.oxfmtrc.json`. There is no ESLint or Prettier.
 - `make build`: production build; catches broken imports that dev mode tolerates.
 - `make list | pending | show | add | sync | transcripts`: the agent CLI (Part B). Local mode uses `DATABASE_URL`; with `TUBEWISE_URL` + `TUBEWISE_TOKEN` set it goes through the app's agent API instead (`scripts/agent/remote.ts`). The MCP server is `mcp/server.ts` (see `docs/mcp.md`).
 
@@ -27,6 +27,7 @@ Local, single-user app that turns YouTube videos and playlists into courses. The
 
 - **bun** is the package manager (`bun install`, `bun add`, `bunx`), never npm or npx. `next` and the CLI (`tsx`) still *run on Node* (node-postgres, `node:sqlite` in the copy script). Bun only installs and launches them.
 - **Arrow functions only** (`export const fn = () => {}`). The exception is code that needs `this` (classes like `HttpError`). Pages use `const Page = () => …; export default Page;`.
+- **No semicolons** (oxfmt `semi: false` keeps one only where ASI needs it) and **braces on every `if`/`else`/loop body**, even one-liners (oxlint `curly: all`). `make fmt` and `oxlint --fix` apply both.
 - **Small files**, about 100–120 lines max. Split UI into components plus custom hooks rather than growing a file.
 - Comment *why*, not what. A deliberate shortcut gets a `ponytail:` comment that names its limit.
 - Non-trivial pure logic gets a tiny `*.check.ts` self-test next to it (see `src/client/lib/plan.check.ts`). `make selfcheck` runs them.

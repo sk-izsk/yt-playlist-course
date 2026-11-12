@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
-import { CompressOutlined, ExpandOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { Button, Popover, Segmented, Switch } from "antd";
-import { SHORTCUTS } from "@/client/hooks/usePlayerShortcuts";
-import { SPEEDS, usePrefs } from "@/client/store/prefs";
-import styles from "./lesson.module.css";
+import { CompressOutlined, ExpandOutlined, QuestionCircleOutlined } from "@ant-design/icons"
+import { Button, Popover, Segmented, Switch } from "antd"
+import { SHORTCUTS } from "@/client/hooks/usePlayerShortcuts"
+import { SPEEDS, usePrefs } from "@/client/store/prefs"
+import styles from "./lesson.module.css"
 
 const Keys = () => (
   <table className={styles.keys}>
@@ -19,11 +19,11 @@ const Keys = () => (
       ))}
     </tbody>
   </table>
-);
+)
 
 /** Speed, auto-next and theater mode, remembered across lessons. */
 export const PlayerBar = () => {
-  const { speed, setSpeed, autoNext, setAutoNext, theater, toggleTheater } = usePrefs();
+  const { speed, setSpeed, autoNext, setAutoNext, theater, toggleTheater } = usePrefs()
   return (
     <div className={styles.playerBar}>
       <Segmented
@@ -38,12 +38,17 @@ export const PlayerBar = () => {
         Auto-next
       </label>
       <span className={styles.spacer} />
-      <Button size="small" type="text" icon={theater ? <CompressOutlined /> : <ExpandOutlined />} onClick={toggleTheater}>
+      <Button
+        size="small"
+        type="text"
+        icon={theater ? <CompressOutlined /> : <ExpandOutlined />}
+        onClick={toggleTheater}
+      >
         {theater ? "Default view" : "Theater"}
       </Button>
       <Popover content={<Keys />} title="Keyboard shortcuts" trigger="click" placement="bottomRight">
         <Button size="small" type="text" icon={<QuestionCircleOutlined />} aria-label="Keyboard shortcuts" />
       </Popover>
     </div>
-  );
-};
+  )
+}

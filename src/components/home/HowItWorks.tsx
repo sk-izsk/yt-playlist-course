@@ -1,6 +1,6 @@
-import { LINES } from "@/shared/lines";
-import { SectionHeading } from "../common/SectionHeading";
-import styles from "./home.module.css";
+import { LINES } from "@/shared/lines"
+import { SectionHeading } from "../common/SectionHeading"
+import styles from "./home.module.css"
 
 // A real sequence, so it's drawn as three stops on one line.
 const STEPS = [
@@ -16,7 +16,7 @@ const STEPS = [
     title: "Ride it to the last stop",
     body: "Pick 30 to 120 minutes a day. A wrong quiz answer jumps the video to the moment that explains it.",
   },
-];
+]
 
 export const HowItWorks = () => (
   <section className={`container ${styles.section}`} id="how">
@@ -33,4 +33,4 @@ export const HowItWorks = () => (
       ))}
     </ol>
   </section>
-);
+)

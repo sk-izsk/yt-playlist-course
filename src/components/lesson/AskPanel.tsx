@@ -1,22 +1,24 @@
-"use client";
+"use client"
 
-import { Button, Input } from "antd";
-import { useState } from "react";
-import { useTutorChat } from "@/client/hooks/useTutor";
-import type { LessonDetail } from "@/shared/types";
-import { MarkdownView } from "../common/MarkdownView";
-import styles from "./lesson.module.css";
+import { Button, Input } from "antd"
+import { useState } from "react"
+import { useTutorChat } from "@/client/hooks/useTutor"
+import type { LessonDetail } from "@/shared/types"
+import { MarkdownView } from "../common/MarkdownView"
+import styles from "./lesson.module.css"
 
 /** "Ask this lesson": a short chat with the AI tutor, grounded in this lesson's notes (and transcript for the owner). */
 export const AskPanel = ({ lesson, seek }: { lesson: LessonDetail; seek: (sec: number) => void }) => {
-  const { turns, busy, ask, reset } = useTutorChat(lesson.token);
-  const [q, setQ] = useState("");
+  const { turns, busy, ask, reset } = useTutorChat(lesson.token)
+  const [q, setQ] = useState("")
 
   const send = () => {
-    if (!q.trim() || busy) return;
-    void ask(q.trim());
-    setQ("");
-  };
+    if (!q.trim() || busy) {
+      return
+    }
+    void ask(q.trim())
+    setQ("")
+  }
 
   return (
     <div className={styles.notes}>
@@ -26,7 +28,9 @@ export const AskPanel = ({ lesson, seek }: { lesson: LessonDetail; seek: (sec: n
             {t.role === "user" ? (
               <strong>{t.content}</strong>
             ) : (
-              <MarkdownView compact onSeek={seek}>{t.content || "…"}</MarkdownView>
+              <MarkdownView compact onSeek={seek}>
+                {t.content || "…"}
+              </MarkdownView>
             )}
           </div>
         </div>
@@ -38,8 +42,8 @@ export const AskPanel = ({ lesson, seek }: { lesson: LessonDetail; seek: (sec: n
         onChange={(e) => setQ(e.target.value)}
         onPressEnter={(e) => {
           if (!e.shiftKey) {
-            e.preventDefault();
-            send();
+            e.preventDefault()
+            send()
           }
         }}
         disabled={busy}
@@ -48,8 +52,12 @@ export const AskPanel = ({ lesson, seek }: { lesson: LessonDetail; seek: (sec: n
         <Button type="primary" onClick={send} loading={busy} disabled={!q.trim()}>
           Ask
         </Button>
-        {turns.length > 0 && <Button onClick={reset} disabled={busy}>New chat</Button>}
+        {turns.length > 0 && (
+          <Button onClick={reset} disabled={busy}>
+            New chat
+          </Button>
+        )}
       </div>
     </div>
-  );
-};
+  )
+}

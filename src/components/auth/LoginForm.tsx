@@ -1,36 +1,36 @@
-"use client";
+"use client"
 
-import { Alert, Button, Form, Input } from "antd";
-import Link from "next/link";
-import { useState } from "react";
-import { api, errorMessage } from "@/client/api";
-import { Logo } from "../layout/Logo";
-import styles from "./LoginForm.module.css";
+import { Alert, Button, Form, Input } from "antd"
+import Link from "next/link"
+import { useState } from "react"
+import { api, errorMessage } from "@/client/api"
+import { Logo } from "../layout/Logo"
+import styles from "./LoginForm.module.css"
 
-type Fields = { username: string; password: string };
+type Fields = { username: string; password: string }
 
 /** Only same-site paths, so ?next= can't bounce you to another origin after login. */
 const safeNext = () => {
-  const next = new URLSearchParams(window.location.search).get("next") ?? "/";
-  return next.startsWith("/") && !next.startsWith("//") ? next : "/";
-};
+  const next = new URLSearchParams(window.location.search).get("next") ?? "/"
+  return next.startsWith("/") && !next.startsWith("//") ? next : "/"
+}
 
 export const LoginForm = () => {
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
 
   const submit = async ({ username, password }: Fields) => {
-    setBusy(true);
-    setError(null);
+    setBusy(true)
+    setError(null)
     try {
-      await api.login(username, password);
+      await api.login(username, password)
       // Full load, not router.push: the proxy and every query should see the new cookies.
-      window.location.assign(safeNext());
+      window.location.assign(safeNext())
     } catch (err) {
-      setError(await errorMessage(err));
-      setBusy(false);
+      setError(await errorMessage(err))
+      setBusy(false)
     }
-  };
+  }
 
   return (
     <div className={styles.page}>
@@ -53,9 +53,10 @@ export const LoginForm = () => {
           </Button>
         </Form>
         <p className={styles.hint}>
-          Logging in lets you add, sync and delete courses and write notes. <Link href="/">Browse without logging in</Link>
+          Logging in lets you add, sync and delete courses and write notes.{" "}
+          <Link href="/">Browse without logging in</Link>
         </p>
       </div>
     </div>
-  );
-};
+  )
+}

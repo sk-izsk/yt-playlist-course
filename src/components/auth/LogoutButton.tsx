@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import { LogoutOutlined } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
-import { api } from "@/client/api";
+import { LogoutOutlined } from "@ant-design/icons"
+import { Button, Tooltip } from "antd"
+import { api } from "@/client/api"
 
 export const LogoutButton = () => (
   <Tooltip title="Log out">
@@ -13,11 +13,10 @@ export const LogoutButton = () => (
       icon={<LogoutOutlined />}
       style={{ border: "1px solid var(--line)" }}
       onClick={async () => {
-        await api.logout().catch(() => {}); // cookies are cleared server-side; go to login either way
+        await api.logout().catch(() => {}) // cookies are cleared server-side; go to login either way
         // Full load on purpose: drops the logged-out user's cached queries.
-        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-        window.location.assign("/login");
+        window.location.assign("/login")
       }}
     />
   </Tooltip>
-);
+)

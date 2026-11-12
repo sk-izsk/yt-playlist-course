@@ -92,7 +92,9 @@
   border: 1px solid var(--line);
   border-radius: 16px;
   background: var(--surface);
-  transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  transition:
+    border-color 0.3s var(--ease),
+    box-shadow 0.3s var(--ease);
 }
 
 /* Hover answers with the course colour, no lift. */

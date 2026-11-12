@@ -1,11 +1,11 @@
-"use client";
+"use client"
 
-import { MoonOutlined, SunOutlined } from "@ant-design/icons";
-import { Button } from "antd";
-import { usePrefs } from "@/client/store/prefs";
+import { MoonOutlined, SunOutlined } from "@ant-design/icons"
+import { Button } from "antd"
+import { usePrefs } from "@/client/store/prefs"
 
 export const ThemeToggle = () => {
-  const { mode, toggleMode } = usePrefs();
+  const { mode, toggleMode } = usePrefs()
   return (
     <Button
       shape="circle"
@@ -15,5 +15,5 @@ export const ThemeToggle = () => {
       onClick={toggleMode}
       style={{ border: "1px solid var(--line)" }}
     />
-  );
+  )
 }

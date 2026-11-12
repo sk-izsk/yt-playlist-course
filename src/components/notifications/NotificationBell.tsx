@@ -1,27 +1,29 @@
-"use client";
+"use client"
 
-import { BellOutlined } from "@ant-design/icons";
-import { Badge, Button } from "antd";
-import { useState } from "react";
-import { useCourses } from "@/client/hooks/useCourses";
-import { useNotificationActions, useNotifications } from "@/client/hooks/useNotifications";
-import { NotificationDrawer } from "./NotificationDrawer";
+import { BellOutlined } from "@ant-design/icons"
+import { Badge, Button } from "antd"
+import { useState } from "react"
+import { useCourses } from "@/client/hooks/useCourses"
+import { useNotificationActions, useNotifications } from "@/client/hooks/useNotifications"
+import { NotificationDrawer } from "./NotificationDrawer"
 
 /** Navbar bell: badge = unread activity + courses with new videos waiting. */
 export const NotificationBell = () => {
-  const [open, setOpen] = useState(false);
-  const { data: events = [] } = useNotifications();
-  const { data: courses = [] } = useCourses();
-  const { markRead } = useNotificationActions();
+  const [open, setOpen] = useState(false)
+  const { data: events = [] } = useNotifications()
+  const { data: courses = [] } = useCourses()
+  const { markRead } = useNotificationActions()
 
-  const unread = events.filter((e) => !e.read).length;
-  const updatable = courses.filter((c) => c.availableUpdates > 0).length;
-  const hasError = events.some((e) => !e.read && e.kind === "error");
+  const unread = events.filter((e) => !e.read).length
+  const updatable = courses.filter((c) => c.availableUpdates > 0).length
+  const hasError = events.some((e) => !e.read && e.kind === "error")
 
   const openDrawer = () => {
-    setOpen(true);
-    if (unread) markRead.mutate();
-  };
+    setOpen(true)
+    if (unread) {
+      markRead.mutate()
+    }
+  }
 
   return (
     <>
@@ -37,5 +39,5 @@ export const NotificationBell = () => {
       </Badge>
       <NotificationDrawer open={open} onClose={() => setOpen(false)} events={events} courses={courses} />
     </>
-  );
-};
+  )
+}

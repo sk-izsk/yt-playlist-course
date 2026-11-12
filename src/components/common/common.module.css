@@ -100,7 +100,9 @@
   color: var(--ink-soft);
   font-size: 12px;
   cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
 }
 
 .token:hover {

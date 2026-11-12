@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "oxlint --deny-warnings src scripts mcp",
+    "format": "oxfmt src scripts mcp",
     "agent": "tsx scripts/agent/index.ts",
     "typecheck": "tsc --noEmit"
   },
@@ -41,8 +42,8 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "drizzle-kit": "^0.31.11",
-    "eslint": "^10.14.0",
-    "eslint-config-next": "16.4.6",
+    "oxfmt": "^0.78.0",
+    "oxlint": "^1.93.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   }

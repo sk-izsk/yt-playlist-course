@@ -1,23 +1,23 @@
-"use client";
+"use client"
 
-import { AppstoreOutlined, CheckSquareOutlined, SearchOutlined, UnorderedListOutlined } from "@ant-design/icons";
-import { Button, Input, Segmented } from "antd";
-import { useSession } from "@/client/hooks/useSession";
-import { useSelection } from "@/client/store/selection";
-import { usePrefs, type LibraryView } from "@/client/store/prefs";
-import styles from "./library.module.css";
+import { AppstoreOutlined, CheckSquareOutlined, SearchOutlined, UnorderedListOutlined } from "@ant-design/icons"
+import { Button, Input, Segmented } from "antd"
+import { useSession } from "@/client/hooks/useSession"
+import { useSelection } from "@/client/store/selection"
+import { usePrefs, type LibraryView } from "@/client/store/prefs"
+import styles from "./library.module.css"
 
 interface Props {
-  search: string;
-  onSearch: (v: string) => void;
-  shown: number;
-  total: number;
+  search: string
+  onSearch: (v: string) => void
+  shown: number
+  total: number
 }
 
 export const LibraryToolbar = ({ search, onSearch, shown, total }: Props) => {
-  const { view, setView } = usePrefs();
-  const { active, start } = useSelection();
-  const { canEdit } = useSession(); // selecting is only for bulk delete
+  const { view, setView } = usePrefs()
+  const { active, start } = useSelection()
+  const { canEdit } = useSession() // selecting is only for bulk delete
   return (
     <div className={styles.toolbar}>
       <Input
@@ -43,5 +43,5 @@ export const LibraryToolbar = ({ search, onSearch, shown, total }: Props) => {
         ]}
       />
     </div>
-  );
-};
+  )
+}

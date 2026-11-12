@@ -1,11 +1,11 @@
-import styles from "./route.module.css";
+import styles from "./route.module.css"
 
 interface Props {
-  done: number;
-  total: number;
+  done: number
+  total: number
   /** How many stations to draw; long courses are sampled so the bar stays readable. */
-  maxStops?: number;
-  label?: string;
+  maxStops?: number
+  label?: string
 }
 
 /**
@@ -14,9 +14,9 @@ interface Props {
  * Colour comes from var(--route) on an ancestor.
  */
 export const RouteBar = ({ done, total, maxStops = 9, label }: Props) => {
-  const pct = total ? Math.min(100, (done / total) * 100) : 0;
-  const stops = Math.min(total, maxStops);
-  const positions = Array.from({ length: stops }, (_, i) => (stops > 1 ? (i / (stops - 1)) * 100 : 0));
+  const pct = total ? Math.min(100, (done / total) * 100) : 0
+  const stops = Math.min(total, maxStops)
+  const positions = Array.from({ length: stops }, (_, i) => (stops > 1 ? (i / (stops - 1)) * 100 : 0))
 
   return (
     <div
@@ -34,5 +34,5 @@ export const RouteBar = ({ done, total, maxStops = 9, label }: Props) => {
       ))}
       {total > 0 && done < total && <span className={styles.here} style={{ left: `${pct}%` }} />}
     </div>
-  );
-};
+  )
+}

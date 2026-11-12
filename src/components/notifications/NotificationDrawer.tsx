@@ -1,16 +1,16 @@
-"use client";
+"use client"
 
-import { Drawer } from "antd";
-import type { AppEvent, CourseSummary } from "@/shared/types";
-import { ActivityList } from "./ActivityList";
-import { UpdatesList } from "./UpdatesList";
-import styles from "./notifications.module.css";
+import { Drawer } from "antd"
+import type { AppEvent, CourseSummary } from "@/shared/types"
+import { ActivityList } from "./ActivityList"
+import { UpdatesList } from "./UpdatesList"
+import styles from "./notifications.module.css"
 
 interface Props {
-  open: boolean;
-  onClose: () => void;
-  events: AppEvent[];
-  courses: CourseSummary[];
+  open: boolean
+  onClose: () => void
+  events: AppEvent[]
+  courses: CourseSummary[]
 }
 
 export const NotificationDrawer = ({ open, onClose, events, courses }: Props) => (
@@ -18,4 +18,4 @@ export const NotificationDrawer = ({ open, onClose, events, courses }: Props) =>
     <UpdatesList courses={courses} onNavigate={onClose} />
     <ActivityList events={events} onNavigate={onClose} />
   </Drawer>
-);
+)

@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import {
   closestCenter,
@@ -8,26 +8,26 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-} from "@dnd-kit/core";
+} from "@dnd-kit/core"
 import {
   rectSortingStrategy,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import type { LibraryView } from "@/client/store/prefs";
-import type { CourseSummary } from "@/shared/types";
-import { CourseCard } from "./CourseCard";
-import { CourseListRow } from "./CourseListRow";
-import { SortableItem } from "./SortableItem";
-import styles from "./library.module.css";
+} from "@dnd-kit/sortable"
+import type { LibraryView } from "@/client/store/prefs"
+import type { CourseSummary } from "@/shared/types"
+import { CourseCard } from "./CourseCard"
+import { CourseListRow } from "./CourseListRow"
+import { SortableItem } from "./SortableItem"
+import styles from "./library.module.css"
 
 interface Props {
-  title?: string;
-  courses: CourseSummary[];
-  view: LibraryView;
-  dragDisabled: boolean;
-  onMove: (from: number, to: number) => void;
+  title?: string
+  courses: CourseSummary[]
+  view: LibraryView
+  dragDisabled: boolean
+  onMove: (from: number, to: number) => void
 }
 
 /** One draggable group (Pinned / All). Items only move within their own group. */
@@ -35,16 +35,20 @@ export const SortableSection = ({ title, courses, view, dragDisabled, onMove }: 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  );
-  if (!courses.length) return null;
+  )
+  if (!courses.length) {
+    return null
+  }
 
-  const ids = courses.map((c) => c.token);
+  const ids = courses.map((c) => c.token)
   const onDragEnd = ({ active, over }: DragEndEvent) => {
-    if (!over || active.id === over.id) return;
-    onMove(ids.indexOf(String(active.id)), ids.indexOf(String(over.id)));
-  };
+    if (!over || active.id === over.id) {
+      return
+    }
+    onMove(ids.indexOf(String(active.id)), ids.indexOf(String(over.id)))
+  }
 
-  const Item = view === "grid" ? CourseCard : CourseListRow;
+  const Item = view === "grid" ? CourseCard : CourseListRow
   return (
     <section className={styles.section}>
       {title && <h3 className={styles.sectionTitle}>{title}</h3>}
@@ -60,5 +64,5 @@ export const SortableSection = ({ title, courses, view, dragDisabled, onMove }: 
         </SortableContext>
       </DndContext>
     </section>
-  );
-};
+  )
+}

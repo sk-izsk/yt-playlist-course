@@ -1,0 +1,42 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  // Replaces eslint-config-next (core-web-vitals + typescript). Native Rust linter, understands TS 7.
+  "plugins": ["typescript", "unicorn", "oxc", "react", "react-perf", "nextjs", "import", "jsx-a11y"],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "env": { "browser": true, "node": true, "es2024": true },
+  "rules": {
+    // House style: every if / else / for / while body in braces, even one-liners (`oxlint --fix` adds them).
+    "curly": ["error", "all"],
+    // The two rules that catch real React bugs (same as eslint-plugin-react-hooks).
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    // React 17+ JSX transform: no React import needed.
+    "react/react-in-jsx-scope": "off",
+    "typescript/no-explicit-any": "warn",
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    // Remote YouTube thumbnails; next/image optimisation buys nothing here.
+    "nextjs/no-img-element": "off",
+    // Inline SVGs use role="img" (the ARIA-recommended pattern); the metro progress bar and selection mark are
+    // custom-drawn widgets with full ARIA, not native <progress>/<input>.
+    "jsx-a11y/prefer-tag-over-role": "off",
+    // antd's Switch renders the real control inside the wrapping <label>.
+    "jsx-a11y/label-has-associated-control": ["error", { "controlComponents": ["Switch"] }],
+    // `globalThis.__pg` keeps one pool across Next dev hot reloads.
+    "no-underscore-dangle": "off",
+    // Side-effect imports are only stylesheets.
+    "import/no-unassigned-import": ["warn", { "allow": ["**/*.css"] }],
+    // antd render-prop callbacks (e.g. Progress `format`) are functions, not components.
+    "react/no-unstable-nested-components": ["warn", { "allowAsProps": true }]
+  },
+  "overrides": [
+    {
+      // A login-only page: focusing the username field is the expected behaviour.
+      "files": ["src/components/auth/LoginForm.tsx"],
+      "rules": { "jsx-a11y/no-autofocus": "off" }
+    }
+  ],
+  "ignorePatterns": [".next/**", "drizzle/**", "next-env.d.ts", "node_modules/**"]
+}

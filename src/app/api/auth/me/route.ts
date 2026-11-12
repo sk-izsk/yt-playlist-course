@@ -1,8 +1,8 @@
-import { eq } from "drizzle-orm";
-import { db, first, schema } from "@/server/db/client";
-import { handleRead } from "@/server/http";
+import { eq } from "drizzle-orm"
+import { db, first, schema } from "@/server/db/client"
+import { handleRead } from "@/server/http"
 
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"
 
 /** `{ username, role }` when logged in, `null` for visitors. The UI shows write controls only for a user. */
 export const GET = () =>
@@ -16,4 +16,4 @@ export const GET = () =>
             .limit(1),
         )) ?? null)
       : null,
-  );
+  )

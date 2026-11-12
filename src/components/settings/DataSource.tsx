@@ -1,19 +1,20 @@
-"use client";
+"use client"
 
-import { Segmented, Typography } from "antd";
-import { useDbSource } from "@/client/hooks/useDbSource";
-import { BackupButton } from "./BackupButton";
+import { Segmented, Typography } from "antd"
+import { useDbSource } from "@/client/hooks/useDbSource"
+import { BackupButton } from "./BackupButton"
 
 /** Live Neon vs the Mac's local mirror. The mirror is read-only: the server refuses every write while it's chosen. */
 export const DataSource = () => {
-  const { available, source, set } = useDbSource();
+  const { available, source, set } = useDbSource()
   if (!available) {
     return (
       <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
         No local backup configured. Set <code>LOCAL_DATABASE_URL</code> in <code>.env.local</code> and run{" "}
-        <code>make db-backup</code> (or <code>make backup-install</code> for every 15 minutes) to get a read-only mirror here.
+        <code>make db-backup</code> (or <code>make backup-install</code> for every 15 minutes) to get a read-only mirror
+        here.
       </Typography.Paragraph>
-    );
+    )
   }
   return (
     <div>
@@ -32,5 +33,5 @@ export const DataSource = () => {
         <code>make backup-install</code>. Disaster recovery: point <code>DATABASE_URL</code> at the mirror.
       </Typography.Paragraph>
     </div>
-  );
-};
+  )
+}

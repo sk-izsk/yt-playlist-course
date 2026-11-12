@@ -1,25 +1,27 @@
-"use client";
+"use client"
 
-import { CheckOutlined } from "@ant-design/icons";
-import { Button, Segmented } from "antd";
-import { useMemo, useState } from "react";
-import { splitIntoDays, todayIndex } from "@/client/lib/plan";
-import { DAILY_OPTIONS, usePrefs } from "@/client/store/prefs";
-import { humanDuration } from "@/shared/format";
-import type { LessonRow as Lesson } from "@/shared/types";
-import { LessonRow } from "./LessonRow";
-import styles from "./course.module.css";
-import stations from "./stations.module.css";
+import { CheckOutlined } from "@ant-design/icons"
+import { Button, Segmented } from "antd"
+import { useMemo, useState } from "react"
+import { splitIntoDays, todayIndex } from "@/client/lib/plan"
+import { DAILY_OPTIONS, usePrefs } from "@/client/store/prefs"
+import { humanDuration } from "@/shared/format"
+import type { LessonRow as Lesson } from "@/shared/types"
+import { LessonRow } from "./LessonRow"
+import styles from "./course.module.css"
+import stations from "./stations.module.css"
 
 export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
-  const { dailyMinutes, setDailyMinutes } = usePrefs();
-  const days = useMemo(() => splitIntoDays(lessons, dailyMinutes), [lessons, dailyMinutes]);
-  const today = todayIndex(days);
-  const [picked, setPicked] = useState<number | null>(null);
-  const active = days[Math.min(picked ?? today, days.length - 1)];
-  const nextToken = lessons.find((l) => !l.completed)?.token;
+  const { dailyMinutes, setDailyMinutes } = usePrefs()
+  const days = useMemo(() => splitIntoDays(lessons, dailyMinutes), [lessons, dailyMinutes])
+  const today = todayIndex(days)
+  const [picked, setPicked] = useState<number | null>(null)
+  const active = days[Math.min(picked ?? today, days.length - 1)]
+  const nextToken = lessons.find((l) => !l.completed)?.token
 
-  if (!active) return null;
+  if (!active) {
+    return null
+  }
   return (
     <section>
       <div className={styles.planHead}>
@@ -36,7 +38,7 @@ export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
 
       <div className={styles.days} role="tablist" aria-label="Days">
         {days.map((d) => {
-          const progress = d.done ? "done" : d.lessons.some((l) => l.completed) ? "partial" : undefined;
+          const progress = d.done ? "done" : d.lessons.some((l) => l.completed) ? "partial" : undefined
           return (
             <Button
               key={d.index}
@@ -50,7 +52,7 @@ export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
             >
               Day {d.index + 1}
             </Button>
-          );
+          )
         })}
       </div>
 
@@ -61,8 +63,10 @@ export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
         {active.index === today && <span className={styles.today}>Today</span>}
       </div>
       <div className={stations.list}>
-        {active.lessons.map((l) => <LessonRow key={l.token} lesson={l} next={l.token === nextToken} />)}
+        {active.lessons.map((l) => (
+          <LessonRow key={l.token} lesson={l} next={l.token === nextToken} />
+        ))}
       </div>
     </section>
-  );
-};
+  )
+}

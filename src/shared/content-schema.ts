@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod"
 
 const practiceItem = z.object({
   difficulty: z.enum(["easy", "medium", "hard"]),
@@ -6,7 +6,7 @@ const practiceItem = z.object({
   prompt: z.string().min(1),
   hint: z.string().optional(),
   url: z.url().optional(),
-});
+})
 
 const quizItem = z
   .object({
@@ -16,7 +16,7 @@ const quizItem = z
     explanation: z.string().optional(),
     atSec: z.number().int().min(0).optional(),
   })
-  .refine((q) => q.answerIndex < q.options.length, "answerIndex out of range");
+  .refine((q) => q.answerIndex < q.options.length, "answerIndex out of range")
 
 /**
  * Shape an agent (Claude / Codex) writes for one lesson via `bun run agent save`.
@@ -33,16 +33,18 @@ export const lessonContentSchema = z
     quiz: z.array(quizItem).default([]),
   })
   .superRefine((c, ctx) => {
-    if (c.kind !== "core") return;
+    if (c.kind !== "core") {
+      return
+    }
     if (!/^##\s+Important points/im.test(c.summary)) {
-      ctx.addIssue({ code: "custom", path: ["summary"], message: 'core lessons need a "## Important points" section' });
+      ctx.addIssue({ code: "custom", path: ["summary"], message: 'core lessons need a "## Important points" section' })
     }
     if (c.practice.length < 3) {
-      ctx.addIssue({ code: "custom", path: ["practice"], message: "core lessons need at least 3 practice items" });
+      ctx.addIssue({ code: "custom", path: ["practice"], message: "core lessons need at least 3 practice items" })
     }
     if (c.quiz.length < 3) {
-      ctx.addIssue({ code: "custom", path: ["quiz"], message: "core lessons need at least 3 quiz questions" });
+      ctx.addIssue({ code: "custom", path: ["quiz"], message: "core lessons need at least 3 quiz questions" })
     }
-  });
+  })
 
-export type LessonContent = z.infer<typeof lessonContentSchema>;
+export type LessonContent = z.infer<typeof lessonContentSchema>
