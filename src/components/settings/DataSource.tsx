@@ -2,6 +2,7 @@
 
 import { Segmented, Typography } from "antd";
 import { useDbSource } from "@/client/hooks/useDbSource";
+import { BackupButton } from "./BackupButton";
 
 /** Live Neon vs the Mac's local mirror. The mirror is read-only: the server refuses every write while it's chosen. */
 export const DataSource = () => {
@@ -25,9 +26,10 @@ export const DataSource = () => {
           { value: "backup", label: "Local backup (read-only)" },
         ]}
       />
+      <BackupButton />
       <Typography.Paragraph type="secondary" style={{ margin: "8px 0 0" }}>
-        The backup is refreshed by <code>make db-backup</code> / the 15-minute launchd job. Disaster recovery: point{" "}
-        <code>DATABASE_URL</code> at it.
+        Also refreshed by <code>make db-backup</code> and, if installed, every 15 minutes by{" "}
+        <code>make backup-install</code>. Disaster recovery: point <code>DATABASE_URL</code> at the mirror.
       </Typography.Paragraph>
     </div>
   );

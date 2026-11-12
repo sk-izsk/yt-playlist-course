@@ -1,5 +1,5 @@
 import ky, { HTTPError, type AfterResponseHook } from "ky";
-import type { AgentToken, TrashedCourse, AppEvent, CourseDetail, CourseSummary, LessonDetail, Note, SyncResult } from "@/shared/types";
+import type { AgentToken, BackupStatus, TrashedCourse, AppEvent, CourseDetail, CourseSummary, LessonDetail, Note, SyncResult } from "@/shared/types";
 
 // One refresh at a time: parallel 401s must share it, or the second rotation looks like token reuse.
 let refreshing: Promise<boolean> | null = null;
@@ -56,6 +56,8 @@ export const api = {
   revokeAgentToken: (id: number) => http.delete(`agent-tokens/${id}`).json(),
   dbSource: () => http.get("db-source").json<{ available: boolean; source: "live" | "backup" }>(),
   setDbSource: (source: "live" | "backup") => http.put("db-source", { json: { source } }).json(),
+  backupStatus: () => http.get("backup").json<BackupStatus>(),
+  runBackup: () => http.post("backup").json<{ log: string[]; status: BackupStatus }>(),
   trash: () => http.get("trash").json<TrashedCourse[]>(),
   tutor: () => http.get("tutor").json<{ enabled: boolean }>(),
   restoreCourse: (token: string) => http.post(`trash/${token}`).json(),

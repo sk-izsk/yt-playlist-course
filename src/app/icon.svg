@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- Same mark as components/layout/Logo.tsx (three lines meeting at one station), with fixed colours:
+       a favicon can't read the page's CSS variables. The station follows the browser's light/dark theme. -->
+  <style>
+    .station { fill: #ffffff; stroke: #101826; }
+    @media (prefers-color-scheme: dark) { .station { fill: #1f1f1f; stroke: #f2f4f7; } }
+  </style>
+  <path d="M3 22 L13 12 H29" fill="none" stroke="#E8483B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M16 3 V29" fill="none" stroke="#2563EB" stroke-width="4" stroke-linecap="round" />
+  <path d="M3 10 L9 16 H29" fill="none" stroke="#1F9D55" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.9" />
+  <rect class="station" x="10.5" y="9.5" width="11" height="9" rx="4.5" stroke-width="2.5" />
+</svg>
