@@ -3,7 +3,7 @@
 
 .DEFAULT_GOAL := help
 .PHONY: help install dev build start stop lint typecheck selfcheck check clean \
-        list pending show add sync fill report transcripts db-generate db-migrate db-copy db-studio user owner mcp-add db-backup backup-install backup-uninstall
+        list pending show add sync fill report transcripts db-generate db-migrate db-copy db-studio user mcp-add db-backup backup-install backup-uninstall
 
 PORT ?= 3000
 
@@ -91,9 +91,6 @@ user: ## Create a login or reset its password (NAME=… ROLE=owner|demo); prompt
 mcp-add: ## Register the MCP server for Claude Code in every folder (URL=… TOKEN=tw_… from Settings)
 	@test -n "$(URL)" -a -n "$(TOKEN)" || (echo "usage: make mcp-add URL=https://… TOKEN=tw_…  (see docs/mcp.md)"; exit 1)
 	claude mcp add tubewise --scope user -e TUBEWISE_URL=$(URL) -e TUBEWISE_TOKEN=$(TOKEN) -- "$(CURDIR)/node_modules/.bin/tsx" "$(CURDIR)/mcp/server.ts"
-
-owner: ## Create/update the owner login from OWNER_USERNAME + OWNER_PASSWORD in .env.local
-	bunx tsx scripts/user-create.ts
 
 db-studio: ## Browse the database in drizzle studio (read it; write through the CLI)
 	bunx drizzle-kit studio

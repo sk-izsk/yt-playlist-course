@@ -73,9 +73,9 @@ Why it's shaped like this:
 
 ```bash
 make install          # bun install
-cp .env.example .env.local   # DATABASE_URL (Neon), JWT_SECRET, optional OWNER_USERNAME / OWNER_PASSWORD
+cp .env.example .env.local   # DATABASE_URL (Neon), JWT_SECRET
 make db-migrate       # create the schema
-make owner            # create your login from OWNER_* (or: make user NAME=you)
+make user NAME=you    # create your login (hidden password prompt; only a hash is stored)
 make dev              # http://localhost:3000
 ```
 
@@ -102,7 +102,7 @@ The writing rules agents follow are in [docs/notes-guide.md](docs/notes-guide.md
 | `make list`, `make pending ID=…`, `make show ID=…`, `make report ID=…` | agent CLI views |
 | `make fill ID=… AGENT=claude\|codex MAX=n` | fill pending lessons, one agent session each |
 | `make db-generate` / `make db-migrate` | schema migrations (drizzle-kit) |
-| `make user NAME=…` / `make owner` | create a login / the owner from `.env.local` |
+| `make user NAME=…` | create a login or reset its password (hidden prompt) |
 | `make db-backup` / `make backup-install` | dump Neon (+ refresh the local mirror) / every 15 min via launchd |
 | `make mcp-add URL=… TOKEN=…` | register the MCP server in Claude Code (user scope) |
 

@@ -16,8 +16,8 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 - **Changed 2026-11-11 (user): the app is public to read.** Anyone can browse courses, lessons, notes, practice and
   quizzes without logging in. Login only unlocks writes: add/sync/delete courses, progress, pin/reorder, personal notes,
   agent tokens. Reads use `handleRead()` (optional user), writes `handle()` (401 "Log in to make changes"); the UI hides
-  write controls via `useSession()`. Owner credentials may live in `.env.local` (`OWNER_USERNAME`/`OWNER_PASSWORD`,
-  applied with `make owner`; only the argon2 hash goes to the DB).
+  write controls via `useSession()`. Login credentials never live in env files: `make user NAME=…` (hidden prompt;
+  only the argon2 hash goes to the DB). (An earlier `make owner` from `.env.local` was removed at the user's request.)
 - **Login: single owner user.** No signup page; create the user with a CLI command.
   - Access token: JWT HS256 via `jose`, 15 min, claims `{sub, role, sid}`, httpOnly Secure SameSite=Lax cookie.
   - Session token: 32 random bytes, only its SHA-256 stored, cookie scoped to `/api/auth`. **24 h sliding** idle expiry,
