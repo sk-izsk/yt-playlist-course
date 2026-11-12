@@ -6,7 +6,9 @@ import { promisify } from "node:util";
 
 const run = promisify(execFile);
 const DIR = process.env.BACKUP_DIR ?? path.join(os.homedir(), ".courseit", "backups");
-const SCRIPT = path.join(process.cwd(), "scripts", "backup.sh");
+// `turbopackIgnore` on every runtime-only path: without it the build can't resolve them and traces (bundles) the
+// whole project into each server function. These paths only exist on the Mac; Vercel never runs this code.
+const SCRIPT = path.join(/* turbopackIgnore: true */ process.cwd(), "scripts", "backup.sh");
 // The dev server may have started without Homebrew / Postgres.app on PATH; pg_dump lives there.
 const PATH = ["/opt/homebrew/bin", "/Applications/Postgres.app/Contents/Versions/latest/bin", process.env.PATH].join(":");
 
@@ -14,8 +16,12 @@ export type BackupStatus = { lastAt: number | null; file: string | null; sizeByt
 
 /** Newest dated dump on this Mac (the mirror is refreshed from the same run). */
 export const backupStatus = async (): Promise<BackupStatus> => {
-  const files = (await readdir(DIR).catch(() => [] as string[])).filter((f) => /^tubewise-.*\.dump$/.test(f));
-  const stats = await Promise.all(files.map(async (f) => ({ f, s: await stat(path.join(DIR, f)) })));
+  const files = (await readdir(/* turbopackIgnore: true */ DIR).catch(() => [] as string[])).filter((f) =>
+    /^tubewise-.*\.dump$/.test(f),
+  );
+  const stats = await Promise.all(
+    files.map(async (f) => ({ f, s: await stat(/* turbopackIgnore: true */ path.join(DIR, f)) })),
+  );
   const newest = stats.sort((a, b) => b.s.mtimeMs - a.s.mtimeMs)[0];
   return { lastAt: newest?.s.mtimeMs ?? null, file: newest?.f ?? null, sizeBytes: newest?.s.size ?? null, dumps: files.length };
 };
