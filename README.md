@@ -3,7 +3,7 @@
 Turn any YouTube video or playlist into a course you actually finish: lessons laid out as a daily route, written
 notes, practice and a quiz for every video, written by an AI agent from the video's own transcript.
 
-**Live:** _coming soon (Vercel)_ · anyone can browse; logging in unlocks changes.
+**Live:** [tubewise.vercel.app](https://tubewise.vercel.app) · anyone can browse; logging in unlocks changes.
 
 | Library | Course route | Lesson notes |
 |---|---|---|

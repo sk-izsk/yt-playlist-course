@@ -54,7 +54,7 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 |---|---|---|
 | 1 ✅ 2026-11-11 | **Postgres**: drizzle pg-core schema, async repo (~54 sync call sites: `.all()/.get()/.run()/transaction`), drizzle-kit migrations instead of migrate-on-load, one-time copy script SQLite → Neon | `make check` passes; app + CLI work against Neon with the user's real data |
 | 2 ✅ 2026-11-11 | **Login** (see decisions) + `users`, `sessions`, `login_attempts` tables + `user:create` CLI | idle logout, refresh, token reuse revocation verified in the browser |
-| 3 ⏳ code done, deploy waits on env vars | **Vercel deploy**: env vars, cron for `check-updates`, transcripts left `pending` online | app live behind login |
+| 3 ✅ 2026-11-12 (tubewise.vercel.app) | **Vercel deploy**: env vars, cron for `check-updates`, transcripts left `pending` online | app live behind login |
 | 4 ✅ 2026-11-11 | **Agent API** `/api/agent/*` + `agent_tokens` table + Settings page | token can save a lesson; can't delete |
 | 5 ✅ 2026-11-11 | **Custom MCP** (`mcp/server.ts`, stdio): `fetch_transcripts`, `list_pending`, `get_lesson`, `save_notes`, `course_report`; writing rules from `docs/notes-guide.md` (move AGENTS.md Part B there) | Claude Code fills one real lesson through MCP |
 | 6 ✅ 2026-11-11 | **CLI remote mode**: `scripts/agent` uses the API when `TUBEWISE_URL`/`TUBEWISE_TOKEN` are set; `make fill` unchanged | `make fill MAX=1` works online |
