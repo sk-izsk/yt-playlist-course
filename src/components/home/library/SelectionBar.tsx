@@ -20,7 +20,7 @@ export const SelectionBar = ({ visible }: { visible: CourseSummary[] }) => {
   const confirmDelete = () =>
     modal.confirm({
       title: `Delete ${n} course${n > 1 ? "s" : ""}?`,
-      content: "Progress, notes and quizzes for them are removed too. This can't be undone.",
+      content: "They move to the trash (Settings) with their progress and notes, and can be restored for 7 days.",
       okText: `Delete ${n}`,
       okButtonProps: { danger: true },
       onOk: () => {

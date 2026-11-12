@@ -22,6 +22,8 @@ export const courses = pgTable("courses", {
   availableUpdates: integer("available_updates").notNull().default(0),
   // Index into shared/lines.ts LINES, picked once on import so courses don't share a colour.
   line: integer("line").notNull().default(0),
+  // Soft delete: set = in the trash (hidden everywhere, restorable); purged for good after 7 days.
+  deletedAt: ms("deleted_at"),
 });
 
 /** Activity feed behind the notification center: updates found, videos added, failures. */

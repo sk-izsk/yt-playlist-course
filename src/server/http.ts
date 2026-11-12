@@ -1,4 +1,6 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { backupAvailable, withSource, type DbSource } from "./db/client";
 import { requireAgent } from "./auth/agent-tokens";
 import { optionalUser, requireUser } from "./auth/require-user";
 import type { AuthUser } from "./auth/tokens";
@@ -22,13 +24,27 @@ export const handlePublic = async <T>(fn: () => T | Promise<T>, status = 200) =>
   }
 };
 
+/** Which database this browser reads: "backup" (the local mirror) only when chosen in Settings and available. */
+export const DB_COOKIE = "tw_db";
+export const chosenSource = async (): Promise<DbSource> =>
+  (await cookies()).get(DB_COOKIE)?.value === "backup" && backupAvailable() ? "backup" : "live";
+
 /** Public reads: `user` is null for visitors. Anything that writes must use `handle` instead. */
 export const handleRead = <T>(fn: (user: AuthUser | null) => T | Promise<T>, status = 200) =>
-  handlePublic(async () => fn(await optionalUser()), status);
+  handlePublic(async () => {
+    const user = await optionalUser();
+    return withSource(await chosenSource(), () => fn(user));
+  }, status);
 
-/** Every write: 401 unless the access cookie holds a valid token. */
+/** Every write: 401 unless logged in; 403 while viewing the local backup, which is read-only. Always hits Neon. */
 export const handle = <T>(fn: (user: AuthUser) => T | Promise<T>, status = 200) =>
-  handlePublic(async () => fn(await requireUser()), status);
+  handlePublic(async () => {
+    const user = await requireUser();
+    if ((await chosenSource()) === "backup") {
+      throw new HttpError(403, "You're viewing the local backup, which is read-only. Switch to Neon (live) in Settings to make changes.");
+    }
+    return fn(user);
+  }, status);
 
 /** /api/agent/* only: `Authorization: Bearer tw_…` (an agent token), never the login cookie. */
 export const handleAgent = <T>(req: Request, fn: (user: AuthUser) => T | Promise<T>, status = 200) =>

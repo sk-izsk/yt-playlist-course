@@ -50,7 +50,7 @@ export const CourseHeader = ({ course: c }: { course: CourseDetail }) => {
           {canEdit && (
             <Popconfirm
               title="Delete this course?"
-              description="Progress, notes and quizzes are removed too."
+              description="It moves to the trash (Settings) and can be restored for 7 days."
               okButtonProps={{ danger: true, loading: del.isPending }}
               onConfirm={() => del.mutateAsync().then(() => router.push("/"))}
             >

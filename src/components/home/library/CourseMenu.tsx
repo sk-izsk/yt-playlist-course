@@ -51,7 +51,7 @@ export const CourseMenu = ({ course: c }: { course: CourseSummary }) => {
     delete: () =>
       modal.confirm({
         title: `Delete "${c.title}"?`,
-        content: "Progress, notes and quizzes for this course are removed too. This can't be undone.",
+        content: "It moves to the trash (Settings) with its progress and notes, and can be restored for 7 days.",
         okText: "Delete",
         okButtonProps: { danger: true },
         onOk: () => del.mutateAsync(),

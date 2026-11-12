@@ -1,0 +1,31 @@
+# Nightly off-site copy of the Neon database (Neon's free tier keeps only a 6 h restore window).
+# Needs one repository secret: NEON_DATABASE_URL (the direct URL, host without "-pooler").
+# Dumps are kept as workflow artifacts for 14 days: Actions → this workflow → a run → Artifacts.
+name: Nightly DB backup
+
+on:
+  schedule:
+    - cron: "30 7 * * *" # 07:30 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    container: postgres:18 # same major as Neon, so pg_dump matches the server
+    steps:
+      - name: pg_dump
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+          PGSSLROOTCERT: system # verify-full against the OS trust store
+        run: |
+          test -n "$DATABASE_URL" || { echo "Add the NEON_DATABASE_URL secret first"; exit 1; }
+          pg_dump --format=custom --no-owner --no-privileges --dbname="$DATABASE_URL" --file="tubewise-$(date +%F).dump"
+          ls -lh tubewise-*.dump
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tubewise-db-${{ github.run_id }}
+          path: tubewise-*.dump
+          retention-days: 14

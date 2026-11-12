@@ -2,6 +2,7 @@ import { db, schema } from "../db/client";
 import { findCourseByYoutubeId } from "../repo/courses";
 import { nextLine, topSortOrder } from "../repo/course-order";
 import { insertLessons, type LessonDraft } from "../repo/lessons";
+import { restoreCourse } from "../repo/trash";
 import { newId } from "../tokens";
 import { fetchPlaylist, fetchVideo } from "../youtube/fetch-course";
 import { parseYouTubeLink } from "../youtube/parse-url";
@@ -48,7 +49,11 @@ export const importCourse = async (input: string): Promise<ImportResult> => {
   const link = parseYouTubeLink(input);
   const id = link.kind === "playlist" ? link.playlistId : link.videoId;
   const existing = await findCourseByYoutubeId(id);
-  if (existing) return { token: existing.token, title: existing.title, created: false, transcripts: Promise.resolve() };
+  if (existing) {
+    // Re-adding a course from the trash brings it back with its progress and notes.
+    if (existing.deletedAt) await restoreCourse(existing.token);
+    return { token: existing.token, title: existing.title, created: false, transcripts: Promise.resolve() };
+  }
 
   const { drafts, ...meta } = await fetchMeta(input);
   const token = newId();

@@ -1,6 +1,7 @@
 import { and, asc, eq, isNull, max } from "drizzle-orm";
 import { db, first, schema } from "../db/client";
 import { newId } from "../tokens";
+import { live, liveLesson } from "./courses";
 
 const { lessons, courses } = schema;
 
@@ -14,7 +15,7 @@ export interface LessonDraft {
 }
 
 export const findLesson = (token: string) =>
-  first(db.select().from(lessons).where(eq(lessons.token, token)).limit(1));
+  first(db.select().from(lessons).where(and(eq(lessons.token, token), liveLesson)).limit(1));
 
 export const lessonsOfCourse = (courseId: number) =>
   db.select().from(lessons).where(eq(lessons.courseId, courseId)).orderBy(asc(lessons.position));
@@ -57,7 +58,8 @@ export const setCompleted = async (token: string, done: boolean) =>
 
 /** Lessons still waiting for an agent to write notes, optionally scoped to one course. */
 export const pendingLessons = (courseToken?: string) => {
-  const where = courseToken ? and(isNull(lessons.summary), eq(courses.token, courseToken)) : isNull(lessons.summary);
+  const base = and(isNull(lessons.summary), live);
+  const where = courseToken ? and(base, eq(courses.token, courseToken)) : base;
   return db
     .select({
       token: lessons.token,

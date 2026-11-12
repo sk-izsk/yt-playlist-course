@@ -58,7 +58,7 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 | 4 ✅ 2026-11-11 | **Agent API** `/api/agent/*` + `agent_tokens` table + Settings page | token can save a lesson; can't delete |
 | 5 ✅ 2026-11-11 | **Custom MCP** (`mcp/server.ts`, stdio): `fetch_transcripts`, `list_pending`, `get_lesson`, `save_notes`, `course_report`; writing rules from `docs/notes-guide.md` (move AGENTS.md Part B there) | Claude Code fills one real lesson through MCP |
 | 6 ✅ 2026-11-11 | **CLI remote mode**: `scripts/agent` uses the API when `TUBEWISE_URL`/`TUBEWISE_TOKEN` are set; `make fill` unchanged | `make fill MAX=1` works online |
-| 7 | **Backups**: Mac mirror (launchd pull every 15 min + 14 dated dumps + local/Neon toggle, read-only local) + nightly `pg_dump` via GitHub Actions + soft delete with a 7-day trash | local mirror matches Neon; a dump restores into a scratch DB |
+| 7 ✅ 2026-11-11 | **Backups**: Mac mirror (launchd pull every 15 min + 14 dated dumps + local/Neon toggle, read-only local) + nightly `pg_dump` via GitHub Actions + soft delete with a 7-day trash | local mirror matches Neon; a dump restores into a scratch DB |
 | 8 | **Demo** | visitor can browse, every write returns 403 |
 | 9 | **AI tutor** (optional): "Ask this lesson", `claude-haiku-5-5`, notes+transcript as cached prefix, daily caps; demo gets notes-only context | streams an answer within caps |
 | 10 | **README / portfolio** | architecture diagram, screenshots, demo link |
@@ -126,6 +126,22 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
   (add courses on the website); `transcripts` downloads on the Mac and uploads.
 - Verified: `TUBEWISE_URL=… TUBEWISE_TOKEN=… make fill ID=<test course> AGENT=claude MAX=1` → a fresh Claude session
   wrote and saved a lesson through the API; report printed.
+
+## Phase 7 notes (done 2026-11-11)
+
+- `scripts/backup.sh` (`make db-backup`): `pg_dump -Fc` of Neon's direct endpoint → `~/.courseit/backups/
+  tubewise-YYYY-MM-DD.dump` (one per day, newest 14 kept), then `pg_restore --clean` into `LOCAL_DATABASE_URL` if set.
+  `PGSSLROOTCERT=system` only for Neon (libpq needs it for verify-full). `make backup-install` loads the launchd job
+  (`scripts/launchd/`, every 15 min); `make backup-uninstall` removes it.
+- `.github/workflows/backup.yml`: nightly `pg_dump` in a `postgres:18` container → 14-day artifact.
+- Soft delete (`drizzle/0003`): `courses.deleted_at`; every query filters `live`/`liveLesson`; Settings → Trash restores;
+  re-adding a trashed course restores it; purge after 7 days (on trash list + daily cron).
+- Read-only local view: `db` is a proxy picking Neon or the mirror per request (AsyncLocalStorage, `tw_db` cookie set from
+  Settings → Data source). Auth, agent API and every write always use Neon; writes 403 while viewing the backup.
+- Verified: dump + mirror into a scratch Postgres (counts and summary bytes identical to Neon, rerun idempotent),
+  14-dump retention, toggle reads the mirror and blocks writes, delete → hidden (app + agent API) → restore, 7-day purge.
+- **Left for the user:** `createdb tubewise_mirror` in your local Postgres + `LOCAL_DATABASE_URL` in `.env.local`,
+  `make backup-install`, and the GitHub secret `NEON_DATABASE_URL` (direct URL) for the nightly workflow (not run yet).
 
 ## Needed from the user
 

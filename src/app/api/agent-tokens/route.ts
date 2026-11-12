@@ -1,9 +1,13 @@
-import { handle, HttpError, readJson } from "@/server/http";
+import { handle, handleRead, HttpError, readJson } from "@/server/http";
 import { createAgentToken, listAgentTokens, ownerOnly } from "@/server/auth/agent-tokens";
 
 export const dynamic = "force-dynamic";
 
-export const GET = () => handle((u) => listAgentTokens(ownerOnly(u).id));
+export const GET = () =>
+  handleRead((u) => {
+    if (!u) throw new HttpError(401, "Log in to manage agent tokens");
+    return listAgentTokens(ownerOnly(u).id);
+  });
 
 /** Body: { name }. The response holds the token in plain text; it is never shown again. */
 export const POST = (req: Request) =>

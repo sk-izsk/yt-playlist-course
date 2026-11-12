@@ -2,6 +2,7 @@ import { and, eq, isNull, lt, or } from "drizzle-orm";
 import { db, schema } from "../db/client";
 import { checkCourseUpdates } from "./check-updates";
 import { addEvent } from "../repo/events";
+import { live, liveLesson } from "../repo/courses";
 import { fillTranscripts } from "./transcripts";
 
 const STALE_MS = 30 * 60 * 1000; // re-check a playlist at most every 30 minutes
@@ -20,7 +21,7 @@ const resumePendingTranscripts = async () => {
   const ids = await db
     .selectDistinct({ id: schema.lessons.courseId })
     .from(schema.lessons)
-    .where(eq(schema.lessons.transcriptStatus, "pending"));
+    .where(and(eq(schema.lessons.transcriptStatus, "pending"), liveLesson));
   ids.forEach(({ id }) => fillTranscripts(id).catch((e) => console.error("[resume]", e)));
 };
 
@@ -34,7 +35,7 @@ export const checkStaleCourses = async (): Promise<StaleCheckResult[]> => {
   const stale = await db
     .select()
     .from(c)
-    .where(and(eq(c.kind, "playlist"), or(isNull(c.lastSyncedAt), lt(c.lastSyncedAt, Date.now() - STALE_MS))));
+    .where(and(eq(c.kind, "playlist"), live, or(isNull(c.lastSyncedAt), lt(c.lastSyncedAt, Date.now() - STALE_MS))));
 
   const results: StaleCheckResult[] = [];
   for (const course of stale) {

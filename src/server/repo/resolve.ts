@@ -1,5 +1,6 @@
-import { like } from "drizzle-orm";
+import { and, like } from "drizzle-orm";
 import { db, schema } from "../db/client";
+import { live, liveLesson } from "./courses";
 
 export type Resolved = { type: "course" | "lesson"; token: string };
 
@@ -10,8 +11,8 @@ export const resolveId = async (input: string): Promise<Resolved> => {
 
   const q = `${prefix}%`;
   const [cs, ls] = await Promise.all([
-    db.select({ token: schema.courses.token }).from(schema.courses).where(like(schema.courses.token, q)),
-    db.select({ token: schema.lessons.token }).from(schema.lessons).where(like(schema.lessons.token, q)),
+    db.select({ token: schema.courses.token }).from(schema.courses).where(and(like(schema.courses.token, q), live)),
+    db.select({ token: schema.lessons.token }).from(schema.lessons).where(and(like(schema.lessons.token, q), liveLesson)),
   ]);
   const hits: Resolved[] = [
     ...cs.map((r) => ({ type: "course" as const, token: r.token })),

@@ -3,7 +3,7 @@
 
 .DEFAULT_GOAL := help
 .PHONY: help install dev build start stop lint typecheck selfcheck check clean \
-        list pending show add sync fill report transcripts db-generate db-migrate db-copy db-studio user owner mcp-add
+        list pending show add sync fill report transcripts db-generate db-migrate db-copy db-studio user owner mcp-add db-backup backup-install backup-uninstall
 
 PORT ?= 3000
 
@@ -97,3 +97,19 @@ owner: ## Create/update the owner login from OWNER_USERNAME + OWNER_PASSWORD in 
 
 db-studio: ## Browse the database in drizzle studio (read it; write through the CLI)
 	bunx drizzle-kit studio
+
+PLIST := $(HOME)/Library/LaunchAgents/com.tubewise.backup.plist
+
+db-backup: ## Dump Neon to ~/.courseit/backups (keeps 14 days) and refresh the local mirror if LOCAL_DATABASE_URL is set
+	scripts/backup.sh
+
+backup-install: ## Run db-backup every 15 minutes with launchd
+	@mkdir -p $(HOME)/.courseit/backups $(dir $(PLIST))
+	sed -e 's|__REPO__|$(CURDIR)|g' -e 's|__HOME__|$(HOME)|g' scripts/launchd/com.tubewise.backup.plist > $(PLIST)
+	launchctl bootout gui/$$(id -u) $(PLIST) 2>/dev/null || true
+	launchctl bootstrap gui/$$(id -u) $(PLIST)
+	@echo "installed; log: ~/.courseit/backups/backup.log"
+
+backup-uninstall: ## Stop the 15-minute backups
+	launchctl bootout gui/$$(id -u) $(PLIST) 2>/dev/null || true
+	rm -f $(PLIST)
