@@ -14,13 +14,13 @@ export const handlePublic = async <T>(fn: () => T | Promise<T>, status = 200) =>
   try {
     return NextResponse.json(await fn(), { status });
   } catch (err) {
-    const code = err instanceof HttpError ? err.status : 400;
-    // Expected rejections (bad input, 401, 404) are HttpErrors; anything else is a real failure worth surfacing.
-    if (code >= 500 || !(err instanceof HttpError)) {
-      console.error("[api]", err);
-      await addEvent({ kind: "error", title: "Something failed on the server", body: (err as Error).message ?? String(err) });
-    }
-    return NextResponse.json({ error: (err as Error).message ?? "Something went wrong" }, { status: code });
+    // Expected rejections (bad input, 401, 404, 422) are HttpErrors and their messages are written for users.
+    if (err instanceof HttpError) return NextResponse.json({ error: err.message }, { status: err.status });
+    // Anything else is a real failure: details (SQL, params, stack) go to the server log and the owner's
+    // notification feed, never to the browser, which is public now.
+    console.error("[api]", err);
+    await addEvent({ kind: "error", title: "Something failed on the server", body: (err as Error).message ?? String(err) });
+    return NextResponse.json({ error: "Something went wrong on the server. Try again." }, { status: 500 });
   }
 };
 
