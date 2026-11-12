@@ -23,7 +23,9 @@ export const Crumbs = ({ items }: { items: Crumb[] }) => {
       <Breadcrumb
         items={items.map((i) => ({
           title: i.href ? (
-            <Link href={i.href} className={styles.crumbLink}>{i.label}</Link>
+            <Link href={i.href} className={styles.crumbLink}>
+              {i.label}
+            </Link>
           ) : (
             <span className={styles.crumbCurrent}>{i.label}</span>
           ),

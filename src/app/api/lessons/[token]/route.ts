@@ -13,7 +13,7 @@ export const GET = async (_: Request, ctx: Ctx) => {
     if (!detail) throw notFound("Lesson");
     return detail;
   });
-}
+};
 
 /** Body: { completed: boolean } */
 export const PATCH = async (req: Request, ctx: Ctx) => {
@@ -23,4 +23,4 @@ export const PATCH = async (req: Request, ctx: Ctx) => {
     if (!(await setCompleted(token, Boolean(completed)))) throw notFound("Lesson");
     return { ok: true };
   });
-}
+};

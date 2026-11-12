@@ -13,4 +13,4 @@ export const useNoteMutations = (lessonToken: string) => {
   const remove = useMutation({ mutationFn: api.deleteNote, onSuccess: refresh });
 
   return { add, remove };
-}
+};

@@ -15,14 +15,29 @@ const ROUTES = [
 ] as const;
 
 const STATIONS: [number, number][] = [
-  [24, 330], [110, 330], [536, 240], [400, 240],
-  [70, 34], [70, 100], [190, 396], [190, 330],
-  [24, 118], [130, 118], [536, 370], [450, 370],
-  [536, 70], [470, 70], [120, 270],
+  [24, 330],
+  [110, 330],
+  [536, 240],
+  [400, 240],
+  [70, 34],
+  [70, 100],
+  [190, 396],
+  [190, 330],
+  [24, 118],
+  [130, 118],
+  [536, 370],
+  [450, 370],
+  [536, 70],
+  [470, 70],
+  [120, 270],
 ];
 
 // Interchanges: where two lines share a stop.
-const INTERCHANGES: [number, number][] = [[260, 240], [300, 200], [190, 260]];
+const INTERCHANGES: [number, number][] = [
+  [260, 240],
+  [300, 200],
+  [190, 260],
+];
 
 const DemoMap = () => (
   <svg className={styles.map} viewBox="0 0 560 420" role="img" aria-labelledby="map-title">

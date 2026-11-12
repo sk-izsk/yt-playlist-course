@@ -21,4 +21,4 @@ export const POST = async (req: Request) => {
       throw new HttpError(422, (err as Error).message);
     }
   }, 201);
-}
+};

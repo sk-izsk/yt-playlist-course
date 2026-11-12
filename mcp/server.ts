@@ -27,19 +27,23 @@ const server = new McpServer(
 
 const text = (t: string) => ({ content: [{ type: "text" as const, text: t }] });
 // Errors (bad id, quality rejection) go back to the agent as text so it can fix and retry.
-const tool = <A>(fn: (args: A) => Promise<string>) => async (args: A) => {
-  try {
-    return text(await fn(args));
-  } catch (err) {
-    return { ...text((err as Error).message), isError: true };
-  }
-};
+const tool =
+  <A>(fn: (args: A) => Promise<string>) =>
+  async (args: A) => {
+    try {
+      return text(await fn(args));
+    } catch (err) {
+      return { ...text((err as Error).message), isError: true };
+    }
+  };
 
 const id = z.string().describe("Full UUID or a unique prefix (at least 4 characters)");
 
 server.registerTool(
   "notes_guide",
-  { description: "The rules for writing lesson notes (kinds, summary format, practice, quiz, quality bar). Read first." },
+  {
+    description: "The rules for writing lesson notes (kinds, summary format, practice, quiz, quality bar). Read first.",
+  },
   tool(async () => readFileSync(GUIDE, "utf8")),
 );
 
@@ -48,28 +52,39 @@ server.registerTool(
   { description: "All courses with ids and how many lessons still need notes." },
   tool(async () =>
     (await agentApi.courses())
-      .map((c) => `${c.token}  notes ${c.lessonCount - c.pendingNotes}/${c.lessonCount}  transcripts pending ${c.transcriptsPending}  ${c.title}`)
+      .map(
+        (c) =>
+          `${c.token}  notes ${c.lessonCount - c.pendingNotes}/${c.lessonCount}  transcripts pending ${c.transcriptsPending}  ${c.title}`,
+      )
       .join("\n"),
   ),
 );
 
 server.registerTool(
   "get_course",
-  { description: "One course: every lesson with id, length, notes status and transcript status.", inputSchema: { course: id } },
+  {
+    description: "One course: every lesson with id, length, notes status and transcript status.",
+    inputSchema: { course: id },
+  },
   tool(async ({ course }) => formatCourse(await agentApi.course(await resolveRemote("course", course)))),
 );
 
 server.registerTool(
   "fetch_transcripts",
   {
-    description: "Download missing YouTube transcripts on this Mac and upload them. Run before writing notes. Takes ~1–2 s per video.",
-    inputSchema: { course: id, retry_errors: z.boolean().optional().describe("Also retry lessons whose last fetch failed") },
+    description:
+      "Download missing YouTube transcripts on this Mac and upload them. Run before writing notes. Takes ~1–2 s per video.",
+    inputSchema: {
+      course: id,
+      retry_errors: z.boolean().optional().describe("Also retry lessons whose last fetch failed"),
+    },
   },
   tool(async ({ course, retry_errors }) => {
     const r = await fetchAndUploadTranscripts(await resolveRemote("course", course), { retryErrors: retry_errors });
     if (!r.total) return "No transcripts missing.";
     const lines = [`${r.total} lessons: ${r.ok} uploaded, ${r.none} have no captions, ${r.failed} failed.`];
-    if (r.errors.length) lines.push("Failures (YouTube may be rate-limiting; retry later with retry_errors):", ...r.errors);
+    if (r.errors.length)
+      lines.push("Failures (YouTube may be rate-limiting; retry later with retry_errors):", ...r.errors);
     return lines.join("\n");
   }),
 );
@@ -80,7 +95,9 @@ server.registerTool(
   tool(async ({ course }) => {
     const rows = await agentApi.pending(course ? await resolveRemote("course", course) : undefined);
     if (!rows.length) return "Nothing pending: every lesson has notes.";
-    return rows.map((r) => `${r.token}  #${r.position}  [transcript: ${r.transcript}]  ${r.title}  — ${r.course}`).join("\n");
+    return rows
+      .map((r) => `${r.token}  #${r.position}  [transcript: ${r.transcript}]  ${r.title}  — ${r.course}`)
+      .join("\n");
   }),
 );
 
@@ -90,10 +107,15 @@ server.registerTool(
     description: "A lesson's details, transcript ([mm:ss|seconds] lines) and target summary length.",
     inputSchema: {
       lesson: id,
-      mode: z.enum(["compact", "full", "head"]).optional().describe("compact (default), full captions, or head = first 3 minutes"),
+      mode: z
+        .enum(["compact", "full", "head"])
+        .optional()
+        .describe("compact (default), full captions, or head = first 3 minutes"),
     },
   },
-  tool(async ({ lesson, mode }) => formatLesson(await agentApi.lesson(await resolveRemote("lesson", lesson), mode ?? "compact"))),
+  tool(async ({ lesson, mode }) =>
+    formatLesson(await agentApi.lesson(await resolveRemote("lesson", lesson), mode ?? "compact")),
+  ),
 );
 
 server.registerTool(
@@ -105,7 +127,10 @@ server.registerTool(
     inputSchema: {
       lesson: id,
       content: z.record(z.string(), z.unknown()).describe("The content JSON object"),
-      force: z.boolean().optional().describe("Overwrite existing notes. Only when the user explicitly asked to redo the lesson."),
+      force: z
+        .boolean()
+        .optional()
+        .describe("Overwrite existing notes. Only when the user explicitly asked to redo the lesson."),
     },
   },
   tool(async ({ lesson, content, force }) => {
@@ -117,7 +142,10 @@ server.registerTool(
 
 server.registerTool(
   "course_report",
-  { description: "Per-lesson table: kind, minutes, summary length, timestamps, practice, quiz, answer order.", inputSchema: { course: id } },
+  {
+    description: "Per-lesson table: kind, minutes, summary length, timestamps, practice, quiz, answer order.",
+    inputSchema: { course: id },
+  },
   tool(async ({ course }) => formatReport(await agentApi.report(await resolveRemote("course", course)))),
 );
 

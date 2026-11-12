@@ -16,4 +16,4 @@ export const toLessonRow = (l: LessonRecord): LessonRow => {
     isNew: l.isNew,
     transcriptStatus: l.transcriptStatus,
   };
-}
+};

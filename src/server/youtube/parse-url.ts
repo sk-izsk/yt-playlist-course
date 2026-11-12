@@ -28,7 +28,7 @@ export const parseYouTubeLink = (input: string): ParsedLink => {
   if (list && !list.startsWith("RD")) return { kind: "playlist", playlistId: list, videoId };
   if (videoId) return { kind: "video", videoId };
   throw new Error("Couldn't find a video or playlist id in that link.");
-}
+};
 
 const extractVideoId = (url: URL): string | undefined => {
   if (url.hostname.endsWith("youtu.be")) return url.pathname.slice(1, 12) || undefined;
@@ -36,4 +36,4 @@ const extractVideoId = (url: URL): string | undefined => {
   if (v) return v;
   const m = url.pathname.match(/^\/(?:shorts|embed|live)\/([\w-]{11})/);
   return m?.[1];
-}
+};

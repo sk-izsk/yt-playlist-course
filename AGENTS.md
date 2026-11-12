@@ -19,7 +19,7 @@ Local, single-user app that turns YouTube videos and playlists into courses. The
 ## Commands (see `Makefile`; run `make` to list them)
 
 - `make dev`: dev server at http://localhost:3000.
-- `make check`: typecheck, lint and the `*.check.ts` self-tests. **Run it before saying you're done.**
+- `make check`: typecheck, lint (**oxlint**, warnings fail too), format check (**oxfmt**) and the `*.check.ts` self-tests. **Run it before saying you're done.** `make fmt` formats; config in `.oxlintrc.json` / `.oxfmtrc.json`. There is no ESLint or Prettier.
 - `make build`: production build; catches broken imports that dev mode tolerates.
 - `make list | pending | show | add | sync | transcripts`: the agent CLI (Part B). Local mode uses `DATABASE_URL`; with `TUBEWISE_URL` + `TUBEWISE_TOKEN` set it goes through the app's agent API instead (`scripts/agent/remote.ts`). The MCP server is `mcp/server.ts` (see `docs/mcp.md`).
 

@@ -32,7 +32,15 @@ export const CourseLibrary = () => {
 
   const move = (section: "pinned" | "rest") => (from: number, to: number) => {
     const all = splitPinned(data);
-    reorder.mutate(reorderTokens(all.pinned.map((c) => c.token), all.rest.map((c) => c.token), section, from, to));
+    reorder.mutate(
+      reorderTokens(
+        all.pinned.map((c) => c.token),
+        all.rest.map((c) => c.token),
+        section,
+        from,
+        to,
+      ),
+    );
   };
 
   return (
@@ -49,8 +57,20 @@ export const CourseLibrary = () => {
           <LibraryToolbar search={search} onSearch={setSearch} shown={visible.length} total={data.length} />
           {selecting && <SelectionBar visible={visible} />}
           {!visible.length && <Empty description={`No course matches "${query}"`} />}
-          <SortableSection title={pinned.length ? "Pinned" : undefined} courses={pinned} view={view} dragDisabled={dragDisabled} onMove={move("pinned")} />
-          <SortableSection title={pinned.length && rest.length ? "All courses" : undefined} courses={rest} view={view} dragDisabled={dragDisabled} onMove={move("rest")} />
+          <SortableSection
+            title={pinned.length ? "Pinned" : undefined}
+            courses={pinned}
+            view={view}
+            dragDisabled={dragDisabled}
+            onMove={move("pinned")}
+          />
+          <SortableSection
+            title={pinned.length && rest.length ? "All courses" : undefined}
+            courses={rest}
+            view={view}
+            dragDisabled={dragDisabled}
+            onMove={move("rest")}
+          />
         </>
       )}
     </section>

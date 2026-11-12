@@ -7,4 +7,4 @@ export const POST = async (_: Request, ctx: RouteContext<"/api/courses/[token]/s
     const { added } = await syncCourse(token);
     return { added };
   });
-}
+};

@@ -19,12 +19,27 @@ export const LiveMap = ({ courses }: { courses: CourseSummary[] }) => {
       <title id="map-title">{`Your ${n} course${n === 1 ? "" : "s"} drawn as metro lines`}</title>
       {routes.map((r, i) => (
         <Link key={r.token} href={`/courses/${r.token}`} className={styles.mapRoute} aria-label={r.title}>
-          <path d={r.d} className={`${styles.mapLine} ${styles.mapAhead}`} style={{ stroke: r.hex, animationDelay: `${i * 140}ms` }} />
+          <path
+            d={r.d}
+            className={`${styles.mapLine} ${styles.mapAhead}`}
+            style={{ stroke: r.hex, animationDelay: `${i * 140}ms` }}
+          />
           {r.travelled && (
-            <path d={r.travelled} className={styles.mapLine} style={{ stroke: r.hex, animationDelay: `${i * 140}ms` }} />
+            <path
+              d={r.travelled}
+              className={styles.mapLine}
+              style={{ stroke: r.hex, animationDelay: `${i * 140}ms` }}
+            />
           )}
           {r.stops.map((s, j) => (
-            <circle key={j} cx={s.x} cy={s.y} r="6" className={styles.station} style={s.done ? { fill: r.hex } : undefined} />
+            <circle
+              key={j}
+              cx={s.x}
+              cy={s.y}
+              r="6"
+              className={styles.station}
+              style={s.done ? { fill: r.hex } : undefined}
+            />
           ))}
           <text x={r.label[0]} y={r.label[1]} className={styles.mapLabel}>
             {r.title}
@@ -34,7 +49,15 @@ export const LiveMap = ({ courses }: { courses: CourseSummary[] }) => {
       {/* Interchanges: the capsules where every line shares the trunk. */}
       {n > 1 &&
         HUBS.map((x) => (
-          <rect key={x} x={x - 10} y={trunkY(0, n) - 10} width="20" height={trunkY(n - 1, n) - trunkY(0, n) + 20} rx="10" className={styles.interchange} />
+          <rect
+            key={x}
+            x={x - 10}
+            y={trunkY(0, n) - 10}
+            width="20"
+            height={trunkY(n - 1, n) - trunkY(0, n) + 20}
+            rx="10"
+            className={styles.interchange}
+          />
         ))}
       {herePt && <circle cx={herePt.x} cy={herePt.y} r="13" className={styles.here} />}
     </svg>

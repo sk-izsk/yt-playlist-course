@@ -19,7 +19,10 @@ export const CourseUpdateBanner = ({ course }: { course: CourseDetail }) => {
     <div className={styles.updateBanner}>
       <CloudDownloadOutlined className={styles.updateIcon} />
       <span>
-        <b>{n} new video{n > 1 ? "s" : ""}</b> in this playlist since you added it.
+        <b>
+          {n} new video{n > 1 ? "s" : ""}
+        </b>{" "}
+        in this playlist since you added it.
       </span>
       <Button type="primary" loading={update.isPending} onClick={() => update.mutate([course])}>
         Add {n} to course

@@ -30,7 +30,9 @@ export const NotesPanel = ({ lesson, player }: { lesson: LessonDetail; player: P
             ▶ {clock(n.atSec)}
           </button>
           <div className={styles.noteBody}>
-            <MarkdownView compact onSeek={player.seek}>{n.text}</MarkdownView>
+            <MarkdownView compact onSeek={player.seek}>
+              {n.text}
+            </MarkdownView>
           </div>
           {canEdit && (
             <Button

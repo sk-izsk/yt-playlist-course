@@ -44,7 +44,12 @@ export const checkStaleCourses = async (): Promise<StaleCheckResult[]> => {
       if (available > course.availableUpdates) results.push({ token: course.token, title: course.title, available });
     } catch (err) {
       // One broken playlist (deleted / private) shouldn't block the others — but you should hear about it.
-      await addEvent({ kind: "error", title: "Update check failed", body: `${course.title}: ${(err as Error).message}`, courseToken: course.token });
+      await addEvent({
+        kind: "error",
+        title: "Update check failed",
+        body: `${course.title}: ${(err as Error).message}`,
+        courseToken: course.token,
+      });
     }
   }
   return results;

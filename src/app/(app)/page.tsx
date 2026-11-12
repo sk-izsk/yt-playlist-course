@@ -10,6 +10,6 @@ const HomePage = () => {
       <HowItWorks />
     </>
   );
-}
+};
 
 export default HomePage;

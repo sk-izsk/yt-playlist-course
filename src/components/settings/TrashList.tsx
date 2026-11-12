@@ -21,14 +21,27 @@ export const TrashList = () => {
   return (
     <div style={{ border: "1px solid var(--line)", borderRadius: "var(--radius)" }}>
       {trash.data?.map((c, i) => (
-        <div key={c.token} style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", borderTop: i ? "1px solid var(--line)" : 0 }}>
+        <div
+          key={c.token}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "12px 16px",
+            borderTop: i ? "1px solid var(--line)" : 0,
+          }}
+        >
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 600 }}>{c.title}</div>
             <div className="mono" style={{ fontSize: 12, color: "var(--ink-soft)" }}>
               {c.channel} · deleted {day(c.deletedAt)} · gone for good {day(c.purgeAt)}
             </div>
           </div>
-          <Button size="small" loading={restore.isPending && restore.variables === c.token} onClick={() => restore.mutate(c.token)}>
+          <Button
+            size="small"
+            loading={restore.isPending && restore.variables === c.token}
+            onClick={() => restore.mutate(c.token)}
+          >
             Restore
           </Button>
         </div>

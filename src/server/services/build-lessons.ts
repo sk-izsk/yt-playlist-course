@@ -16,6 +16,6 @@ export const draftsFromVideo = (video: RemoteVideo, chapters: RemoteChapter[]): 
       durationSec: Math.max(0, endSec - ch.startSec),
     };
   });
-}
+};
 
 export const draftsFromPlaylist = (videos: RemoteVideo[]): LessonDraft[] => videos.map((v) => ({ ...v }));

@@ -24,7 +24,6 @@ export const CourseCard = ({ course: c, handle }: { course: CourseSummary; handl
     <div className={styles.card} data-selected={selected} style={routeStyle(c.line)}>
       <Link href={`/courses/${c.token}`} className={styles.cardLink} onClick={onClick}>
         <div className={styles.thumb}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- remote YouTube thumbs, no optimisation needed locally */}
           <img src={c.thumbnail} alt="" loading="lazy" />
           <span className={`${styles.duration} mono`}>{humanDuration(c.totalSec)}</span>
           <div className={styles.thumbBadges}>

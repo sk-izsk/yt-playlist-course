@@ -22,10 +22,14 @@ const reportRun = async (courseId: number, total: number, failed: number) => {
       courseToken: course.token,
     });
   } else {
-    await addEvent({ kind: "success", title: "Transcripts ready", body: `${course.title} — ${total} lesson${total === 1 ? "" : "s"}`, courseToken: course.token });
+    await addEvent({
+      kind: "success",
+      title: "Transcripts ready",
+      body: `${course.title} — ${total} lesson${total === 1 ? "" : "s"}`,
+      courseToken: course.token,
+    });
   }
 };
-
 
 /** Fetches transcripts for every lesson still `pending`, one video at a time. */
 export const fillTranscripts = async (courseId: number, opts: { retryErrors?: boolean } = {}) => {
@@ -49,7 +53,11 @@ export const fillTranscripts = async (courseId: number, opts: { retryErrors?: bo
         const t = await fetchBestTranscript(videoId);
         for (const l of group) {
           if (!t) await saveTranscript(l.id, "none");
-          else await saveTranscript(l.id, "ok", { lang: t.lang, segments: sliceSegments(t.segments, l.startSec ?? 0, l.endSec ?? Infinity) });
+          else
+            await saveTranscript(l.id, "ok", {
+              lang: t.lang,
+              segments: sliceSegments(t.segments, l.startSec ?? 0, l.endSec ?? Infinity),
+            });
         }
       } catch (err) {
         console.warn(`[transcripts] ${videoId}:`, (err as Error).message);
@@ -62,4 +70,4 @@ export const fillTranscripts = async (courseId: number, opts: { retryErrors?: bo
   } finally {
     running.delete(courseId);
   }
-}
+};

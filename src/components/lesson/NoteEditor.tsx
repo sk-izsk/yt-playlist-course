@@ -43,7 +43,9 @@ export const NoteEditor = ({ saving, onSave }: Props) => {
       {mode === "write" ? (
         <Input.TextArea
           autoSize={{ minRows: 7, maxRows: 20 }}
-          placeholder={"Write while you watch — the note is pinned at the current video time.\n\n- key idea\n- **important** term"}
+          placeholder={
+            "Write while you watch — the note is pinned at the current video time.\n\n- key idea\n- **important** term"
+          }
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
@@ -53,7 +55,11 @@ export const NoteEditor = ({ saving, onSave }: Props) => {
         />
       ) : (
         <div className={styles.preview}>
-          {text.trim() ? <MarkdownView compact>{text}</MarkdownView> : <span className={styles.hint}>Nothing to preview yet.</span>}
+          {text.trim() ? (
+            <MarkdownView compact>{text}</MarkdownView>
+          ) : (
+            <span className={styles.hint}>Nothing to preview yet.</span>
+          )}
         </div>
       )}
 

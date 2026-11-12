@@ -26,7 +26,9 @@ export const AskPanel = ({ lesson, seek }: { lesson: LessonDetail; seek: (sec: n
             {t.role === "user" ? (
               <strong>{t.content}</strong>
             ) : (
-              <MarkdownView compact onSeek={seek}>{t.content || "…"}</MarkdownView>
+              <MarkdownView compact onSeek={seek}>
+                {t.content || "…"}
+              </MarkdownView>
             )}
           </div>
         </div>
@@ -48,7 +50,11 @@ export const AskPanel = ({ lesson, seek }: { lesson: LessonDetail; seek: (sec: n
         <Button type="primary" onClick={send} loading={busy} disabled={!q.trim()}>
           Ask
         </Button>
-        {turns.length > 0 && <Button onClick={reset} disabled={busy}>New chat</Button>}
+        {turns.length > 0 && (
+          <Button onClick={reset} disabled={busy}>
+            New chat
+          </Button>
+        )}
       </div>
     </div>
   );

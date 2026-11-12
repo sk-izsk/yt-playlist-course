@@ -14,7 +14,8 @@ export const PUT = (req: Request) =>
     await requireUser();
     const { source } = await readJson<{ source?: string }>(req);
     if (source !== "live" && source !== "backup") throw new HttpError(400, "source must be live or backup");
-    if (source === "backup" && !backupAvailable()) throw new HttpError(400, "No local backup configured (LOCAL_DATABASE_URL)");
+    if (source === "backup" && !backupAvailable())
+      throw new HttpError(400, "No local backup configured (LOCAL_DATABASE_URL)");
     (await cookies()).set(DB_COOKIE, source, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 30 * 24 * 3600 });
     return { source };
   });

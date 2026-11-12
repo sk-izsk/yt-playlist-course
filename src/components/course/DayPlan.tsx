@@ -61,7 +61,9 @@ export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
         {active.index === today && <span className={styles.today}>Today</span>}
       </div>
       <div className={stations.list}>
-        {active.lessons.map((l) => <LessonRow key={l.token} lesson={l} next={l.token === nextToken} />)}
+        {active.lessons.map((l) => (
+          <LessonRow key={l.token} lesson={l} next={l.token === nextToken} />
+        ))}
       </div>
     </section>
   );

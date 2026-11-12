@@ -15,13 +15,24 @@ export interface LessonDraft {
 }
 
 export const findLesson = (token: string) =>
-  first(db.select().from(lessons).where(and(eq(lessons.token, token), liveLesson)).limit(1));
+  first(
+    db
+      .select()
+      .from(lessons)
+      .where(and(eq(lessons.token, token), liveLesson))
+      .limit(1),
+  );
 
 export const lessonsOfCourse = (courseId: number) =>
   db.select().from(lessons).where(eq(lessons.courseId, courseId)).orderBy(asc(lessons.position));
 
 export const maxPosition = async (courseId: number): Promise<number> => {
-  const row = await first(db.select({ m: max(lessons.position) }).from(lessons).where(eq(lessons.courseId, courseId)));
+  const row = await first(
+    db
+      .select({ m: max(lessons.position) })
+      .from(lessons)
+      .where(eq(lessons.courseId, courseId)),
+  );
   return row?.m ?? 0;
 };
 

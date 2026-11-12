@@ -12,4 +12,4 @@ export const POST = async (req: Request, ctx: RouteContext<"/api/lessons/[token]
     if (!text?.trim()) throw new HttpError(400, "Note is empty");
     return addNote(lesson.id, Math.max(0, Math.floor(atSec ?? 0)), text.trim());
   }, 201);
-}
+};

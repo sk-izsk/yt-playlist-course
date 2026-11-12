@@ -8,9 +8,14 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 export type TranscriptRun = { total: number; ok: number; none: number; failed: number; errors: string[] };
 
 /** Fetches every `pending` (and, if asked, `error`) transcript of a course and uploads it, one video at a time. */
-export const fetchAndUploadTranscripts = async (courseId: string, opts: { retryErrors?: boolean } = {}): Promise<TranscriptRun> => {
+export const fetchAndUploadTranscripts = async (
+  courseId: string,
+  opts: { retryErrors?: boolean } = {},
+): Promise<TranscriptRun> => {
   const targets = await agentApi.transcriptTargets(courseId);
-  const todo = targets.filter((l) => l.transcriptStatus === "pending" || (opts.retryErrors && l.transcriptStatus === "error"));
+  const todo = targets.filter(
+    (l) => l.transcriptStatus === "pending" || (opts.retryErrors && l.transcriptStatus === "error"),
+  );
   const run: TranscriptRun = { total: todo.length, ok: 0, none: 0, failed: 0, errors: [] };
 
   // Chapter lessons share one video: fetch it once, slice per lesson.

@@ -60,7 +60,6 @@ export const CourseHeader = ({ course: c }: { course: CourseDetail }) => {
         </div>
       </div>
       <div className={styles.cover}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={c.thumbnail} alt="" />
       </div>
     </header>

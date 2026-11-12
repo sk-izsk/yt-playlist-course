@@ -37,7 +37,10 @@ export const pickLine = (token: string, used: number[]): number => {
 
 /** Two-letter line code from the title, like a metro roundel ("System Design" → "SD"). */
 export const lineCode = (title: string) => {
-  const words = title.replace(/[^\p{L}\p{N}\s]/gu, " ").split(/\s+/).filter(Boolean);
+  const words = title
+    .replace(/[^\p{L}\p{N}\s]/gu, " ")
+    .split(/\s+/)
+    .filter(Boolean);
   const code = words.length > 1 ? words[0][0] + words[1][0] : (words[0] ?? "?").slice(0, 2);
   return code.toUpperCase();
 };

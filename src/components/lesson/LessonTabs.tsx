@@ -21,11 +21,23 @@ export const LessonTabs = ({ lesson, player }: { lesson: LessonDetail; player: P
       defaultActiveKey="summary"
       items={[
         { key: "summary", label: "Summary", children: <SummaryPanel lesson={lesson} seek={player.seek} /> },
-        { key: "practice", label: count("Practice", lesson.practice.length), children: <PracticePanel items={lesson.practice} /> },
-        { key: "quiz", label: count("Quiz", lesson.quiz.length), children: <QuizPanel items={lesson.quiz} seek={player.seek} /> },
-        { key: "notes", label: count("My notes", lesson.notes.length), children: <NotesPanel lesson={lesson} player={player} /> },
+        {
+          key: "practice",
+          label: count("Practice", lesson.practice.length),
+          children: <PracticePanel items={lesson.practice} />,
+        },
+        {
+          key: "quiz",
+          label: count("Quiz", lesson.quiz.length),
+          children: <QuizPanel items={lesson.quiz} seek={player.seek} />,
+        },
+        {
+          key: "notes",
+          label: count("My notes", lesson.notes.length),
+          children: <NotesPanel lesson={lesson} player={player} />,
+        },
         ...(tutor ? [ask] : []),
       ]}
     />
   );
-}
+};

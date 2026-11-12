@@ -32,9 +32,7 @@ const main = async () => {
       for (let i = 0; i < all.length; i += BATCH) {
         const chunk = all.slice(i, i + BATCH);
         const cols = Object.keys(chunk[0]);
-        const values = chunk.map(
-          (_, r) => `(${cols.map((_, c) => `$${r * cols.length + c + 1}`).join(",")})`,
-        );
+        const values = chunk.map((_row, r) => `(${cols.map((_col, c) => `$${r * cols.length + c + 1}`).join(",")})`);
         // segments/options are JSON text in SQLite and go straight into jsonb.
         await client.query(
           `INSERT INTO ${table} (${cols.join(",")}) VALUES ${values.join(",")}`,

@@ -15,7 +15,11 @@ export interface QualityContext {
 
 const TS = /\(#t=(\d+)\)/g;
 const GRIDS = [0.2, 0.25];
-const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 const sentences = (s: string) =>
   s
     .split(/(?<=[.!?])\s+|\n+/)
@@ -61,7 +65,8 @@ export const qualityIssues = (c: LessonContent, ctx: QualityContext): string[] =
   const summaryTs = [...c.summary.matchAll(TS)].map((m) => Number(m[1]));
   const allTs = [...summaryTs, ...quiz.flatMap((q) => (q.atSec === undefined ? [] : [q.atSec]))];
   const outside = allTs.filter((t) => t < ctx.startSec - 5 || t > ctx.endSec + 5);
-  if (outside.length) issues.push(`timestamps outside the video (${ctx.startSec}–${ctx.endSec}s): ${outside.join(", ")}`);
+  if (outside.length)
+    issues.push(`timestamps outside the video (${ctx.startSec}–${ctx.endSec}s): ${outside.join(", ")}`);
 
   if (ctx.segmentStarts.length) {
     const unmatched = allTs.filter((t) => !ctx.segmentStarts.some((s) => Math.abs(s - t) <= 3));
@@ -75,7 +80,9 @@ export const qualityIssues = (c: LessonContent, ctx: QualityContext): string[] =
       return f > 0.01 && GRIDS.some((g) => Math.abs(f - Math.round(f / g) * g) < 0.006);
     }).length;
     if (onGrid >= 3 && onGrid / summaryTs.length >= 0.75) {
-      issues.push("summary: timestamps sit on a 20%/25% grid of the video; take each one from the transcript line that explains it");
+      issues.push(
+        "summary: timestamps sit on a 20%/25% grid of the video; take each one from the transcript line that explains it",
+      );
     }
   }
 
@@ -85,7 +92,10 @@ export const qualityIssues = (c: LessonContent, ctx: QualityContext): string[] =
 
   const seen = new Set(ctx.otherSummaries.flatMap(sentences));
   const reused = sentences(c.summary).filter((s) => seen.has(s));
-  if (reused.length) issues.push(`summary: ${reused.length} sentence(s) already used in another lesson, e.g. "${reused[0].slice(0, 70)}…"`);
+  if (reused.length)
+    issues.push(
+      `summary: ${reused.length} sentence(s) already used in another lesson, e.g. "${reused[0].slice(0, 70)}…"`,
+    );
 
   return issues;
 };

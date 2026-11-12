@@ -38,4 +38,4 @@ export const QuizPanel = ({ items, seek }: { items: QuizItem[]; seek: (sec: numb
       )}
     </div>
   );
-}
+};

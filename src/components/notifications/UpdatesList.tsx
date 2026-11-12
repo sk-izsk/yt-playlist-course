@@ -35,7 +35,13 @@ export const UpdatesList = ({ courses, onNavigate }: { courses: CourseSummary[];
             {c.title}
           </Link>
           <span className={styles.updateCount}>+{c.availableUpdates} new</span>
-          <Button size="small" type="primary" loading={busy?.includes(c)} disabled={update.isPending} onClick={() => update.mutate([c])}>
+          <Button
+            size="small"
+            type="primary"
+            loading={busy?.includes(c)}
+            disabled={update.isPending}
+            onClick={() => update.mutate([c])}
+          >
             Update
           </Button>
         </div>

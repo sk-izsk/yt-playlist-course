@@ -1,6 +1,10 @@
 type Line = [sec: number, text: string];
 
-const norm = (s: string) => s.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
 
 /**
  * Shrinks a transcript before an agent reads it: caption lines merge into blocks of about

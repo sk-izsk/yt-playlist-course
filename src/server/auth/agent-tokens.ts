@@ -17,7 +17,12 @@ export const createAgentToken = async (userId: number, name: string) => {
   const [row] = await db
     .insert(agentTokens)
     .values({ userId, name, hash: sha256(token), prefix: token.slice(0, 10) })
-    .returning({ id: agentTokens.id, name: agentTokens.name, prefix: agentTokens.prefix, createdAt: agentTokens.createdAt });
+    .returning({
+      id: agentTokens.id,
+      name: agentTokens.name,
+      prefix: agentTokens.prefix,
+      createdAt: agentTokens.createdAt,
+    });
   return { ...row, token };
 };
 

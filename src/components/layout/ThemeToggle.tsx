@@ -16,4 +16,4 @@ export const ThemeToggle = () => {
       style={{ border: "1px solid var(--line)" }}
     />
   );
-}
+};

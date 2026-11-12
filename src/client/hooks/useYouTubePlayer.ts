@@ -14,7 +14,7 @@ interface Options {
   onSpeedChange?: (rate: number) => void;
 }
 
-const useLatest = <T,>(value: T) => {
+const useLatest = <T>(value: T) => {
   const r = useRef(value);
   useEffect(() => {
     r.current = value;

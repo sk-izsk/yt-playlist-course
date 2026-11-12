@@ -15,7 +15,13 @@ export const splitPinned = (list: CourseSummary[]) => ({
 });
 
 /** Moves `from` → `to` inside one section, returning the full token order (pinned first). */
-export const reorderTokens = (pinned: string[], rest: string[], section: "pinned" | "rest", from: number, to: number) => {
+export const reorderTokens = (
+  pinned: string[],
+  rest: string[],
+  section: "pinned" | "rest",
+  from: number,
+  to: number,
+) => {
   const move = (arr: string[]) => {
     const next = [...arr];
     const [item] = next.splice(from, 1);

@@ -20,7 +20,8 @@ export const PUT = async (req: Request, ctx: RouteContext<"/api/agent/lessons/[t
     const lesson = await findLesson(token);
     if (!lesson) throw notFound("Lesson");
     const parsed = body.safeParse(await readJson(req));
-    if (!parsed.success) throw new HttpError(400, parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; "));
+    if (!parsed.success)
+      throw new HttpError(400, parsed.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`).join("; "));
     const t = parsed.data;
     await saveTranscript(lesson.id, t.status, t.status === "ok" ? { lang: t.lang, segments: t.segments } : undefined);
     return { ok: true, status: t.status };

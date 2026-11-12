@@ -39,7 +39,9 @@ export const saveLessonContent = async (token: string, raw: unknown, opts: { for
     otherAnswerOrders,
   });
   if (issues.length) {
-    throw new Error(`Notes for ${token} look template-generated; fix and save again:\n${issues.map((i) => `  - ${i}`).join("\n")}`);
+    throw new Error(
+      `Notes for ${token} look template-generated; fix and save again:\n${issues.map((i) => `  - ${i}`).join("\n")}`,
+    );
   }
 
   await replaceLessonContent(lesson.id, content);

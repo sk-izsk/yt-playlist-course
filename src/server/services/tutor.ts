@@ -38,7 +38,10 @@ Never reveal quiz answers outright; give hints instead.`;
 
 /** Lesson notes (+ transcript for the owner; visitors get notes-only context to keep public calls cheap). */
 export const lessonMaterial = ({ lesson: l, transcript }: LessonContext, withTranscript: boolean) => {
-  const parts = [`# ${l.title}\nCourse: ${l.course.title} (${l.course.channel})`, `## Notes\n${l.summary ?? "(no notes yet)"}`];
+  const parts = [
+    `# ${l.title}\nCourse: ${l.course.title} (${l.course.channel})`,
+    `## Notes\n${l.summary ?? "(no notes yet)"}`,
+  ];
   if (l.practice.length) parts.push(`## Practice\n${l.practice.map((p) => `- ${p.title}: ${p.prompt}`).join("\n")}`);
   if (withTranscript && transcript?.lines.length) {
     parts.push(`## Transcript\n${transcript.lines.map(([s, t]) => `[${clock(s)}|${Math.floor(s)}] ${t}`).join("\n")}`);

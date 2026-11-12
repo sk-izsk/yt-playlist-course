@@ -18,7 +18,12 @@ export interface MapRoute {
 }
 
 export const MAX_LINES = 5;
-const L = 24, R = 536, HUB_IN = 200, HUB_OUT = 360, MID = 210, TRUNK_GAP = 14;
+const L = 24,
+  R = 536,
+  HUB_IN = 200,
+  HUB_OUT = 360,
+  MID = 210,
+  TRUNK_GAP = 14;
 export const HUBS = [HUB_IN, HUB_OUT] as const;
 
 const toD = (pts: Pt[]) => pts.map(([x, y], i) => `${i ? "L" : "M"}${+x.toFixed(1)} ${+y.toFixed(1)}`).join(" ");
@@ -48,7 +53,9 @@ const lane = (i: number, n: number) => (n === 1 ? MID : 50 + (i * 320) / (n - 1)
 export const trunkY = (i: number, n: number) => MID + (i - (n - 1) / 2) * TRUNK_GAP;
 
 const pathFor = (i: number, n: number): Pt[] => {
-  const yIn = lane(i, n), yOut = lane(n - 1 - i, n), trunk = trunkY(i, n);
+  const yIn = lane(i, n),
+    yOut = lane(n - 1 - i, n),
+    trunk = trunkY(i, n);
   return [
     [L, yIn],
     [HUB_IN - Math.abs(yIn - trunk), yIn],
@@ -61,7 +68,7 @@ const pathFor = (i: number, n: number): Pt[] => {
 
 // ponytail: stops are sampled (max 8), not one per lesson; a 125-lesson line would be a solid bead chain.
 export const layoutRoutes = (courses: CourseSummary[]): MapRoute[] => {
-  const picked = [...courses].sort((a, b) => Number(b.pinned) - Number(a.pinned)).slice(0, MAX_LINES);
+  const picked = courses.toSorted((a, b) => Number(b.pinned) - Number(a.pinned)).slice(0, MAX_LINES);
   return picked.map((c, i) => {
     const pts = pathFor(i, picked.length);
     const progress = c.lessonCount ? c.completedCount / c.lessonCount : 0;
@@ -71,7 +78,8 @@ export const layoutRoutes = (courses: CourseSummary[]): MapRoute[] => {
     const legEnd = (lens[0] + lens[1] * 0.4) / total; // just before the left interchange
     const legStart = 1 - (lens[4] + lens[3] * 0.6) / total; // just after the right interchange
     const k = Math.min(Math.max(c.lessonCount, 2), 8);
-    const kLeft = Math.ceil(k / 2), kRight = k - kLeft;
+    const kLeft = Math.ceil(k / 2),
+      kRight = k - kLeft;
     const ts = [
       ...Array.from({ length: kLeft }, (_, s) => (kLeft === 1 ? 0 : (s * legEnd) / (kLeft - 1))),
       ...Array.from({ length: kRight }, (_, s) => (kRight === 1 ? 1 : legStart + (s * (1 - legStart)) / (kRight - 1))),

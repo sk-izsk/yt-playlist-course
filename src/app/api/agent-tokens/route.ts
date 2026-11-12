@@ -13,6 +13,6 @@ export const GET = () =>
 export const POST = (req: Request) =>
   handle(async (u) => {
     const { name } = await readJson<{ name?: string }>(req);
-    if (!name?.trim()) throw new HttpError(400, "Give the token a name, e.g. \"MacBook MCP\"");
+    if (!name?.trim()) throw new HttpError(400, 'Give the token a name, e.g. "MacBook MCP"');
     return createAgentToken(ownerOnly(u).id, name.trim().slice(0, 60));
   }, 201);

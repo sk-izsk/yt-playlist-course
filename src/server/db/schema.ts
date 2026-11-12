@@ -42,7 +42,9 @@ export const lessons = pgTable(
   {
     id: id(),
     token: text("token").notNull().unique(),
-    courseId: integer("course_id").notNull().references(() => courses.id, { onDelete: "cascade" }),
+    courseId: integer("course_id")
+      .notNull()
+      .references(() => courses.id, { onDelete: "cascade" }),
     position: integer("position").notNull(),
     videoId: text("video_id").notNull(),
     title: text("title").notNull(),
@@ -66,13 +68,18 @@ export const lessons = pgTable(
 );
 
 export const transcripts = pgTable("transcripts", {
-  lessonId: integer("lesson_id").primaryKey().references(() => lessons.id, { onDelete: "cascade" }),
+  lessonId: integer("lesson_id")
+    .primaryKey()
+    .references(() => lessons.id, { onDelete: "cascade" }),
   lang: text("lang").notNull(),
   // Array<[offsetSec, text]>
   segments: jsonb("segments").$type<Array<[number, string]>>().notNull(),
 });
 
-const lessonRef = () => integer("lesson_id").notNull().references(() => lessons.id, { onDelete: "cascade" });
+const lessonRef = () =>
+  integer("lesson_id")
+    .notNull()
+    .references(() => lessons.id, { onDelete: "cascade" });
 
 export const practice = pgTable("practice", {
   id: id(),

@@ -21,7 +21,8 @@ export const useCheckCourse = (token: string) => {
     mutationFn: () => api.checkCourse(token),
     onSuccess: ({ available }) => {
       refresh(token);
-      if (available) message.info(`${available} new video${available > 1 ? "s" : ""} available — press Update to add them`);
+      if (available)
+        message.info(`${available} new video${available > 1 ? "s" : ""} available — press Update to add them`);
       else message.success("Up to date — no new videos");
     },
   });
@@ -37,7 +38,8 @@ export const useUpdateCourses = () => {
       for (const c of courses) added += (await api.syncCourse(c.token)).added.length;
       return added;
     },
-    onSuccess: (added) => message.success(added ? `Added ${added} new video${added > 1 ? "s" : ""}` : "Already up to date"),
+    onSuccess: (added) =>
+      message.success(added ? `Added ${added} new video${added > 1 ? "s" : ""}` : "Already up to date"),
     onSettled: (_d, _e, courses) => courses.forEach((c) => refresh(c.token)),
   });
 };

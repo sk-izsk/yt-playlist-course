@@ -37,21 +37,19 @@ export const fetchBestTranscript = async (videoId: string): Promise<Transcript |
   if (!tracks.length) return null;
 
   const codes = tracks.map((t) => t.languageCode);
-  const lang =
-    PREFERRED.map((p) => codes.find((c) => c === p || c.startsWith(`${p}-`))).find(Boolean) ??
-    codes[0];
+  const lang = PREFERRED.map((p) => codes.find((c) => c === p || c.startsWith(`${p}-`))).find(Boolean) ?? codes[0];
 
   const raw = await fetchTranscript(videoId, { lang });
   const segments = raw.map((s): Segment => [Math.round(s.offset * 10) / 10, decode(s.text)]);
   return { lang, segments };
-}
+};
 
 /** Segments inside [start, end) — used when one video is split into chapter lessons. */
 export const sliceSegments = (segments: Segment[], start = 0, end = Infinity): Segment[] => {
   return segments.filter(([t]) => t >= start && t < end);
-}
+};
 
 const isNoCaptions = (err: unknown) => {
   const name = (err as Error)?.constructor?.name ?? "";
   return /Disabled|NotAvailable/.test(name);
-}
+};

@@ -18,7 +18,7 @@ assert.deepEqual(compactTranscript(lines), [
 
 // Seeded rng: shuffling keeps the right text right and avoids runs and reused orders.
 let seed = 7;
-const rng = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+const rng = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 const quiz = [0, 1, 2, 3].map((n) => ({ question: `Q${n}`, options: [`right${n}`, "w1", "w2", "w3"], answerIndex: 0 }));
 for (let i = 0; i < 50; i++) {
   const out = shuffleQuiz(quiz, ["1,2,0,3", "1,2,0,3"], rng);

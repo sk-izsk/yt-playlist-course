@@ -48,13 +48,23 @@ export const LessonHeader = ({ lesson: l, toggle }: Props) => {
       </div>
     </div>
   );
-}
+};
 
-const NavButton = ({ token, icon, label, end }: { token: string | null; icon: ReactNode; label: string; end?: boolean }) => {
+const NavButton = ({
+  token,
+  icon,
+  label,
+  end,
+}: {
+  token: string | null;
+  icon: ReactNode;
+  label: string;
+  end?: boolean;
+}) => {
   const btn = (
     <Button disabled={!token} icon={icon} iconPlacement={end ? "end" : "start"}>
       {label}
     </Button>
   );
   return token ? <Link href={`/lessons/${token}`}>{btn}</Link> : btn;
-}
+};

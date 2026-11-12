@@ -21,9 +21,12 @@ export const required = (v: string | undefined, name: string): string => {
   return v;
 };
 
-export const printPending = (rows: { token: string; position: number; transcript: string; title: string; course: string }[]) => {
+export const printPending = (
+  rows: { token: string; position: number; transcript: string; title: string; course: string }[],
+) => {
   if (!rows.length) return console.log("Nothing pending — every lesson has notes.");
-  for (const r of rows) console.log(`${r.token}  #${r.position}  [transcript: ${r.transcript}]  ${r.title}  — ${r.course}`);
+  for (const r of rows)
+    console.log(`${r.token}  #${r.position}  [transcript: ${r.transcript}]  ${r.title}  — ${r.course}`);
 };
 
 export const printSaved = (token: string, r: { kind: string; practice: number; quiz: number }) =>

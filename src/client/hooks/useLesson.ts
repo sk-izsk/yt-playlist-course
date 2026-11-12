@@ -5,7 +5,7 @@ import { qk } from "../query-keys";
 
 export const useLesson = (token: string) => {
   return useQuery({ queryKey: qk.lesson(token), queryFn: () => api.lesson(token) });
-}
+};
 
 /** Optimistic toggle — the checkmark should feel instant. */
 export const useToggleComplete = (token: string, courseToken?: string) => {
@@ -26,4 +26,4 @@ export const useToggleComplete = (token: string, courseToken?: string) => {
       if (courseToken) qc.invalidateQueries({ queryKey: qk.course(courseToken) });
     },
   });
-}
+};

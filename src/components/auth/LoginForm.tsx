@@ -53,7 +53,8 @@ export const LoginForm = () => {
           </Button>
         </Form>
         <p className={styles.hint}>
-          Logging in lets you add, sync and delete courses and write notes. <Link href="/">Browse without logging in</Link>
+          Logging in lets you add, sync and delete courses and write notes.{" "}
+          <Link href="/">Browse without logging in</Link>
         </p>
       </div>
     </div>

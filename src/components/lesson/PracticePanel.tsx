@@ -16,16 +16,20 @@ export const PracticePanel = ({ items }: { items: PracticeItem[] }) => {
         return (
           <section key={level}>
             <h3 className={styles.levelHead}>
-              <span className={styles.level} data-level={level}>{level}</span>
+              <span className={styles.level} data-level={level}>
+                {level}
+              </span>
               {group.length} problem{group.length > 1 ? "s" : ""}
             </h3>
-            {group.map((p) => <PracticeCard key={p.id} item={p} />)}
+            {group.map((p) => (
+              <PracticeCard key={p.id} item={p} />
+            ))}
           </section>
         );
       })}
     </div>
   );
-}
+};
 
 const PracticeCard = ({ item: p }: { item: PracticeItem }) => {
   return (
@@ -42,4 +46,4 @@ const PracticeCard = ({ item: p }: { item: PracticeItem }) => {
       {p.hint && <Collapse ghost size="small" items={[{ key: "h", label: "Hint", children: p.hint }]} />}
     </div>
   );
-}
+};

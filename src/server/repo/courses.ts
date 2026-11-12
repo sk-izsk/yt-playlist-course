@@ -49,10 +49,22 @@ export const listCourses = (): Promise<CourseSummary[]> =>
     .orderBy(sql`${courses.pinned} desc`, asc(courses.sortOrder), sql`${courses.createdAt} desc`);
 
 export const findCourse = (token: string) =>
-  first(db.select().from(courses).where(and(eq(courses.token, token), live)).limit(1));
+  first(
+    db
+      .select()
+      .from(courses)
+      .where(and(eq(courses.token, token), live))
+      .limit(1),
+  );
 
 export const findCourseById = (id: number) =>
-  first(db.select().from(courses).where(and(eq(courses.id, id), live)).limit(1));
+  first(
+    db
+      .select()
+      .from(courses)
+      .where(and(eq(courses.id, id), live))
+      .limit(1),
+  );
 
 export const findCourseByYoutubeId = (youtubeId: string) =>
   first(db.select().from(courses).where(eq(courses.youtubeId, youtubeId)).limit(1));

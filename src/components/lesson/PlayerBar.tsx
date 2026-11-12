@@ -38,7 +38,12 @@ export const PlayerBar = () => {
         Auto-next
       </label>
       <span className={styles.spacer} />
-      <Button size="small" type="text" icon={theater ? <CompressOutlined /> : <ExpandOutlined />} onClick={toggleTheater}>
+      <Button
+        size="small"
+        type="text"
+        icon={theater ? <CompressOutlined /> : <ExpandOutlined />}
+        onClick={toggleTheater}
+      >
         {theater ? "Default view" : "Theater"}
       </Button>
       <Popover content={<Keys />} title="Keyboard shortcuts" trigger="click" placement="bottomRight">

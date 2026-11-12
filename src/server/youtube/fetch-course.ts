@@ -52,7 +52,7 @@ export const fetchPlaylist = async (playlistId: string): Promise<RemotePlaylist>
     thumbnail: videos[0]?.thumbnail ?? "",
     videos,
   };
-}
+};
 
 /** One video's details plus its YouTube chapters (empty if the creator added none). */
 export const fetchVideo = async (videoId: string) => {
@@ -75,4 +75,4 @@ export const fetchVideo = async (videoId: string) => {
     channel: b.channel?.name ?? b.author ?? "",
     chapters,
   };
-}
+};

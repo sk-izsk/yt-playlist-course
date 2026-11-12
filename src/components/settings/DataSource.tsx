@@ -11,7 +11,8 @@ export const DataSource = () => {
     return (
       <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
         No local backup configured. Set <code>LOCAL_DATABASE_URL</code> in <code>.env.local</code> and run{" "}
-        <code>make db-backup</code> (or <code>make backup-install</code> for every 15 minutes) to get a read-only mirror here.
+        <code>make db-backup</code> (or <code>make backup-install</code> for every 15 minutes) to get a read-only mirror
+        here.
       </Typography.Paragraph>
     );
   }

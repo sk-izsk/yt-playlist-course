@@ -4,8 +4,27 @@ import type { CourseSummary } from "@/shared/types";
 import { MAX_LINES, layoutRoutes, slice } from "./route-map";
 
 // slice: halfway along an L-shape of two 10-long legs lands on the corner.
-assert.deepEqual(slice([[0, 0], [10, 0], [10, 10]], 0.5).at(-1), [10, 0]);
-assert.deepEqual(slice([[0, 0], [10, 0]], 2).at(-1), [10, 0]); // clamps past the end
+assert.deepEqual(
+  slice(
+    [
+      [0, 0],
+      [10, 0],
+      [10, 10],
+    ],
+    0.5,
+  ).at(-1),
+  [10, 0],
+);
+assert.deepEqual(
+  slice(
+    [
+      [0, 0],
+      [10, 0],
+    ],
+    2,
+  ).at(-1),
+  [10, 0],
+); // clamps past the end
 
 const mk = (token: string, lessonCount: number, completedCount: number, pinned = false) =>
   ({ token, title: token, lessonCount, completedCount, pinned, line: 0 }) as CourseSummary;

@@ -40,7 +40,12 @@ export const checkCourseUpdatesByToken = async (token: string) => {
   try {
     return await checkCourseUpdates(course);
   } catch (err) {
-    await addEvent({ kind: "error", title: "Update check failed", body: `${course.title}: ${(err as Error).message}`, courseToken: token });
+    await addEvent({
+      kind: "error",
+      title: "Update check failed",
+      body: `${course.title}: ${(err as Error).message}`,
+      courseToken: token,
+    });
     throw err;
   }
 };

@@ -12,7 +12,10 @@ export const topSortOrder = async () => {
 
 /** Line colour for a new course: the least-used one (see pickLine). */
 export const nextLine = async (token: string) =>
-  pickLine(token, (await db.select({ line: courses.line }).from(courses)).map((r) => r.line));
+  pickLine(
+    token,
+    (await db.select({ line: courses.line }).from(courses)).map((r) => r.line),
+  );
 
 /** Persists drag & drop order: each token's index becomes its sort value. */
 export const reorderCourses = (tokens: string[]) =>

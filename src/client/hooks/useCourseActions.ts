@@ -4,7 +4,10 @@ import { api } from "../api";
 import { qk } from "../query-keys";
 
 /** Optimistically rewrites the cached course list, rolling back if the server rejects. */
-const useOptimisticCourses = <V,>(mutationFn: (v: V) => Promise<unknown>, apply: (list: CourseSummary[], v: V) => CourseSummary[]) => {
+const useOptimisticCourses = <V>(
+  mutationFn: (v: V) => Promise<unknown>,
+  apply: (list: CourseSummary[], v: V) => CourseSummary[],
+) => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn,

@@ -22,11 +22,9 @@ export const Providers = ({ children }: { children: ReactNode }) => {
     <AntdRegistry>
       <ConfigProvider theme={buildTheme(mode)}>
         <App>
-          <QueryClientProvider client={client}>
-            {children}
-          </QueryClientProvider>
+          <QueryClientProvider client={client}>{children}</QueryClientProvider>
         </App>
       </ConfigProvider>
     </AntdRegistry>
   );
-}
+};

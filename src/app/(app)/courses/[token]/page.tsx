@@ -29,6 +29,6 @@ const CoursePage = ({ params }: PageProps<"/courses/[token]">) => {
       )}
     </div>
   );
-}
+};
 
 export default CoursePage;

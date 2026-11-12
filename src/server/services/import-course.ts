@@ -42,7 +42,7 @@ const fetchMeta = async (input: string): Promise<CourseMeta> => {
     thumbnail: video.thumbnail,
     drafts: draftsFromVideo(video, chapters),
   };
-}
+};
 
 /** Adds a playlist or video as a course. Re-adding the same link returns the existing course. */
 export const importCourse = async (input: string): Promise<ImportResult> => {
@@ -65,4 +65,4 @@ export const importCourse = async (input: string): Promise<ImportResult> => {
 
   const transcripts = fillTranscripts(course.id).catch((e) => console.error("[import]", e));
   return { token: course.token, title: course.title, created: true, transcripts };
-}
+};

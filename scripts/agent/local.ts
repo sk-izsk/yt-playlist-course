@@ -15,10 +15,13 @@ import { showId } from "./show";
 export const commands: Commands = {
   list: async () => {
     for (const c of await listCourses()) {
-      console.log(`${c.token}  ${c.completedCount}/${c.lessonCount} watched  ${c.lessonCount - c.pendingNotes}/${c.lessonCount} notes  ${c.title}`);
+      console.log(
+        `${c.token}  ${c.completedCount}/${c.lessonCount} watched  ${c.lessonCount - c.pendingNotes}/${c.lessonCount} notes  ${c.title}`,
+      );
     }
   },
-  pending: async ([course]) => printPending(await pendingLessons(course ? await resolveAs("course", course) : undefined)),
+  pending: async ([course]) =>
+    printPending(await pendingLessons(course ? await resolveAs("course", course) : undefined)),
   show: ([id, ...flags]) => showId(required(id, "id"), flags),
   report: async ([id]) => reportCourse(await resolveAs("course", required(id, "course id"))),
   save: async ([id, file, flag]) => {

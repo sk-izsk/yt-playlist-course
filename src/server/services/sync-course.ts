@@ -40,8 +40,6 @@ export const syncCourse = async (token: string): Promise<SyncResult & { transcri
     });
   }
 
-  const transcripts = inserted.length
-    ? fillTranscripts(course.id).catch((e) => console.error("[sync]", e))
-    : done;
+  const transcripts = inserted.length ? fillTranscripts(course.id).catch((e) => console.error("[sync]", e)) : done;
   return { added: inserted.map(toLessonRow), transcripts };
-}
+};

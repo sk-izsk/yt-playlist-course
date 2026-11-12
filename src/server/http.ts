@@ -19,7 +19,11 @@ export const handlePublic = async <T>(fn: () => T | Promise<T>, status = 200) =>
     // Anything else is a real failure: details (SQL, params, stack) go to the server log and the owner's
     // notification feed, never to the browser, which is public now.
     console.error("[api]", err);
-    await addEvent({ kind: "error", title: "Something failed on the server", body: (err as Error).message ?? String(err) });
+    await addEvent({
+      kind: "error",
+      title: "Something failed on the server",
+      body: (err as Error).message ?? String(err),
+    });
     return NextResponse.json({ error: "Something went wrong on the server. Try again." }, { status: 500 });
   }
 };
@@ -43,7 +47,10 @@ export const handle = <T>(fn: (user: AuthUser) => T | Promise<T>, status = 200) 
     // Only the owner changes anything; a "demo" login (if one is ever handed out) is read-only like a visitor.
     if (user.role !== "owner") throw new HttpError(403, "This account is read-only");
     if ((await chosenSource()) === "backup") {
-      throw new HttpError(403, "You're viewing the local backup, which is read-only. Switch to Neon (live) in Settings to make changes.");
+      throw new HttpError(
+        403,
+        "You're viewing the local backup, which is read-only. Switch to Neon (live) in Settings to make changes.",
+      );
     }
     return fn(user);
   }, status);

@@ -20,7 +20,9 @@ import styles from "./library.module.css";
 import { useSession } from "@/client/hooks/useSession";
 
 const youtubeUrl = (c: CourseSummary) =>
-  c.kind === "playlist" ? `https://www.youtube.com/playlist?list=${c.youtubeId}` : `https://www.youtube.com/watch?v=${c.youtubeId}`;
+  c.kind === "playlist"
+    ? `https://www.youtube.com/playlist?list=${c.youtubeId}`
+    : `https://www.youtube.com/watch?v=${c.youtubeId}`;
 
 export const CourseMenu = ({ course: c }: { course: CourseSummary }) => {
   const { canEdit } = useSession(); // visitors read only

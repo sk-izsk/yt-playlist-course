@@ -31,7 +31,7 @@ export const splitIntoDays = (lessons: LessonRow[], minutesPerDay: number): Plan
   }
   flush();
   return days;
-}
+};
 
 /** "Today" = the first day with unfinished lessons. */
 export const todayIndex = (days: PlanDay[]) => {

@@ -13,7 +13,11 @@ const isRun = (order: number[]) =>
  * Rejects orders that are all one position, a straight run, or already used by 2+ other lessons.
  * Explanations must not name positions ("option A") since they move here.
  */
-export const shuffleQuiz = <T extends QuizLike>(quiz: T[], otherOrders: string[], rng: () => number = Math.random): T[] => {
+export const shuffleQuiz = <T extends QuizLike>(
+  quiz: T[],
+  otherOrders: string[],
+  rng: () => number = Math.random,
+): T[] => {
   for (let attempt = 0; attempt < 100; attempt++) {
     const out = quiz.map((q) => {
       const idx = q.options.map((_, i) => i);

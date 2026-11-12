@@ -15,7 +15,6 @@ export const LogoutButton = () => (
       onClick={async () => {
         await api.logout().catch(() => {}); // cookies are cleared server-side; go to login either way
         // Full load on purpose: drops the logged-out user's cached queries.
-        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.assign("/login");
       }}
     />

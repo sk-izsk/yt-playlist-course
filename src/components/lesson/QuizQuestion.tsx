@@ -60,4 +60,4 @@ export const QuizQuestion = ({ index, total, item: q, chosen, onChoose, seek }: 
       )}
     </div>
   );
-}
+};

@@ -9,7 +9,13 @@ export const DragHandle = ({ handle }: { handle: HandleProps | null }) => {
   if (!handle) return null;
   if (!canEdit) return null;
   return (
-    <button type="button" className={styles.toolBtn} aria-label="Drag to reorder" {...handle.attributes} {...handle.listeners}>
+    <button
+      type="button"
+      className={styles.toolBtn}
+      aria-label="Drag to reorder"
+      {...handle.attributes}
+      {...handle.listeners}
+    >
       <HolderOutlined />
     </button>
   );

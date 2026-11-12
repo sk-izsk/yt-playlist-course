@@ -16,6 +16,6 @@ const LessonPage = ({ params }: PageProps<"/lessons/[token]">) => {
       {lesson && <LessonView lesson={lesson} />}
     </div>
   );
-}
+};
 
 export default LessonPage;

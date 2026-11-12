@@ -8,7 +8,9 @@ export const users = pgTable("users", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
   username: text("username").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  role: text("role", { enum: ["owner", "demo"] }).notNull().default("owner"),
+  role: text("role", { enum: ["owner", "demo"] })
+    .notNull()
+    .default("owner"),
   createdAt: ms("created_at").notNull().$defaultFn(now),
 });
 
@@ -17,7 +19,9 @@ export const sessions = pgTable(
   "sessions",
   {
     id: text("id").primaryKey(), // UUID; the `sid` claim in access tokens
-    userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     currentHash: text("current_hash").notNull(),
     rotatedAt: ms("rotated_at").notNull(),
     expiresAt: ms("expires_at").notNull(), // sliding: now + 24 h on every refresh
@@ -30,7 +34,9 @@ export const sessions = pgTable(
 /** Every refresh token a session ever issued (SHA-256 only), so an old one is recognised as reuse. */
 export const refreshTokens = pgTable("refresh_tokens", {
   hash: text("hash").primaryKey(),
-  sessionId: text("session_id").notNull().references(() => sessions.id, { onDelete: "cascade" }),
+  sessionId: text("session_id")
+    .notNull()
+    .references(() => sessions.id, { onDelete: "cascade" }),
   createdAt: ms("created_at").notNull().$defaultFn(now),
 });
 
@@ -40,7 +46,9 @@ export const refreshTokens = pgTable("refresh_tokens", {
  */
 export const agentTokens = pgTable("agent_tokens", {
   id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   hash: text("hash").notNull().unique(),
   prefix: text("prefix").notNull(),

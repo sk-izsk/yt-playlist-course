@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  CheckCircleFilled,
-  CloseCircleFilled,
-  CloudDownloadOutlined,
-  InfoCircleFilled,
-} from "@ant-design/icons";
+import { CheckCircleFilled, CloseCircleFilled, CloudDownloadOutlined, InfoCircleFilled } from "@ant-design/icons";
 import { Button } from "antd";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -40,7 +35,9 @@ export const ActivityList = ({ events, onNavigate }: { events: AppEvent[]; onNav
       {events.map((e) => {
         const body = (
           <>
-            <span className={styles.icon} data-kind={e.kind}>{ICON[e.kind]}</span>
+            <span className={styles.icon} data-kind={e.kind}>
+              {ICON[e.kind]}
+            </span>
             <span className={styles.eventText}>
               <b>{e.title}</b>
               {e.body && <span>{e.body}</span>}
@@ -49,7 +46,13 @@ export const ActivityList = ({ events, onNavigate }: { events: AppEvent[]; onNav
           </>
         );
         return e.courseToken ? (
-          <Link key={e.id} href={`/courses/${e.courseToken}`} onClick={onNavigate} className={styles.event} data-unread={!e.read}>
+          <Link
+            key={e.id}
+            href={`/courses/${e.courseToken}`}
+            onClick={onNavigate}
+            className={styles.event}
+            data-unread={!e.read}
+          >
             {body}
           </Link>
         ) : (

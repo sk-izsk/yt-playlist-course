@@ -25,7 +25,8 @@ export const modeFromFlags = (flags: string[]): TranscriptMode =>
   flags.includes("--full") ? "full" : flags.includes("--head") ? "head" : "compact";
 
 // Short videos get shorter notes; padding a 10-minute video to 3,500 characters invites nitpicks.
-export const targetChars = (durationSec: number) => Math.min(3500, Math.max(1200, Math.round((durationSec / 60) * 1.1) * 100));
+export const targetChars = (durationSec: number) =>
+  Math.min(3500, Math.max(1200, Math.round((durationSec / 60) * 1.1) * 100));
 
 export const formatCourse = (c: CourseDetail) => {
   const todo = c.lessons.filter((l) => !l.hasNotes);
@@ -37,8 +38,14 @@ export const formatCourse = (c: CourseDetail) => {
       : "All lessons have notes. Nothing to do unless the user asks to redo one.\n",
   ];
   for (const l of c.lessons) {
-    const flags = [l.completed ? "watched" : "", l.hasNotes ? `notes:${l.kind}` : "NEEDS NOTES", `transcript:${l.transcriptStatus}`];
-    out.push(`${l.token}  #${String(l.position).padStart(2)}  ${humanDuration(l.durationSec).padStart(6)}  ${l.title}  [${flags.filter(Boolean).join(", ")}]`);
+    const flags = [
+      l.completed ? "watched" : "",
+      l.hasNotes ? `notes:${l.kind}` : "NEEDS NOTES",
+      `transcript:${l.transcriptStatus}`,
+    ];
+    out.push(
+      `${l.token}  #${String(l.position).padStart(2)}  ${humanDuration(l.durationSec).padStart(6)}  ${l.title}  [${flags.filter(Boolean).join(", ")}]`,
+    );
   }
   return out.join("\n");
 };
@@ -55,7 +62,9 @@ export const formatLesson = ({ lesson: l, targetChars: target, transcript: t }: 
       : "Notes: MISSING\n",
   ];
   if (!t) {
-    out.push(`No transcript (status: ${l.transcriptStatus}). Work from the title and your knowledge, and say so in the summary.`);
+    out.push(
+      `No transcript (status: ${l.transcriptStatus}). Work from the title and your knowledge, and say so in the summary.`,
+    );
     return out.join("\n");
   }
   out.push(`Target summary for a core lesson: about ${target} characters (a guide, not a cap).`);
@@ -63,7 +72,10 @@ export const formatLesson = ({ lesson: l, targetChars: target, transcript: t }: 
   out.push(`## Transcript (${t.lang}${t.lang !== "en" ? " — write notes in English" : ""}; ${label})`);
   // Format: [mm:ss|seconds] — seconds are absolute video time; use them for #t= links and atSec.
   for (const [sec, text] of t.lines) out.push(`[${clock(sec)}|${Math.floor(sec)}] ${text}`);
-  if (t.mode === "head") out.push(`\n(First ${HEAD_SEC / 60} minutes only. Clearly light? Write light notes. Otherwise run show without --head.)`);
+  if (t.mode === "head")
+    out.push(
+      `\n(First ${HEAD_SEC / 60} minutes only. Clearly light? Write light notes. Otherwise run show without --head.)`,
+    );
   return out.join("\n");
 };
 

@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { APIError, AuthenticationError, RateLimitError } from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { optionalUser } from "@/server/auth/require-user";
 import { HttpError, notFound, readJson } from "@/server/http";
@@ -11,7 +11,10 @@ export const dynamic = "force-dynamic";
 const cleanHistory = (raw: unknown): Turn[] => {
   if (!Array.isArray(raw)) return [];
   const turns = raw
-    .filter((t): t is Turn => (t?.role === "user" || t?.role === "assistant") && typeof t.content === "string" && t.content.trim() !== "")
+    .filter(
+      (t): t is Turn =>
+        (t?.role === "user" || t?.role === "assistant") && typeof t.content === "string" && t.content.trim() !== "",
+    )
     .slice(-8)
     .map((t) => ({ role: t.role, content: t.content.slice(0, 4000) }));
   while (turns.length && turns[0].role !== "user") turns.shift();
@@ -19,9 +22,9 @@ const cleanHistory = (raw: unknown): Turn[] => {
 };
 
 const apiErrorText = (err: unknown) => {
-  if (err instanceof Anthropic.AuthenticationError) return "The tutor's API key was rejected. Check ANTHROPIC_API_KEY.";
-  if (err instanceof Anthropic.RateLimitError) return "The tutor is busy right now. Try again in a minute.";
-  if (err instanceof Anthropic.APIError) return `The tutor failed (${err.status ?? "network"}). Try again.`;
+  if (err instanceof AuthenticationError) return "The tutor's API key was rejected. Check ANTHROPIC_API_KEY.";
+  if (err instanceof RateLimitError) return "The tutor is busy right now. Try again in a minute.";
+  if (err instanceof APIError) return `The tutor failed (${err.status ?? "network"}). Try again.`;
   return "The tutor failed. Try again.";
 };
 
@@ -36,7 +39,8 @@ export const POST = async (req: Request, ctx: RouteContext<"/api/lessons/[token]
     const context = await lessonContext(token, "compact");
     if (!context) throw notFound("Lesson");
     const audience = user?.role === "owner" ? "owner" : "public";
-    if (!(await takeQuota(audience))) throw new HttpError(429, "The tutor's daily limit is used up. It resets at midnight UTC.");
+    if (!(await takeQuota(audience)))
+      throw new HttpError(429, "The tutor's daily limit is used up. It resets at midnight UTC.");
 
     const turns: Turn[] = [...cleanHistory(history), { role: "user", content: question.trim().slice(0, 2000) }];
     const stream = streamAnswer(lessonMaterial(context, audience === "owner"), cleanHistory(turns));
@@ -45,7 +49,8 @@ export const POST = async (req: Request, ctx: RouteContext<"/api/lessons/[token]
       start: async (out) => {
         try {
           for await (const ev of stream) {
-            if (ev.type === "content_block_delta" && ev.delta.type === "text_delta") out.enqueue(enc.encode(ev.delta.text));
+            if (ev.type === "content_block_delta" && ev.delta.type === "text_delta")
+              out.enqueue(enc.encode(ev.delta.text));
           }
           const final = await stream.finalMessage();
           // Haiku has no server-side fallback: say so instead of ending on a half answer.
@@ -59,7 +64,9 @@ export const POST = async (req: Request, ctx: RouteContext<"/api/lessons/[token]
       },
       cancel: () => stream.abort(),
     });
-    return new Response(body, { headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" } });
+    return new Response(body, {
+      headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" },
+    });
   } catch (err) {
     const status = err instanceof HttpError ? err.status : 400;
     return NextResponse.json({ error: (err as Error).message }, { status });

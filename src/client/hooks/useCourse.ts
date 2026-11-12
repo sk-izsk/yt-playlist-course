@@ -11,7 +11,7 @@ export const useCourse = (token: string) => {
     // Keep polling while transcripts are still being fetched in the background.
     refetchInterval: (q) => (q.state.data?.lessons.some((l) => l.transcriptStatus === "pending") ? 3000 : false),
   });
-}
+};
 
 export const useSyncCourse = (token: string) => {
   const qc = useQueryClient();
@@ -23,7 +23,7 @@ export const useSyncCourse = (token: string) => {
       qc.invalidateQueries({ queryKey: qk.notifications });
     },
   });
-}
+};
 
 /**
  * Removes the course from the list instantly (optimistic), shows "Deleting… → Deleted",
@@ -42,7 +42,11 @@ export const useDeleteCourse = (token: string) => {
       await qc.cancelQueries({ queryKey: qk.courses });
       const prev = qc.getQueryData<CourseSummary[]>(qk.courses);
       const gone = prev?.find((c) => c.token === token);
-      if (prev) qc.setQueryData(qk.courses, prev.filter((c) => c.token !== token));
+      if (prev)
+        qc.setQueryData(
+          qk.courses,
+          prev.filter((c) => c.token !== token),
+        );
       return { prev, title: gone?.title };
     },
     onSuccess: (_d, _v, ctx) => {

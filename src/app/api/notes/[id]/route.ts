@@ -7,4 +7,4 @@ export const DELETE = async (_: Request, ctx: RouteContext<"/api/notes/[id]">) =
     if (!(await deleteNote(Number(id)))) throw notFound("Note");
     return { ok: true };
   });
-}
+};

@@ -15,7 +15,7 @@ export const GET = async (_: Request, ctx: Ctx) => {
     if (user && detail.newCount) await markCourseSeen((await findCourse(token))!.id);
     return detail;
   });
-}
+};
 
 /** Body: { pinned: boolean } */
 export const PATCH = async (req: Request, ctx: Ctx) => {
@@ -33,4 +33,4 @@ export const DELETE = async (_: Request, ctx: Ctx) => {
     if (!(await deleteCourse(token))) throw notFound("Course");
     return { ok: true };
   });
-}
+};
