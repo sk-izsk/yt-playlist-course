@@ -169,3 +169,12 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 - Phase 3: Vercel env vars (`DATABASE_URL`, `JWT_SECRET`).
 - Phase 7: GitHub secret for the backup job.
 - Cleanup: the throwaway test deploy `vercel-yt-test` is still live → `bunx vercel remove vercel-yt-test --yes`.
+
+## Phase 3 done (2026-11-12)
+
+- Live at https://tubewise.vercel.app, imported from GitHub; production deploys from `dev` (merge `online` → `dev` via PR).
+- Gotcha hit on the way: Vercel's import pre-filled env vars from `.env.example`, so `DATABASE_URL` was the placeholder
+  (`getaddrinfo ENOTFOUND HOST-pooler.REGION…`). Fixed by setting real values (Production only) and redeploying;
+  `.env.example` now has every value commented out.
+- Vercel's `JWT_SECRET` is deliberately different from the local one (separate login cookies per site).
+- Verified live: 4 courses / 206 lessons readable logged out, visitor writes 401, cron without secret 401, owner login works.
