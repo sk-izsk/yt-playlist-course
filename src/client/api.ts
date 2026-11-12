@@ -57,6 +57,7 @@ export const api = {
   dbSource: () => http.get("db-source").json<{ available: boolean; source: "live" | "backup" }>(),
   setDbSource: (source: "live" | "backup") => http.put("db-source", { json: { source } }).json(),
   trash: () => http.get("trash").json<TrashedCourse[]>(),
+  tutor: () => http.get("tutor").json<{ enabled: boolean }>(),
   restoreCourse: (token: string) => http.post(`trash/${token}`).json(),
 
   courses: () => http.get("courses").json<CourseSummary[]>(),

@@ -1,4 +1,4 @@
-import { bigint, boolean, index, integer, jsonb, pgTable, text } from "drizzle-orm/pg-core";
+import { bigint, boolean, index, integer, jsonb, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
 
 const now = () => Date.now();
 // Epoch milliseconds, as in the SQLite era, so DTOs and the client stay unchanged. JS numbers hold them exactly.
@@ -93,6 +93,17 @@ export const quiz = pgTable("quiz", {
   explanation: text("explanation"),
   atSec: integer("at_sec"),
 });
+
+/** AI tutor calls per day and audience ("owner" | "public"): the free-tier caps count here. */
+export const tutorUsage = pgTable(
+  "tutor_usage",
+  {
+    day: text("day").notNull(), // YYYY-MM-DD (UTC)
+    audience: text("audience", { enum: ["owner", "public"] }).notNull(),
+    count: integer("count").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.day, t.audience] })],
+);
 
 export const notes = pgTable("notes", {
   id: id(),
