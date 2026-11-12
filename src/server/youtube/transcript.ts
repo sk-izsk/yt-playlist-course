@@ -7,6 +7,13 @@ export interface Transcript {
   segments: Segment[];
 }
 
+/**
+ * YouTube blocks transcript requests from Vercel's IPs (tested 2026-11-11), so online the lessons stay
+ * `pending` and the Mac uploads transcripts later. PROXY_URL is the hook for routing through a proxy one day;
+ * it is deliberately not wired (no free proxy works), so setting it does nothing yet.
+ */
+export const canFetchTranscripts = () => !process.env.VERCEL;
+
 // English first, then Hindi, then whatever the video has.
 const PREFERRED = ["en", "hi"];
 

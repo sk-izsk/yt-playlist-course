@@ -1,4 +1,4 @@
-import { handle, notFound, readJson } from "@/server/http";
+import { handle, handleRead, notFound, readJson } from "@/server/http";
 import { getLessonDetail } from "@/server/repo/lesson-detail";
 import { setCompleted } from "@/server/repo/lessons";
 
@@ -8,8 +8,8 @@ type Ctx = RouteContext<"/api/lessons/[token]">;
 
 export const GET = async (_: Request, ctx: Ctx) => {
   const { token } = await ctx.params;
-  return handle(() => {
-    const detail = getLessonDetail(token);
+  return handleRead(async () => {
+    const detail = await getLessonDetail(token);
     if (!detail) throw notFound("Lesson");
     return detail;
   });
@@ -20,7 +20,7 @@ export const PATCH = async (req: Request, ctx: Ctx) => {
   const { token } = await ctx.params;
   return handle(async () => {
     const { completed } = await readJson<{ completed?: boolean }>(req);
-    if (!setCompleted(token, Boolean(completed))) throw notFound("Lesson");
+    if (!(await setCompleted(token, Boolean(completed)))) throw notFound("Lesson");
     return { ok: true };
   });
 }

@@ -1,22 +1,24 @@
-import { asc, eq, sql } from "drizzle-orm";
-import { db, schema } from "../db/client";
+import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { db, first, schema } from "../db/client";
 import type { CourseDetail, CourseSummary } from "@/shared/types";
 import { toLessonRow } from "./mappers";
 
 const { courses, lessons } = schema;
 
 // Aggregates computed in SQL so the list stays one query regardless of course size.
+// Postgres returns count/sum as bigint/numeric strings, hence mapWith(Number).
+const num = (q: ReturnType<typeof sql>) => sql<number>`${q}`.mapWith(Number);
 const stats = {
-  lessonCount: sql<number>`count(${lessons.id})`,
-  completedCount: sql<number>`count(${lessons.completedAt})`,
-  totalSec: sql<number>`coalesce(sum(${lessons.durationSec}), 0)`,
-  newCount: sql<number>`coalesce(sum(${lessons.isNew}), 0)`,
-  pendingNotes: sql<number>`coalesce(sum(case when ${lessons.summary} is null then 1 else 0 end), 0)`,
-  transcriptsPending: sql<number>`coalesce(sum(case when ${lessons.transcriptStatus} = 'pending' then 1 else 0 end), 0)`,
+  lessonCount: num(sql`count(${lessons.id})`),
+  completedCount: num(sql`count(${lessons.completedAt})`),
+  totalSec: num(sql`coalesce(sum(${lessons.durationSec}), 0)`),
+  newCount: num(sql`count(*) filter (where ${lessons.isNew})`),
+  pendingNotes: num(sql`count(${lessons.id}) filter (where ${lessons.summary} is null)`),
+  transcriptsPending: num(sql`count(*) filter (where ${lessons.transcriptStatus} = 'pending')`),
 };
 
-const summaryQuery = () => {
-  return db
+const summaryQuery = () =>
+  db
     .select({
       token: courses.token,
       kind: courses.kind,
@@ -32,42 +34,51 @@ const summaryQuery = () => {
     })
     .from(courses)
     .leftJoin(lessons, eq(lessons.courseId, courses.id))
-    .groupBy(courses.id);
-}
+    .groupBy(courses.id)
+    .$dynamic();
 
-export const listCourses = (): CourseSummary[] => {
+/** Courses not in the trash. Every read and write goes through this; only repo/trash.ts sees deleted ones. */
+export const live = isNull(courses.deletedAt);
+/** Lessons whose course is not in the trash. */
+export const liveLesson = inArray(lessons.courseId, db.select({ id: courses.id }).from(courses).where(live));
+
+export const listCourses = (): Promise<CourseSummary[]> =>
   // Pinned first, then your drag order, then newest.
-  return summaryQuery()
-    .orderBy(sql`${courses.pinned} desc`, asc(courses.sortOrder), sql`${courses.createdAt} desc`)
-    .all();
-}
+  summaryQuery()
+    .where(live)
+    .orderBy(sql`${courses.pinned} desc`, asc(courses.sortOrder), sql`${courses.createdAt} desc`);
 
-export const findCourse = (token: string) => {
-  return db.select().from(courses).where(eq(courses.token, token)).get();
-}
+export const findCourse = (token: string) =>
+  first(db.select().from(courses).where(and(eq(courses.token, token), live)).limit(1));
 
-export const findCourseByYoutubeId = (youtubeId: string) => {
-  return db.select().from(courses).where(eq(courses.youtubeId, youtubeId)).get();
-}
+export const findCourseById = (id: number) =>
+  first(db.select().from(courses).where(and(eq(courses.id, id), live)).limit(1));
 
-export const getCourseDetail = (token: string): CourseDetail | null => {
-  const summary = summaryQuery().where(eq(courses.token, token)).get();
+export const findCourseByYoutubeId = (youtubeId: string) =>
+  first(db.select().from(courses).where(eq(courses.youtubeId, youtubeId)).limit(1));
+
+export const getCourseDetail = async (token: string): Promise<CourseDetail | null> => {
+  const summary = await first(summaryQuery().where(and(eq(courses.token, token), live)));
   if (!summary) return null;
-  const rows = db
+  const rows = await db
     .select()
     .from(lessons)
     .innerJoin(courses, eq(lessons.courseId, courses.id))
     .where(eq(courses.token, token))
-    .orderBy(asc(lessons.position))
-    .all();
+    .orderBy(asc(lessons.position));
   return { ...summary, lessons: rows.map((r) => toLessonRow(r.lessons)) };
-}
+};
 
-export const deleteCourse = (token: string) => {
-  return db.delete(courses).where(eq(courses.token, token)).run().changes > 0;
-}
+/** Moves a course to the trash (restorable for 7 days, see repo/trash.ts). */
+export const deleteCourse = async (token: string) =>
+  (
+    await db
+      .update(courses)
+      .set({ deletedAt: Date.now() })
+      .where(and(eq(courses.token, token), live))
+      .returning({ id: courses.id })
+  ).length > 0;
 
 /** Opening a course clears its "new" badges. */
-export const markCourseSeen = (courseId: number) => {
-  db.update(lessons).set({ isNew: false }).where(eq(lessons.courseId, courseId)).run();
-}
+export const markCourseSeen = (courseId: number) =>
+  db.update(lessons).set({ isNew: false }).where(eq(lessons.courseId, courseId));

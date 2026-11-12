@@ -2,6 +2,7 @@ import { db, schema } from "../db/client";
 import { findCourseByYoutubeId } from "../repo/courses";
 import { nextLine, topSortOrder } from "../repo/course-order";
 import { insertLessons, type LessonDraft } from "../repo/lessons";
+import { restoreCourse } from "../repo/trash";
 import { newId } from "../tokens";
 import { fetchPlaylist, fetchVideo } from "../youtube/fetch-course";
 import { parseYouTubeLink } from "../youtube/parse-url";
@@ -47,17 +48,20 @@ const fetchMeta = async (input: string): Promise<CourseMeta> => {
 export const importCourse = async (input: string): Promise<ImportResult> => {
   const link = parseYouTubeLink(input);
   const id = link.kind === "playlist" ? link.playlistId : link.videoId;
-  const existing = findCourseByYoutubeId(id);
-  if (existing) return { token: existing.token, title: existing.title, created: false, transcripts: Promise.resolve() };
+  const existing = await findCourseByYoutubeId(id);
+  if (existing) {
+    // Re-adding a course from the trash brings it back with its progress and notes.
+    if (existing.deletedAt) await restoreCourse(existing.token);
+    return { token: existing.token, title: existing.title, created: false, transcripts: Promise.resolve() };
+  }
 
   const { drafts, ...meta } = await fetchMeta(input);
   const token = newId();
-  const course = db
+  const [course] = await db
     .insert(schema.courses)
-    .values({ ...meta, token, line: nextLine(token), lastSyncedAt: Date.now(), sortOrder: topSortOrder() })
-    .returning()
-    .get();
-  insertLessons(course, drafts);
+    .values({ ...meta, token, line: await nextLine(token), lastSyncedAt: Date.now(), sortOrder: await topSortOrder() })
+    .returning();
+  await insertLessons(course, drafts);
 
   const transcripts = fillTranscripts(course.id).catch((e) => console.error("[import]", e));
   return { token: course.token, title: course.title, created: true, transcripts };

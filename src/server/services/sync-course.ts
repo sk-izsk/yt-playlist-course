@@ -14,25 +14,25 @@ import type { SyncResult } from "@/shared/types";
  * Removed videos are kept — your progress and notes on them are worth more than parity.
  */
 export const syncCourse = async (token: string): Promise<SyncResult & { transcripts: Promise<void> }> => {
-  const course = findCourse(token);
+  const course = await findCourse(token);
   if (!course) throw new Error(`Unknown course ${token}`);
   const done = Promise.resolve();
   if (course.kind !== "playlist") return { added: [], transcripts: done };
 
   const remote = await fetchPlaylist(course.youtubeId);
-  const known = new Set(lessonsOfCourse(course.id).map((l) => l.videoId));
+  const known = new Set((await lessonsOfCourse(course.id)).map((l) => l.videoId));
   const fresh = remote.videos.filter((v) => !known.has(v.videoId));
 
-  const inserted = insertLessons(course, draftsFromPlaylist(fresh), {
-    afterPosition: maxPosition(course.id),
+  const inserted = await insertLessons(course, draftsFromPlaylist(fresh), {
+    afterPosition: await maxPosition(course.id),
     isNew: true,
   });
-  db.update(schema.courses)
+  await db
+    .update(schema.courses)
     .set({ lastSyncedAt: Date.now(), availableUpdates: 0 })
-    .where(eq(schema.courses.id, course.id))
-    .run();
+    .where(eq(schema.courses.id, course.id));
   if (inserted.length) {
-    addEvent({
+    await addEvent({
       kind: "success",
       title: `Added ${inserted.length} new video${inserted.length > 1 ? "s" : ""}`,
       body: course.title,

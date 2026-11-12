@@ -1,7 +1,36 @@
-import ky, { HTTPError } from "ky";
-import type { AppEvent, CourseDetail, CourseSummary, LessonDetail, Note, SyncResult } from "@/shared/types";
+import ky, { HTTPError, type AfterResponseHook } from "ky";
+import type { AgentToken, TrashedCourse, AppEvent, CourseDetail, CourseSummary, LessonDetail, Note, SyncResult } from "@/shared/types";
 
-const http = ky.create({ prefix: "/api", timeout: 120_000, retry: 0 });
+// One refresh at a time: parallel 401s must share it, or the second rotation looks like token reuse.
+let refreshing: Promise<boolean> | null = null;
+const refreshOnce = () =>
+  (refreshing ??= fetch("/api/auth/refresh", { method: "POST" })
+    .then((r) => r.ok, () => false)
+    .finally(() => {
+      refreshing = null;
+    }));
+
+/**
+ * 401 token_expired → refresh → replay the request once. If the session is over (idle 24 h, revoked) the server
+ * has cleared the cookies, so reload into the public visitor view. Other 401s ("Log in to make changes") surface
+ * as normal errors: reading never needs login.
+ */
+const authRetry: AfterResponseHook = async ({ response, retryCount }) => {
+  if (response.status !== 401 || retryCount > 0) return;
+  const { error } = (await response.clone().json().catch(() => ({}))) as { error?: string };
+  if (error !== "token_expired") return;
+  if (await refreshOnce()) return ky.retry({ delay: 0 });
+  window.location.reload();
+};
+
+const http = ky.create({
+  prefix: "/api",
+  timeout: 120_000,
+  // limit 1 makes ky keep an unread copy of the body for the auth replay; with no methods/status codes,
+  // ordinary automatic retries never fire (a forced ky.retry() skips those checks).
+  retry: { limit: 1, methods: [], statusCodes: [] },
+  hooks: { afterResponse: [authRetry] },
+});
 
 /**
  * Surfaces the server's `{ error }` message instead of "Request failed with status 400".
@@ -19,6 +48,18 @@ export const errorMessage = async (err: unknown): Promise<string> => {
 };
 
 export const api = {
+  login: (username: string, password: string) => http.post("auth/login", { json: { username, password } }).json(),
+  logout: () => http.post("auth/logout").json(),
+  me: () => http.get("auth/me").json<{ username: string; role: "owner" | "demo" } | null>(),
+  agentTokens: () => http.get("agent-tokens").json<AgentToken[]>(),
+  createAgentToken: (name: string) => http.post("agent-tokens", { json: { name } }).json<AgentToken & { token: string }>(),
+  revokeAgentToken: (id: number) => http.delete(`agent-tokens/${id}`).json(),
+  dbSource: () => http.get("db-source").json<{ available: boolean; source: "live" | "backup" }>(),
+  setDbSource: (source: "live" | "backup") => http.put("db-source", { json: { source } }).json(),
+  trash: () => http.get("trash").json<TrashedCourse[]>(),
+  tutor: () => http.get("tutor").json<{ enabled: boolean }>(),
+  restoreCourse: (token: string) => http.post(`trash/${token}`).json(),
+
   courses: () => http.get("courses").json<CourseSummary[]>(),
   course: (token: string) => http.get(`courses/${token}`).json<CourseDetail>(),
   addCourse: (url: string) => http.post("courses", { json: { url } }).json<{ token: string; title: string; created: boolean }>(),

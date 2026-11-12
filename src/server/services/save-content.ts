@@ -8,8 +8,8 @@ import { getTranscript, quizOf, replaceLessonContent } from "../repo/lesson-cont
  * Validates agent-written JSON and stores it. Throws a readable error listing every problem.
  * Refuses to overwrite a lesson that already has notes unless `force` — finished work is never redone by accident.
  */
-export const saveLessonContent = (token: string, raw: unknown, opts: { force?: boolean } = {}) => {
-  const lesson = findLesson(token);
+export const saveLessonContent = async (token: string, raw: unknown, opts: { force?: boolean } = {}) => {
+  const lesson = await findLesson(token);
   if (!lesson) throw new Error(`Unknown lesson ${token}`);
   if (lesson.summary && !opts.force) {
     throw new Error(`Lesson ${token} already has notes. Re-run with --force only if the user asked to redo it.`);
@@ -22,8 +22,11 @@ export const saveLessonContent = (token: string, raw: unknown, opts: { force?: b
   }
 
   const startSec = lesson.startSec ?? 0;
-  const others = lessonsOfCourse(lesson.courseId).filter((l) => l.id !== lesson.id);
-  const otherAnswerOrders = others.map((l) => quizOf(l.id).map((q) => q.answerIndex).join(",")).filter(Boolean);
+  const others = (await lessonsOfCourse(lesson.courseId)).filter((l) => l.id !== lesson.id);
+  // ponytail: one quiz query per sibling lesson; fine for playlists of ~100, batch with inArray if it gets slow.
+  const otherQuizzes = await Promise.all(others.map((l) => quizOf(l.id)));
+  const otherAnswerOrders = otherQuizzes.map((qs) => qs.map((q) => q.answerIndex).join(",")).filter(Boolean);
+  const transcript = await getTranscript(lesson.id);
   // Answer positions are code's job, not the agent's: shuffle so no habit (all A, C,A,D,B…) survives.
   const content = { ...parsed.data, quiz: shuffleQuiz(parsed.data.quiz, otherAnswerOrders) };
 
@@ -31,7 +34,7 @@ export const saveLessonContent = (token: string, raw: unknown, opts: { force?: b
   const issues = qualityIssues(content, {
     startSec,
     endSec: lesson.endSec ?? startSec + lesson.durationSec,
-    segmentStarts: (getTranscript(lesson.id)?.segments ?? []).map(([sec]) => sec),
+    segmentStarts: (transcript?.segments ?? []).map(([sec]) => sec),
     otherSummaries: others.flatMap((l) => (l.summary ? [l.summary] : [])),
     otherAnswerOrders,
   });
@@ -39,6 +42,6 @@ export const saveLessonContent = (token: string, raw: unknown, opts: { force?: b
     throw new Error(`Notes for ${token} look template-generated; fix and save again:\n${issues.map((i) => `  - ${i}`).join("\n")}`);
   }
 
-  replaceLessonContent(lesson.id, content);
+  await replaceLessonContent(lesson.id, content);
   return { kind: content.kind, practice: content.practice.length, quiz: content.quiz.length };
 };

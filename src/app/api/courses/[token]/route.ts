@@ -1,4 +1,4 @@
-import { handle, notFound, readJson } from "@/server/http";
+import { handle, handleRead, notFound, readJson } from "@/server/http";
 import { setPinned } from "@/server/repo/course-order";
 import { deleteCourse, findCourse, getCourseDetail, markCourseSeen } from "@/server/repo/courses";
 
@@ -8,11 +8,11 @@ type Ctx = RouteContext<"/api/courses/[token]">;
 
 export const GET = async (_: Request, ctx: Ctx) => {
   const { token } = await ctx.params;
-  return handle(() => {
-    const detail = getCourseDetail(token);
+  return handleRead(async (user) => {
+    const detail = await getCourseDetail(token);
     if (!detail) throw notFound("Course");
-    // Badges show on this visit, then clear for the next one.
-    if (detail.newCount) markCourseSeen(findCourse(token)!.id);
+    // Badges show on this visit, then clear for the next one (only the owner's visit counts).
+    if (user && detail.newCount) await markCourseSeen((await findCourse(token))!.id);
     return detail;
   });
 }
@@ -22,15 +22,15 @@ export const PATCH = async (req: Request, ctx: Ctx) => {
   const { token } = await ctx.params;
   return handle(async () => {
     const { pinned } = await readJson<{ pinned?: boolean }>(req);
-    if (!setPinned(token, Boolean(pinned))) throw notFound("Course");
+    if (!(await setPinned(token, Boolean(pinned)))) throw notFound("Course");
     return { ok: true };
   });
 };
 
 export const DELETE = async (_: Request, ctx: Ctx) => {
   const { token } = await ctx.params;
-  return handle(() => {
-    if (!deleteCourse(token)) throw notFound("Course");
+  return handle(async () => {
+    if (!(await deleteCourse(token))) throw notFound("Course");
     return { ok: true };
   });
 }

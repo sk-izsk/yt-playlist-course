@@ -17,11 +17,13 @@ import { useCopy } from "@/client/hooks/useCopy";
 import { displayId } from "@/shared/format";
 import type { CourseSummary } from "@/shared/types";
 import styles from "./library.module.css";
+import { useSession } from "@/client/hooks/useSession";
 
 const youtubeUrl = (c: CourseSummary) =>
   c.kind === "playlist" ? `https://www.youtube.com/playlist?list=${c.youtubeId}` : `https://www.youtube.com/watch?v=${c.youtubeId}`;
 
 export const CourseMenu = ({ course: c }: { course: CourseSummary }) => {
+  const { canEdit } = useSession(); // visitors read only
   const { modal } = App.useApp();
   const pin = useTogglePin();
   const del = useDeleteCourse(c.token);
@@ -49,13 +51,14 @@ export const CourseMenu = ({ course: c }: { course: CourseSummary }) => {
     delete: () =>
       modal.confirm({
         title: `Delete "${c.title}"?`,
-        content: "Progress, notes and quizzes for this course are removed too. This can't be undone.",
+        content: "It moves to the trash (Settings) with its progress and notes, and can be restored for 7 days.",
         okText: "Delete",
         okButtonProps: { danger: true },
         onOk: () => del.mutateAsync(),
       }),
   };
 
+  if (!canEdit) return null;
   return (
     <Dropdown trigger={["click"]} placement="bottomRight" menu={{ items, onClick: ({ key }) => actions[key]?.() }}>
       <button type="button" className={styles.toolBtn} aria-label="Course actions">

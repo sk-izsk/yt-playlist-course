@@ -8,6 +8,6 @@ export const PUT = async (req: Request) =>
     if (!Array.isArray(tokens) || !tokens.every((t) => typeof t === "string")) {
       throw new HttpError(400, "tokens must be an array of course ids");
     }
-    reorderCourses(tokens);
+    await reorderCourses(tokens);
     return { ok: true };
   });

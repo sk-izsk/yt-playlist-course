@@ -14,9 +14,8 @@ export const Hero = () => (
         Paste a link. Every video becomes a stop with notes, practice and a quiz, laid out as a daily plan you can
         actually keep.
       </p>
-      <div className={styles.addCard} id="add">
-        <AddLinkForm />
-      </div>
+      {/* Renders its own card, and nothing for visitors (adding needs login). */}
+      <AddLinkForm />
     </div>
     <TransitMap />
   </section>

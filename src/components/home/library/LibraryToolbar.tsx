@@ -2,6 +2,7 @@
 
 import { AppstoreOutlined, CheckSquareOutlined, SearchOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { Button, Input, Segmented } from "antd";
+import { useSession } from "@/client/hooks/useSession";
 import { useSelection } from "@/client/store/selection";
 import { usePrefs, type LibraryView } from "@/client/store/prefs";
 import styles from "./library.module.css";
@@ -16,6 +17,7 @@ interface Props {
 export const LibraryToolbar = ({ search, onSearch, shown, total }: Props) => {
   const { view, setView } = usePrefs();
   const { active, start } = useSelection();
+  const { canEdit } = useSession(); // selecting is only for bulk delete
   return (
     <div className={styles.toolbar}>
       <Input
@@ -27,7 +29,7 @@ export const LibraryToolbar = ({ search, onSearch, shown, total }: Props) => {
         className={styles.search}
       />
       <span className={styles.count}>{search ? `${shown} of ${total}` : `${total} courses`}</span>
-      {!active && (
+      {canEdit && !active && (
         <Button icon={<CheckSquareOutlined />} onClick={start}>
           Select
         </Button>

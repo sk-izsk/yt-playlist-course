@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { NavBar } from "@/components/layout/NavBar";
 import { Providers } from "./providers";
 import "./globals.css";
 
@@ -16,10 +15,7 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: LayoutProps<"/">) => (
   <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
     <body>
-      <Providers>
-        <NavBar />
-        <main>{children}</main>
-      </Providers>
+      <Providers>{children}</Providers>
     </body>
   </html>
 );

@@ -1,25 +1,51 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import * as schema from "./schema";
-import { BOOTSTRAP_SQL } from "./bootstrap.sql";
-import { migrate } from "./migrate";
-import { DB_PATH, ensureDbLocation } from "./path";
+import { AsyncLocalStorage } from "node:async_hooks";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
+import * as authSchema from "./auth-schema";
+import * as appSchema from "./schema";
 
-const open = () => {
-  ensureDbLocation();
-  const sqlite = new Database(DB_PATH);
-  // WAL lets the dev server and the agent CLI use the DB at the same time.
-  sqlite.pragma("journal_mode = WAL");
-  sqlite.pragma("foreign_keys = ON");
-  return sqlite;
-};
+const schema = { ...appSchema, ...authSchema };
 
-// Reuse one connection across Next dev hot reloads…
-const g = globalThis as unknown as { __sqlite?: Database.Database };
-const sqlite = (g.__sqlite ??= open());
-// …but re-run the (idempotent, cheap) schema setup on every module load so new columns land without a restart.
-sqlite.exec(BOOTSTRAP_SQL);
-migrate(sqlite);
+// Next and `bun run` load .env.local themselves; plain `bunx tsx` scripts don't.
+if (!process.env.DATABASE_URL) {
+  try {
+    process.loadEnvFile(".env.local");
+  } catch {}
+}
+const url = process.env.DATABASE_URL;
+if (!url) throw new Error("DATABASE_URL is not set (put it in .env.local).");
 
-export const db = drizzle(sqlite, { schema });
+// One pool across Next dev hot reloads; otherwise every reload leaks connections to Neon.
+// ponytail: max 5 suits one user on Neon's pooled (-pooler) URL; raise it if requests start queueing.
+const g = globalThis as unknown as { __pg?: Pool; __pgBackup?: Pool };
+export const pool = (g.__pg ??= new Pool({ connectionString: url, max: 5 }));
+
+// Optional local mirror (scripts/backup.sh keeps it fresh). Only on a Mac: Vercel can't reach it.
+const backupUrl = process.env.VERCEL ? undefined : process.env.LOCAL_DATABASE_URL;
+const backupPool = backupUrl ? (g.__pgBackup ??= new Pool({ connectionString: backupUrl, max: 3 })) : undefined;
+
+const liveDb = drizzle(pool, { schema });
+const backupDb = backupPool ? drizzle(backupPool, { schema }) : undefined;
+
+export type DbSource = "live" | "backup";
+const source = new AsyncLocalStorage<DbSource>();
+export const backupAvailable = () => Boolean(backupDb);
+export const currentSource = (): DbSource => (backupDb && source.getStore() === "backup" ? "backup" : "live");
+/** Runs a request against the chosen database (http.ts sets it from the "tw_db" cookie). */
+export const withSource = <T>(s: DbSource, fn: () => T) => source.run(s, fn);
+
+/**
+ * Every repo call goes through this proxy, so one request reads either Neon or the local backup without
+ * threading a db handle everywhere. Writes against the backup are refused earlier, in handle().
+ */
+export const db = new Proxy(liveDb, {
+  get: (_, key) => {
+    const target = currentSource() === "backup" ? backupDb! : liveDb;
+    const value = Reflect.get(target, key, target);
+    return typeof value === "function" ? value.bind(target) : value;
+  },
+});
 export { schema };
+
+/** First row or undefined: Postgres has no `.get()`, so add `.limit(1)` to the query for speed. */
+export const first = async <T>(rows: PromiseLike<T[]>) => (await rows)[0];

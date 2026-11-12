@@ -1,11 +1,10 @@
 # Tubewise — common tasks. Run `make` (or `make help`) to list them.
-# Package manager is bun; Next and the agent CLI run on Node (better-sqlite3 is a Node addon).
+# Package manager is bun; Next and the agent CLI run on Node.
 
 .DEFAULT_GOAL := help
 .PHONY: help install dev build start stop lint typecheck selfcheck check clean \
-        list pending show add sync fill report transcripts db-path db-backup db-shell
+        list pending show add sync fill report transcripts db-generate db-migrate db-copy db-studio user mcp-add db-backup backup-install backup-uninstall
 
-DB ?= $(HOME)/.courseit/app.db
 PORT ?= 3000
 
 help: ## Show this list
@@ -29,7 +28,7 @@ stop: ## Stop whatever is listening on the dev port
 
 # ---------------------------------------------------------------- quality
 lint: ## ESLint
-	bunx eslint src scripts
+	bunx eslint src scripts mcp
 
 typecheck: ## TypeScript, no emit
 	bunx next typegen >/dev/null 2>&1; bunx tsc --noEmit
@@ -75,14 +74,39 @@ transcripts: ## Retry missing/failed transcripts (ID=course-id)
 	@test -n "$(ID)" || (echo "usage: make transcripts ID=<course-id>" && exit 1)
 	bun run --silent agent transcripts $(ID)
 
-# ---------------------------------------------------------------- data
-db-path: ## Where the SQLite database lives
-	@echo $(DB)
+# ---------------------------------------------------------------- data (Postgres via DATABASE_URL in .env.local; bun loads it)
+db-generate: ## After editing schema.ts: write a new SQL migration into drizzle/
+	bunx drizzle-kit generate
 
-db-backup: ## Copy the database to ~/.courseit/backups/ (safe while the app runs)
-	@mkdir -p $(dir $(DB))backups
-	sqlite3 $(DB) ".backup '$(dir $(DB))backups/app-$$(date +%Y%m%d-%H%M%S).db'"
-	@ls -t $(dir $(DB))backups | head -1
+db-migrate: ## Apply pending migrations to DATABASE_URL
+	bunx drizzle-kit migrate
 
-db-shell: ## Open the database in sqlite3 (read it; write through the CLI)
-	sqlite3 $(DB)
+db-copy: ## One-time copy of the old SQLite DB (~/.courseit/app.db) into an empty Postgres
+	bunx tsx scripts/copy-sqlite-to-pg.ts
+
+user: ## Create a login or reset its password (NAME=… ROLE=owner|demo); prompts for the password
+	@test -n "$(NAME)" || (echo "usage: make user NAME=<username> [ROLE=owner|demo]"; exit 1)
+	@read -s -p "Password for $(NAME): " P; echo; PASSWORD="$$P" bunx tsx scripts/user-create.ts $(NAME) $(or $(ROLE),owner)
+
+mcp-add: ## Register the MCP server for Claude Code in every folder (URL=… TOKEN=tw_… from Settings)
+	@test -n "$(URL)" -a -n "$(TOKEN)" || (echo "usage: make mcp-add URL=https://… TOKEN=tw_…  (see docs/mcp.md)"; exit 1)
+	claude mcp add tubewise --scope user -e TUBEWISE_URL=$(URL) -e TUBEWISE_TOKEN=$(TOKEN) -- "$(CURDIR)/node_modules/.bin/tsx" "$(CURDIR)/mcp/server.ts"
+
+db-studio: ## Browse the database in drizzle studio (read it; write through the CLI)
+	bunx drizzle-kit studio
+
+PLIST := $(HOME)/Library/LaunchAgents/com.tubewise.backup.plist
+
+db-backup: ## Dump Neon to ~/.courseit/backups (keeps 14 days) and refresh the local mirror if LOCAL_DATABASE_URL is set
+	scripts/backup.sh
+
+backup-install: ## Run db-backup every 15 minutes with launchd
+	@mkdir -p $(HOME)/.courseit/backups $(dir $(PLIST))
+	sed -e 's|__REPO__|$(CURDIR)|g' -e 's|__HOME__|$(HOME)|g' scripts/launchd/com.tubewise.backup.plist > $(PLIST)
+	launchctl bootout gui/$$(id -u) $(PLIST) 2>/dev/null || true
+	launchctl bootstrap gui/$$(id -u) $(PLIST)
+	@echo "installed; log: ~/.courseit/backups/backup.log"
+
+backup-uninstall: ## Stop the 15-minute backups
+	launchctl bootout gui/$$(id -u) $(PLIST) 2>/dev/null || true
+	rm -f $(PLIST)

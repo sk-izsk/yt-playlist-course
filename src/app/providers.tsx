@@ -6,7 +6,6 @@ import { App, ConfigProvider } from "antd";
 import { useEffect, useState, type ReactNode } from "react";
 import { buildTheme } from "@/client/theme/antd-theme";
 import { usePrefs } from "@/client/store/prefs";
-import { AutoSync } from "@/components/layout/AutoSync";
 
 export const Providers = ({ children }: { children: ReactNode }) => {
   const [client] = useState(
@@ -24,7 +23,6 @@ export const Providers = ({ children }: { children: ReactNode }) => {
       <ConfigProvider theme={buildTheme(mode)}>
         <App>
           <QueryClientProvider client={client}>
-            <AutoSync />
             {children}
           </QueryClientProvider>
         </App>
