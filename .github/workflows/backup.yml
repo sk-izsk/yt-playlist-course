@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     container: postgres:18 # same major as Neon, so pg_dump matches the server
     steps:
+      # The postgres image has no CA bundle, so verify-full can't check Neon's certificate without this.
+      - name: Install CA certificates
+        run: apt-get update -qq && apt-get install -y -qq ca-certificates >/dev/null
       - name: pg_dump
         env:
           DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
