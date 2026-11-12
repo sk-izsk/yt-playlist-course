@@ -56,6 +56,7 @@ export const requireAgent = async (req: Request): Promise<AuthUser> => {
       .limit(1),
   );
   if (!row) throw new HttpError(401, "Agent token is invalid or revoked");
+  if (row.role !== "owner") throw new HttpError(403, "Agent tokens only work for the owner account");
   await db.update(agentTokens).set({ lastUsedAt: Date.now() }).where(eq(agentTokens.id, row.id));
   return { id: row.userId, role: row.role, sid: `agent:${row.id}` };
 };

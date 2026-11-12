@@ -59,7 +59,7 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
 | 5 ✅ 2026-11-11 | **Custom MCP** (`mcp/server.ts`, stdio): `fetch_transcripts`, `list_pending`, `get_lesson`, `save_notes`, `course_report`; writing rules from `docs/notes-guide.md` (move AGENTS.md Part B there) | Claude Code fills one real lesson through MCP |
 | 6 ✅ 2026-11-11 | **CLI remote mode**: `scripts/agent` uses the API when `TUBEWISE_URL`/`TUBEWISE_TOKEN` are set; `make fill` unchanged | `make fill MAX=1` works online |
 | 7 ✅ 2026-11-11 | **Backups**: Mac mirror (launchd pull every 15 min + 14 dated dumps + local/Neon toggle, read-only local) + nightly `pg_dump` via GitHub Actions + soft delete with a 7-day trash | local mirror matches Neon; a dump restores into a scratch DB |
-| 8 | **Demo** | visitor can browse, every write returns 403 |
+| 8 ✅ 2026-11-11 (by public read) | **Demo** | visitor can browse, every write returns 403 |
 | 9 | **AI tutor** (optional): "Ask this lesson", `claude-haiku-5-5`, notes+transcript as cached prefix, daily caps; demo gets notes-only context | streams an answer within caps |
 | 10 | **README / portfolio** | architecture diagram, screenshots, demo link |
 
@@ -142,6 +142,14 @@ Do **one phase per session**, verify it (`make check`, browser, a real lesson sa
   14-dump retention, toggle reads the mirror and blocks writes, delete → hidden (app + agent API) → restore, 7-day purge.
 - **Left for the user:** `createdb tubewise_mirror` in your local Postgres + `LOCAL_DATABASE_URL` in `.env.local`,
   `make backup-install`, and the GitHub secret `NEON_DATABASE_URL` (direct URL) for the nightly workflow (not run yet).
+
+## Phase 8 notes (done 2026-11-11)
+
+- Superseded by the user's "public read-only" decision: every visitor already browses the real library, so no demo
+  copy, demo button or demo session is needed. Done-when holds: visitors browse, every write is refused (401).
+- Hardening: `handle()` now lets only `role = owner` write (403 "This account is read-only"); agent tokens only work
+  for the owner; trash is owner-only. Verified with a throwaway `demo` user (reads 200, all writes 403), then deleted.
+- `user_id` scoping stays unnecessary while there is one owner; add it before ever creating a second *owner*.
 
 ## Needed from the user
 

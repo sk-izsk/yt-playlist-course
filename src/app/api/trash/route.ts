@@ -7,5 +7,6 @@ export const dynamic = "force-dynamic";
 export const GET = () =>
   handleRead((user) => {
     if (!user) throw new HttpError(401, "Log in to see the trash");
+    if (user.role !== "owner") throw new HttpError(403, "This account is read-only");
     return listTrash();
   });

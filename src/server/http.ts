@@ -40,6 +40,8 @@ export const handleRead = <T>(fn: (user: AuthUser | null) => T | Promise<T>, sta
 export const handle = <T>(fn: (user: AuthUser) => T | Promise<T>, status = 200) =>
   handlePublic(async () => {
     const user = await requireUser();
+    // Only the owner changes anything; a "demo" login (if one is ever handed out) is read-only like a visitor.
+    if (user.role !== "owner") throw new HttpError(403, "This account is read-only");
     if ((await chosenSource()) === "backup") {
       throw new HttpError(403, "You're viewing the local backup, which is read-only. Switch to Neon (live) in Settings to make changes.");
     }
