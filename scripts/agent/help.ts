@@ -1,4 +1,4 @@
-export type Commands = Record<string, (args: string[]) => Promise<void> | void>;
+export type Commands = Record<string, (args: string[]) => Promise<void> | void>
 
 export const HELP = `Commands (ids = full UUID v4 from the app):
   list                          all courses with ids and progress
@@ -14,20 +14,25 @@ export const HELP = `Commands (ids = full UUID v4 from the app):
   sync <course-id>              pull new videos from the playlist                 (local mode only)
   transcripts <course-id>       retry missing/failed transcripts
 
-Mode: local (DATABASE_URL) by default; remote (the app's agent API) when TUBEWISE_URL and TUBEWISE_TOKEN are set.`;
+Mode: local (DATABASE_URL) by default; remote (the app's agent API) when TUBEWISE_URL and TUBEWISE_TOKEN are set.`
 
 export const required = (v: string | undefined, name: string): string => {
-  if (!v) throw new Error(`Missing ${name}.\n\n${HELP}`);
-  return v;
-};
+  if (!v) {
+    throw new Error(`Missing ${name}.\n\n${HELP}`)
+  }
+  return v
+}
 
 export const printPending = (
   rows: { token: string; position: number; transcript: string; title: string; course: string }[],
 ) => {
-  if (!rows.length) return console.log("Nothing pending — every lesson has notes.");
-  for (const r of rows)
-    console.log(`${r.token}  #${r.position}  [transcript: ${r.transcript}]  ${r.title}  — ${r.course}`);
-};
+  if (!rows.length) {
+    return console.log("Nothing pending — every lesson has notes.")
+  }
+  for (const r of rows) {
+    console.log(`${r.token}  #${r.position}  [transcript: ${r.transcript}]  ${r.title}  — ${r.course}`)
+  }
+}
 
 export const printSaved = (token: string, r: { kind: string; practice: number; quiz: number }) =>
-  console.log(`Saved ${token} (${r.kind}): summary + ${r.practice} practice + ${r.quiz} quiz.`);
+  console.log(`Saved ${token} (${r.kind}): summary + ${r.practice} practice + ${r.quiz} quiz.`)

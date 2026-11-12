@@ -1,7 +1,7 @@
-import type { schema } from "../db/client";
-import type { LessonRow } from "@/shared/types";
+import type { schema } from "../db/client"
+import type { LessonRow } from "@/shared/types"
 
-type LessonRecord = typeof schema.lessons.$inferSelect;
+type LessonRecord = typeof schema.lessons.$inferSelect
 
 export const toLessonRow = (l: LessonRecord): LessonRow => {
   return {
@@ -15,5 +15,5 @@ export const toLessonRow = (l: LessonRecord): LessonRow => {
     kind: l.kind,
     isNew: l.isNew,
     transcriptStatus: l.transcriptStatus,
-  };
-};
+  }
+}

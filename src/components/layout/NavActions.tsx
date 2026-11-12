@@ -1,19 +1,19 @@
-"use client";
+"use client"
 
-import { SettingOutlined } from "@ant-design/icons";
-import { Button, Tag, Tooltip } from "antd";
-import Link from "next/link";
-import { useDbSource } from "@/client/hooks/useDbSource";
-import { useSession } from "@/client/hooks/useSession";
-import { LogoutButton } from "../auth/LogoutButton";
-import { NotificationBell } from "../notifications/NotificationBell";
-import { ThemeToggle } from "./ThemeToggle";
-import styles from "./NavBar.module.css";
+import { SettingOutlined } from "@ant-design/icons"
+import { Button, Tag, Tooltip } from "antd"
+import Link from "next/link"
+import { useDbSource } from "@/client/hooks/useDbSource"
+import { useSession } from "@/client/hooks/useSession"
+import { LogoutButton } from "../auth/LogoutButton"
+import { NotificationBell } from "../notifications/NotificationBell"
+import { ThemeToggle } from "./ThemeToggle"
+import styles from "./NavBar.module.css"
 
 /** Right side of the nav: visitors get "Log in"; the owner gets the bell, settings, logout and "Add a course". */
 export const NavActions = () => {
-  const { user, canEdit, loading } = useSession();
-  const { source } = useDbSource();
+  const { user, canEdit, loading } = useSession()
+  const { source } = useDbSource()
   return (
     <>
       {source === "backup" && (
@@ -44,5 +44,5 @@ export const NavActions = () => {
         </Link>
       )}
     </>
-  );
-};
+  )
+}

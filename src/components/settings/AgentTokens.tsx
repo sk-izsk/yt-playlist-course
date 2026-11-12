@@ -1,22 +1,22 @@
-"use client";
+"use client"
 
-import { Alert, Button, Input, Popconfirm, Space, Typography } from "antd";
-import { useState } from "react";
-import { useAgentTokens } from "@/client/hooks/useAgentTokens";
+import { Alert, Button, Input, Popconfirm, Space, Typography } from "antd"
+import { useState } from "react"
+import { useAgentTokens } from "@/client/hooks/useAgentTokens"
 
-const when = (ms?: number | null) => (ms ? new Date(ms).toLocaleString() : "never");
+const when = (ms?: number | null) => (ms ? new Date(ms).toLocaleString() : "never")
 
 /** Create (shown once) and revoke the tokens the Mac's MCP server / CLI use for /api/agent/*. */
 export const AgentTokens = () => {
-  const { list, create, revoke } = useAgentTokens();
-  const [name, setName] = useState("");
-  const [fresh, setFresh] = useState<string | null>(null);
+  const { list, create, revoke } = useAgentTokens()
+  const [name, setName] = useState("")
+  const [fresh, setFresh] = useState<string | null>(null)
 
   const add = async () => {
-    const res = await create.mutateAsync(name.trim());
-    setFresh(res.token);
-    setName("");
-  };
+    const res = await create.mutateAsync(name.trim())
+    setFresh(res.token)
+    setName("")
+  }
 
   return (
     <Space orientation="vertical" size="middle" style={{ width: "100%" }}>
@@ -83,5 +83,5 @@ export const AgentTokens = () => {
         ))}
       </div>
     </Space>
-  );
-};
+  )
+}

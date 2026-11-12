@@ -1,6 +1,6 @@
-import { AddLinkForm } from "./AddLinkForm";
-import { TransitMap } from "./TransitMap";
-import styles from "./home.module.css";
+import { AddLinkForm } from "./AddLinkForm"
+import { TransitMap } from "./TransitMap"
+import styles from "./home.module.css"
 
 export const Hero = () => (
   <section className={`container ${styles.hero}`}>
@@ -19,4 +19,4 @@ export const Hero = () => (
     </div>
     <TransitMap />
   </section>
-);
+)

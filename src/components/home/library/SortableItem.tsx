@@ -1,20 +1,20 @@
-"use client";
+"use client"
 
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import type { ReactNode } from "react";
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import type { ReactNode } from "react"
 
-export type HandleProps = Pick<ReturnType<typeof useSortable>, "attributes" | "listeners">;
+export type HandleProps = Pick<ReturnType<typeof useSortable>, "attributes" | "listeners">
 
 interface Props {
-  id: string;
-  disabled?: boolean;
+  id: string
+  disabled?: boolean
   /** Render prop: spread `handle` onto the drag handle so the rest of the card stays clickable. */
-  children: (handle: HandleProps | null) => ReactNode;
+  children: (handle: HandleProps | null) => ReactNode
 }
 
 export const SortableItem = ({ id, disabled, children }: Props) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled })
   return (
     <div
       ref={setNodeRef}
@@ -28,5 +28,5 @@ export const SortableItem = ({ id, disabled, children }: Props) => {
     >
       {children(disabled ? null : { attributes, listeners })}
     </div>
-  );
-};
+  )
+}

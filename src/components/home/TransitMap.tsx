@@ -1,9 +1,9 @@
-"use client";
+"use client"
 
-import { useCourses } from "@/client/hooks/useCourses";
-import { LINES } from "@/shared/lines";
-import { LiveMap } from "./LiveMap";
-import styles from "./home.module.css";
+import { useCourses } from "@/client/hooks/useCourses"
+import { LINES } from "@/shared/lines"
+import { LiveMap } from "./LiveMap"
+import styles from "./home.module.css"
 
 // Demo map for an empty library: a small octilinear network where each course is a line.
 // The lines draw themselves once on load (the page's single orchestrated motion).
@@ -12,7 +12,7 @@ const ROUTES = [
   { line: LINES[1], name: "System design", d: "M70 34 V140 L190 260 V396", label: [82, 30] },
   { line: LINES[2], name: "DSA patterns", d: "M24 118 H210 L300 208 V300 L370 370 H536", label: [150, 146] },
   { line: LINES[4], name: "Gen AI", d: "M536 70 H430 L300 200 L230 270 H120", label: [536, 60] },
-] as const;
+] as const
 
 const STATIONS: [number, number][] = [
   [24, 330],
@@ -30,14 +30,14 @@ const STATIONS: [number, number][] = [
   [536, 70],
   [470, 70],
   [120, 270],
-];
+]
 
 // Interchanges: where two lines share a stop.
 const INTERCHANGES: [number, number][] = [
   [260, 240],
   [300, 200],
   [190, 260],
-];
+]
 
 const DemoMap = () => (
   <svg className={styles.map} viewBox="0 0 560 420" role="img" aria-labelledby="map-title">
@@ -70,10 +70,10 @@ const DemoMap = () => (
       </text>
     ))}
   </svg>
-);
+)
 
 /** Your real courses once you have some; the demo map until then (and while loading). */
 export const TransitMap = () => {
-  const { data } = useCourses();
-  return data?.length ? <LiveMap courses={data} /> : <DemoMap />;
-};
+  const { data } = useCourses()
+  return data?.length ? <LiveMap courses={data} /> : <DemoMap />
+}

@@ -1,29 +1,33 @@
-import { CaretRightOutlined } from "@ant-design/icons";
-import { Button } from "antd";
-import { clock } from "@/shared/format";
-import type { QuizItem } from "@/shared/types";
-import styles from "./lesson.module.css";
+import { CaretRightOutlined } from "@ant-design/icons"
+import { Button } from "antd"
+import { clock } from "@/shared/format"
+import type { QuizItem } from "@/shared/types"
+import styles from "./lesson.module.css"
 
 interface Props {
-  index: number;
-  total: number;
-  item: QuizItem;
-  chosen: number | undefined;
-  onChoose: (option: number) => void;
-  seek: (sec: number) => void;
+  index: number
+  total: number
+  item: QuizItem
+  chosen: number | undefined
+  onChoose: (option: number) => void
+  seek: (sec: number) => void
 }
 
-const LETTERS = "ABCDEF";
+const LETTERS = "ABCDEF"
 
 export const QuizQuestion = ({ index, total, item: q, chosen, onChoose, seek }: Props) => {
-  const answered = chosen !== undefined;
-  const wrong = answered && chosen !== q.answerIndex;
+  const answered = chosen !== undefined
+  const wrong = answered && chosen !== q.answerIndex
 
   const state = (i: number) => {
-    if (!answered) return undefined;
-    if (i === q.answerIndex) return "right";
-    return i === chosen ? "wrong" : undefined;
-  };
+    if (!answered) {
+      return undefined
+    }
+    if (i === q.answerIndex) {
+      return "right"
+    }
+    return i === chosen ? "wrong" : undefined
+  }
 
   return (
     <div className={styles.question}>
@@ -59,5 +63,5 @@ export const QuizQuestion = ({ index, total, item: q, chosen, onChoose, seek }: 
         </div>
       )}
     </div>
-  );
-};
+  )
+}

@@ -1,4 +1,4 @@
-import { LINES } from "@/shared/lines";
+import { LINES } from "@/shared/lines"
 
 /** Three lines meeting at one station — the app's mark. */
 export const Logo = ({ size = 26 }: { size?: number }) => (
@@ -23,4 +23,4 @@ export const Logo = ({ size = 26 }: { size?: number }) => (
     />
     <rect x="10.5" y="9.5" width="11" height="9" rx="4.5" fill="var(--surface)" stroke="var(--ink)" strokeWidth="2.5" />
   </svg>
-);
+)

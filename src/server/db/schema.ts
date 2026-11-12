@@ -1,9 +1,9 @@
-import { bigint, boolean, index, integer, jsonb, pgTable, primaryKey, text } from "drizzle-orm/pg-core";
+import { bigint, boolean, index, integer, jsonb, pgTable, primaryKey, text } from "drizzle-orm/pg-core"
 
-const now = () => Date.now();
+const now = () => Date.now()
 // Epoch milliseconds, as in the SQLite era, so DTOs and the client stay unchanged. JS numbers hold them exactly.
-const ms = (name: string) => bigint(name, { mode: "number" });
-const id = () => integer("id").primaryKey().generatedByDefaultAsIdentity();
+const ms = (name: string) => bigint(name, { mode: "number" })
+const id = () => integer("id").primaryKey().generatedByDefaultAsIdentity()
 
 export const courses = pgTable("courses", {
   id: id(),
@@ -24,7 +24,7 @@ export const courses = pgTable("courses", {
   line: integer("line").notNull().default(0),
   // Soft delete: set = in the trash (hidden everywhere, restorable); purged for good after 7 days.
   deletedAt: ms("deleted_at"),
-});
+})
 
 /** Activity feed behind the notification center: updates found, videos added, failures. */
 export const events = pgTable("events", {
@@ -35,7 +35,7 @@ export const events = pgTable("events", {
   courseToken: text("course_token"),
   createdAt: ms("created_at").notNull().$defaultFn(now),
   read: boolean("read").notNull().default(false),
-});
+})
 
 export const lessons = pgTable(
   "lessons",
@@ -65,7 +65,7 @@ export const lessons = pgTable(
     createdAt: ms("created_at").notNull().$defaultFn(now),
   },
   (t) => [index("lessons_course_idx").on(t.courseId, t.position)],
-);
+)
 
 export const transcripts = pgTable("transcripts", {
   lessonId: integer("lesson_id")
@@ -74,12 +74,12 @@ export const transcripts = pgTable("transcripts", {
   lang: text("lang").notNull(),
   // Array<[offsetSec, text]>
   segments: jsonb("segments").$type<Array<[number, string]>>().notNull(),
-});
+})
 
 const lessonRef = () =>
   integer("lesson_id")
     .notNull()
-    .references(() => lessons.id, { onDelete: "cascade" });
+    .references(() => lessons.id, { onDelete: "cascade" })
 
 export const practice = pgTable("practice", {
   id: id(),
@@ -89,7 +89,7 @@ export const practice = pgTable("practice", {
   prompt: text("prompt").notNull(),
   hint: text("hint"),
   url: text("url"),
-});
+})
 
 export const quiz = pgTable("quiz", {
   id: id(),
@@ -99,7 +99,7 @@ export const quiz = pgTable("quiz", {
   answerIndex: integer("answer_index").notNull(),
   explanation: text("explanation"),
   atSec: integer("at_sec"),
-});
+})
 
 /** AI tutor calls per day and audience ("owner" | "public"): the free-tier caps count here. */
 export const tutorUsage = pgTable(
@@ -110,7 +110,7 @@ export const tutorUsage = pgTable(
     count: integer("count").notNull().default(0),
   },
   (t) => [primaryKey({ columns: [t.day, t.audience] })],
-);
+)
 
 export const notes = pgTable("notes", {
   id: id(),
@@ -118,4 +118,4 @@ export const notes = pgTable("notes", {
   atSec: integer("at_sec").notNull(),
   text: text("text").notNull(),
   createdAt: ms("created_at").notNull().$defaultFn(now),
-});
+})

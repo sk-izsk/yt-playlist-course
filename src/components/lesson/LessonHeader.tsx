@@ -1,23 +1,23 @@
-"use client";
+"use client"
 
-import { CheckOutlined, LeftOutlined, RightOutlined, YoutubeOutlined } from "@ant-design/icons";
-import { Button } from "antd";
-import Link from "next/link";
-import type { ReactNode } from "react";
-import type { useToggleComplete } from "@/client/hooks/useLesson";
-import { useSession } from "@/client/hooks/useSession";
-import { humanDuration, watchUrl } from "@/shared/format";
-import type { LessonDetail } from "@/shared/types";
-import { TokenChip } from "../common/TokenChip";
-import styles from "./lesson.module.css";
+import { CheckOutlined, LeftOutlined, RightOutlined, YoutubeOutlined } from "@ant-design/icons"
+import { Button } from "antd"
+import Link from "next/link"
+import type { ReactNode } from "react"
+import type { useToggleComplete } from "@/client/hooks/useLesson"
+import { useSession } from "@/client/hooks/useSession"
+import { humanDuration, watchUrl } from "@/shared/format"
+import type { LessonDetail } from "@/shared/types"
+import { TokenChip } from "../common/TokenChip"
+import styles from "./lesson.module.css"
 
 interface Props {
-  lesson: LessonDetail;
-  toggle: ReturnType<typeof useToggleComplete>;
+  lesson: LessonDetail
+  toggle: ReturnType<typeof useToggleComplete>
 }
 
 export const LessonHeader = ({ lesson: l, toggle }: Props) => {
-  const { canEdit } = useSession(); // progress is the owner's; visitors just watch
+  const { canEdit } = useSession() // progress is the owner's; visitors just watch
   return (
     <div className={styles.header}>
       <div className={styles.titleRow}>
@@ -47,8 +47,8 @@ export const LessonHeader = ({ lesson: l, toggle }: Props) => {
         <NavButton token={l.nextToken} icon={<RightOutlined />} label="Next" end />
       </div>
     </div>
-  );
-};
+  )
+}
 
 const NavButton = ({
   token,
@@ -56,15 +56,15 @@ const NavButton = ({
   label,
   end,
 }: {
-  token: string | null;
-  icon: ReactNode;
-  label: string;
-  end?: boolean;
+  token: string | null
+  icon: ReactNode
+  label: string
+  end?: boolean
 }) => {
   const btn = (
     <Button disabled={!token} icon={icon} iconPlacement={end ? "end" : "start"}>
       {label}
     </Button>
-  );
-  return token ? <Link href={`/lessons/${token}`}>{btn}</Link> : btn;
-};
+  )
+  return token ? <Link href={`/lessons/${token}`}>{btn}</Link> : btn
+}

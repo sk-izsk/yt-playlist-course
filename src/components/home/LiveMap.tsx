@@ -1,18 +1,18 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useMemo } from "react";
-import { HUBS, layoutRoutes, trunkY } from "@/client/lib/route-map";
-import type { CourseSummary } from "@/shared/types";
-import styles from "./home.module.css";
+import Link from "next/link"
+import { useMemo } from "react"
+import { HUBS, layoutRoutes, trunkY } from "@/client/lib/route-map"
+import type { CourseSummary } from "@/shared/types"
+import styles from "./home.module.css"
 
 /** The hero map drawn from your library: one line per course, stops fill in as you watch. */
 export const LiveMap = ({ courses }: { courses: CourseSummary[] }) => {
-  const routes = useMemo(() => layoutRoutes(courses), [courses]);
-  const n = routes.length;
+  const routes = useMemo(() => layoutRoutes(courses), [courses])
+  const n = routes.length
   // "You are here": the first line (pinned first) that's started but not finished, else the first unfinished one.
-  const here = routes.find((r) => r.progress > 0 && r.progress < 1) ?? routes.find((r) => r.progress < 1);
-  const herePt = here && (here.stops.findLast((s) => s.done) ?? here.stops[0]);
+  const here = routes.find((r) => r.progress > 0 && r.progress < 1) ?? routes.find((r) => r.progress < 1)
+  const herePt = here && (here.stops.findLast((s) => s.done) ?? here.stops[0])
 
   return (
     <svg className={styles.map} viewBox="0 0 560 420" role="img" aria-labelledby="map-title">
@@ -61,5 +61,5 @@ export const LiveMap = ({ courses }: { courses: CourseSummary[] }) => {
         ))}
       {herePt && <circle cx={herePt.x} cy={herePt.y} r="13" className={styles.here} />}
     </svg>
-  );
-};
+  )
+}

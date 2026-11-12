@@ -1,20 +1,22 @@
-import { Progress, Tooltip } from "antd";
-import type { CourseSummary } from "@/shared/types";
-import styles from "./library.module.css";
+import { Progress, Tooltip } from "antd"
+import type { CourseSummary } from "@/shared/types"
+import styles from "./library.module.css"
 
 interface Props {
-  course: CourseSummary;
+  course: CourseSummary
   /** "card": ring with "4/35" inside, beside the card title; "row": small ring + label for list view. */
-  variant?: "card" | "row";
+  variant?: "card" | "row"
 }
 
 /** Live ring while a course's transcripts are still being fetched. */
 export const TranscriptBadge = ({ course: c, variant = "card" }: Props) => {
-  if (!c.transcriptsPending) return null;
-  const done = c.lessonCount - c.transcriptsPending;
-  const pct = c.lessonCount ? Math.round((done / c.lessonCount) * 100) : 0;
-  const count = `${done}/${c.lessonCount}`;
-  const card = variant === "card";
+  if (!c.transcriptsPending) {
+    return null
+  }
+  const done = c.lessonCount - c.transcriptsPending
+  const pct = c.lessonCount ? Math.round((done / c.lessonCount) * 100) : 0
+  const count = `${done}/${c.lessonCount}`
+  const card = variant === "card"
 
   return (
     <Tooltip title={`Transcripts ${count} — fetching in the background`}>
@@ -36,5 +38,5 @@ export const TranscriptBadge = ({ course: c, variant = "card" }: Props) => {
         {!card && <span>Transcripts {count}</span>}
       </span>
     </Tooltip>
-  );
-};
+  )
+}

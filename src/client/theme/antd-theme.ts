@@ -1,6 +1,6 @@
-import { theme, type ThemeConfig } from "antd";
+import { theme, type ThemeConfig } from "antd"
 
-export type Mode = "light" | "dark";
+export type Mode = "light" | "dark"
 
 // Mirrors the tokens in globals.css — antd needs real values, not var() refs, to derive its palette.
 const palette = {
@@ -24,10 +24,10 @@ const palette = {
     line: "#f2f4f71f",
     accent: "#6e9bff",
   },
-} as const;
+} as const
 
 export const buildTheme = (mode: Mode): ThemeConfig => {
-  const p = palette[mode];
+  const p = palette[mode]
   return {
     algorithm: mode === "dark" ? theme.darkAlgorithm : theme.defaultAlgorithm,
     token: {
@@ -65,5 +65,5 @@ export const buildTheme = (mode: Mode): ThemeConfig => {
       Tag: { borderRadiusSM: 999 },
       Progress: { defaultColor: p.primary },
     },
-  };
-};
+  }
+}

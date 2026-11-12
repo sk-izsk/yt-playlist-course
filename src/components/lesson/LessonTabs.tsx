@@ -1,20 +1,20 @@
-"use client";
+"use client"
 
-import { Tabs } from "antd";
-import { useTutorEnabled } from "@/client/hooks/useTutor";
-import type { PlayerControls } from "@/client/hooks/useYouTubePlayer";
-import type { LessonDetail } from "@/shared/types";
-import { AskPanel } from "./AskPanel";
-import { NotesPanel } from "./NotesPanel";
-import { PracticePanel } from "./PracticePanel";
-import { QuizPanel } from "./QuizPanel";
-import { SummaryPanel } from "./SummaryPanel";
+import { Tabs } from "antd"
+import { useTutorEnabled } from "@/client/hooks/useTutor"
+import type { PlayerControls } from "@/client/hooks/useYouTubePlayer"
+import type { LessonDetail } from "@/shared/types"
+import { AskPanel } from "./AskPanel"
+import { NotesPanel } from "./NotesPanel"
+import { PracticePanel } from "./PracticePanel"
+import { QuizPanel } from "./QuizPanel"
+import { SummaryPanel } from "./SummaryPanel"
 
-const count = (label: string, n: number) => (n ? `${label} · ${n}` : label);
+const count = (label: string, n: number) => (n ? `${label} · ${n}` : label)
 
 export const LessonTabs = ({ lesson, player }: { lesson: LessonDetail; player: PlayerControls }) => {
-  const tutor = useTutorEnabled(); // the "Ask" tab exists only when the server has an API key
-  const ask = { key: "ask", label: "Ask", children: <AskPanel lesson={lesson} seek={player.seek} /> };
+  const tutor = useTutorEnabled() // the "Ask" tab exists only when the server has an API key
+  const ask = { key: "ask", label: "Ask", children: <AskPanel lesson={lesson} seek={player.seek} /> }
   return (
     <Tabs
       size="large"
@@ -39,5 +39,5 @@ export const LessonTabs = ({ lesson, player }: { lesson: LessonDetail; player: P
         ...(tutor ? [ask] : []),
       ]}
     />
-  );
-};
+  )
+}

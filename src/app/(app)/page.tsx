@@ -1,6 +1,6 @@
-import { CourseLibrary } from "@/components/home/library/CourseLibrary";
-import { Hero } from "@/components/home/Hero";
-import { HowItWorks } from "@/components/home/HowItWorks";
+import { CourseLibrary } from "@/components/home/library/CourseLibrary"
+import { Hero } from "@/components/home/Hero"
+import { HowItWorks } from "@/components/home/HowItWorks"
 
 const HomePage = () => {
   return (
@@ -9,7 +9,7 @@ const HomePage = () => {
       <CourseLibrary />
       <HowItWorks />
     </>
-  );
-};
+  )
+}
 
-export default HomePage;
+export default HomePage

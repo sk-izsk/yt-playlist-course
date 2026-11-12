@@ -27,6 +27,7 @@ Local, single-user app that turns YouTube videos and playlists into courses. The
 
 - **bun** is the package manager (`bun install`, `bun add`, `bunx`), never npm or npx. `next` and the CLI (`tsx`) still *run on Node* (node-postgres, `node:sqlite` in the copy script). Bun only installs and launches them.
 - **Arrow functions only** (`export const fn = () => {}`). The exception is code that needs `this` (classes like `HttpError`). Pages use `const Page = () => …; export default Page;`.
+- **No semicolons** (oxfmt `semi: false` keeps one only where ASI needs it) and **braces on every `if`/`else`/loop body**, even one-liners (oxlint `curly: all`). `make fmt` and `oxlint --fix` apply both.
 - **Small files**, about 100–120 lines max. Split UI into components plus custom hooks rather than growing a file.
 - Comment *why*, not what. A deliberate shortcut gets a `ponytail:` comment that names its limit.
 - Non-trivial pure logic gets a tiny `*.check.ts` self-test next to it (see `src/client/lib/plan.check.ts`). `make selfcheck` runs them.

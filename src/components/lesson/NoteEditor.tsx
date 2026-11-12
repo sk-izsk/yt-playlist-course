@@ -1,29 +1,31 @@
-"use client";
+"use client"
 
-import { Button, Input, Segmented } from "antd";
-import { useState } from "react";
-import { MarkdownView } from "../common/MarkdownView";
-import styles from "./lesson.module.css";
+import { Button, Input, Segmented } from "antd"
+import { useState } from "react"
+import { MarkdownView } from "../common/MarkdownView"
+import styles from "./lesson.module.css"
 
 interface Props {
-  saving: boolean;
-  onSave: (text: string) => Promise<unknown>;
+  saving: boolean
+  onSave: (text: string) => Promise<unknown>
 }
 
-const HINT = "Markdown: - bullets · **bold** · `code` · - [ ] todo · ⌘/Ctrl + Enter to pin";
+const HINT = "Markdown: - bullets · **bold** · `code` · - [ ] todo · ⌘/Ctrl + Enter to pin"
 
 /** Big markdown editor with a live preview; the note is pinned at the current video time. */
 export const NoteEditor = ({ saving, onSave }: Props) => {
-  const [text, setText] = useState("");
-  const [mode, setMode] = useState<"write" | "preview">("write");
+  const [text, setText] = useState("")
+  const [mode, setMode] = useState<"write" | "preview">("write")
 
   const save = () => {
-    if (!text.trim()) return;
+    if (!text.trim()) {
+      return
+    }
     onSave(text).then(() => {
-      setText("");
-      setMode("write");
-    });
-  };
+      setText("")
+      setMode("write")
+    })
+  }
 
   return (
     <div className={styles.editor}>
@@ -49,7 +51,9 @@ export const NoteEditor = ({ saving, onSave }: Props) => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === "Enter") save();
+            if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+              save()
+            }
           }}
           className={styles.textarea}
         />
@@ -69,5 +73,5 @@ export const NoteEditor = ({ saving, onSave }: Props) => {
         </Button>
       </div>
     </div>
-  );
-};
+  )
+}

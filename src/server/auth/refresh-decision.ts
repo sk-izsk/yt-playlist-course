@@ -1,7 +1,7 @@
 /** A rotated-away token presented this soon counts as a race between tabs, not theft. */
-export const GRACE_MS = 30_000;
+export const GRACE_MS = 30_000
 
-export type RefreshDecision = "rotate" | "expired" | "reuse";
+export type RefreshDecision = "rotate" | "expired" | "reuse"
 
 /**
  * What to do with a presented refresh token that belongs to `session`.
@@ -14,7 +14,11 @@ export const decideRefresh = (
   presentedHash: string,
   now: number,
 ): RefreshDecision => {
-  if (session.revokedAt != null || session.expiresAt <= now) return "expired";
-  if (presentedHash === session.currentHash) return "rotate";
-  return now - session.rotatedAt <= GRACE_MS ? "rotate" : "reuse";
-};
+  if (session.revokedAt != null || session.expiresAt <= now) {
+    return "expired"
+  }
+  if (presentedHash === session.currentHash) {
+    return "rotate"
+  }
+  return now - session.rotatedAt <= GRACE_MS ? "rotate" : "reuse"
+}

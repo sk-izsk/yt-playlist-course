@@ -1,10 +1,10 @@
-type Line = [sec: number, text: string];
+type Line = [sec: number, text: string]
 
 const norm = (s: string) =>
   s
     .toLowerCase()
     .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim();
+    .trim()
 
 /**
  * Shrinks a transcript before an agent reads it: caption lines merge into blocks of about
@@ -14,24 +14,33 @@ const norm = (s: string) =>
  * ponytail: exact-repeat removal only; paraphrased repeats stay. Fuzzy matching if it matters.
  */
 export const compactTranscript = (segments: Line[], chunkSec = 12): Line[] => {
-  const chunks: Line[] = [];
+  const chunks: Line[] = []
   for (const [sec, text] of segments) {
-    const cur = chunks.at(-1);
-    if (cur && sec - cur[0] < chunkSec) cur[1] += ` ${text}`;
-    else chunks.push([sec, text]);
+    const cur = chunks.at(-1)
+    if (cur && sec - cur[0] < chunkSec) {
+      cur[1] += ` ${text}`
+    } else {
+      chunks.push([sec, text])
+    }
   }
 
-  const recent: string[] = [];
-  const out: Line[] = [];
+  const recent: string[] = []
+  const out: Line[] = []
   for (const [sec, text] of chunks) {
     const kept = text.split(/(?<=[.?!।])\s+/).filter((s) => {
-      const n = norm(s);
-      if (!n || recent.includes(n)) return false;
-      recent.push(n);
-      if (recent.length > 3) recent.shift();
-      return true;
-    });
-    if (kept.length) out.push([sec, kept.join(" ")]);
+      const n = norm(s)
+      if (!n || recent.includes(n)) {
+        return false
+      }
+      recent.push(n)
+      if (recent.length > 3) {
+        recent.shift()
+      }
+      return true
+    })
+    if (kept.length) {
+      out.push([sec, kept.join(" ")])
+    }
   }
-  return out;
-};
+  return out
+}

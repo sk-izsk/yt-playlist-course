@@ -1,10 +1,10 @@
-import type { LessonRow } from "@/shared/types";
+import type { LessonRow } from "@/shared/types"
 
 export interface PlanDay {
-  index: number;
-  lessons: LessonRow[];
-  totalSec: number;
-  done: boolean;
+  index: number
+  lessons: LessonRow[]
+  totalSec: number
+  done: boolean
 }
 
 /**
@@ -12,29 +12,33 @@ export interface PlanDay {
  * ponytail: ignores partial watching — a 40m lesson in a 30m day still counts as one day.
  */
 export const splitIntoDays = (lessons: LessonRow[], minutesPerDay: number): PlanDay[] => {
-  const budget = minutesPerDay * 60;
-  const days: PlanDay[] = [];
-  let cur: LessonRow[] = [];
-  let sum = 0;
+  const budget = minutesPerDay * 60
+  const days: PlanDay[] = []
+  let cur: LessonRow[] = []
+  let sum = 0
 
   const flush = () => {
-    if (!cur.length) return;
-    days.push({ index: days.length, lessons: cur, totalSec: sum, done: cur.every((l) => l.completed) });
-    cur = [];
-    sum = 0;
-  };
+    if (!cur.length) {
+      return
+    }
+    days.push({ index: days.length, lessons: cur, totalSec: sum, done: cur.every((l) => l.completed) })
+    cur = []
+    sum = 0
+  }
 
   for (const l of lessons) {
-    if (cur.length && sum + l.durationSec > budget) flush();
-    cur.push(l);
-    sum += l.durationSec;
+    if (cur.length && sum + l.durationSec > budget) {
+      flush()
+    }
+    cur.push(l)
+    sum += l.durationSec
   }
-  flush();
-  return days;
-};
+  flush()
+  return days
+}
 
 /** "Today" = the first day with unfinished lessons. */
 export const todayIndex = (days: PlanDay[]) => {
-  const i = days.findIndex((d) => !d.done);
-  return i === -1 ? Math.max(0, days.length - 1) : i;
-};
+  const i = days.findIndex((d) => !d.done)
+  return i === -1 ? Math.max(0, days.length - 1) : i
+}

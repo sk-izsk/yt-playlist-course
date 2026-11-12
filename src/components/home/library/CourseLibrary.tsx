@@ -1,37 +1,37 @@
-"use client";
+"use client"
 
-import { Empty, Skeleton } from "antd";
-import { useEffect, useMemo, useState } from "react";
-import { useReorderCourses } from "@/client/hooks/useCourseActions";
-import { useCourses } from "@/client/hooks/useCourses";
-import { useDebouncedValue } from "@/client/hooks/useDebouncedValue";
-import { filterCourses, reorderTokens, splitPinned } from "@/client/lib/library";
-import { usePrefs } from "@/client/store/prefs";
-import { useSelection } from "@/client/store/selection";
-import { SectionHeading } from "../../common/SectionHeading";
-import { LibraryToolbar } from "./LibraryToolbar";
-import { SelectionBar } from "./SelectionBar";
-import { SortableSection } from "./SortableSection";
-import styles from "./library.module.css";
+import { Empty, Skeleton } from "antd"
+import { useEffect, useMemo, useState } from "react"
+import { useReorderCourses } from "@/client/hooks/useCourseActions"
+import { useCourses } from "@/client/hooks/useCourses"
+import { useDebouncedValue } from "@/client/hooks/useDebouncedValue"
+import { filterCourses, reorderTokens, splitPinned } from "@/client/lib/library"
+import { usePrefs } from "@/client/store/prefs"
+import { useSelection } from "@/client/store/selection"
+import { SectionHeading } from "../../common/SectionHeading"
+import { LibraryToolbar } from "./LibraryToolbar"
+import { SelectionBar } from "./SelectionBar"
+import { SortableSection } from "./SortableSection"
+import styles from "./library.module.css"
 
 export const CourseLibrary = () => {
-  const { data = [], isLoading } = useCourses();
-  const view = usePrefs((s) => s.view);
-  const selecting = useSelection((s) => s.active);
-  const stopSelecting = useSelection((s) => s.stop);
-  const reorder = useReorderCourses();
-  const [search, setSearch] = useState("");
-  const query = useDebouncedValue(search, 250);
+  const { data = [], isLoading } = useCourses()
+  const view = usePrefs((s) => s.view)
+  const selecting = useSelection((s) => s.active)
+  const stopSelecting = useSelection((s) => s.stop)
+  const reorder = useReorderCourses()
+  const [search, setSearch] = useState("")
+  const query = useDebouncedValue(search, 250)
 
-  useEffect(() => stopSelecting, [stopSelecting]); // leave select mode when navigating away
+  useEffect(() => stopSelecting, [stopSelecting]) // leave select mode when navigating away
 
-  const visible = useMemo(() => filterCourses(data, query), [data, query]);
-  const { pinned, rest } = useMemo(() => splitPinned(visible), [visible]);
+  const visible = useMemo(() => filterCourses(data, query), [data, query])
+  const { pinned, rest } = useMemo(() => splitPinned(visible), [visible])
   // Reordering a filtered subset would scramble hidden courses; dragging also pauses while selecting.
-  const dragDisabled = Boolean(query.trim()) || selecting;
+  const dragDisabled = Boolean(query.trim()) || selecting
 
   const move = (section: "pinned" | "rest") => (from: number, to: number) => {
-    const all = splitPinned(data);
+    const all = splitPinned(data)
     reorder.mutate(
       reorderTokens(
         all.pinned.map((c) => c.token),
@@ -40,8 +40,8 @@ export const CourseLibrary = () => {
         from,
         to,
       ),
-    );
-  };
+    )
+  }
 
   return (
     <section className={`container ${styles.library}`}>
@@ -74,5 +74,5 @@ export const CourseLibrary = () => {
         </>
       )}
     </section>
-  );
-};
+  )
+}

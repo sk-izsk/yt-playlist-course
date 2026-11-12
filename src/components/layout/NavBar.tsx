@@ -1,7 +1,7 @@
-import Link from "next/link";
-import { Logo } from "./Logo";
-import { NavActions } from "./NavActions";
-import styles from "./NavBar.module.css";
+import Link from "next/link"
+import { Logo } from "./Logo"
+import { NavActions } from "./NavActions"
+import styles from "./NavBar.module.css"
 
 export const NavBar = () => (
   <header className={styles.wrap}>
@@ -17,4 +17,4 @@ export const NavBar = () => (
       <NavActions />
     </nav>
   </header>
-);
+)

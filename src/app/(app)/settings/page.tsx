@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import { AgentTokens } from "@/components/settings/AgentTokens";
-import { DataSource } from "@/components/settings/DataSource";
-import { TrashList } from "@/components/settings/TrashList";
+import { AgentTokens } from "@/components/settings/AgentTokens"
+import { DataSource } from "@/components/settings/DataSource"
+import { TrashList } from "@/components/settings/TrashList"
 
 const SettingsPage = () => (
   <div style={{ width: "min(760px, 100% - 32px)", margin: "40px auto" }}>
@@ -14,6 +14,6 @@ const SettingsPage = () => (
     <h2 style={{ fontSize: 18, fontWeight: 600, margin: "40px 0 12px" }}>Trash</h2>
     <TrashList />
   </div>
-);
+)
 
-export default SettingsPage;
+export default SettingsPage

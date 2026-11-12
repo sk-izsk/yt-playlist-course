@@ -8,6 +8,8 @@
   },
   "env": { "browser": true, "node": true, "es2024": true },
   "rules": {
+    // House style: every if / else / for / while body in braces, even one-liners (`oxlint --fix` adds them).
+    "curly": ["error", "all"],
     // The two rules that catch real React bugs (same as eslint-plugin-react-hooks).
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "warn",

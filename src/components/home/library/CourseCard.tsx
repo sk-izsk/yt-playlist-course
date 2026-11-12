@@ -1,24 +1,24 @@
-"use client";
+"use client"
 
-import { PushpinFilled } from "@ant-design/icons";
-import { Tag } from "antd";
-import Link from "next/link";
-import { humanDuration } from "@/shared/format";
-import { routeStyle } from "@/shared/lines";
-import type { CourseSummary } from "@/shared/types";
-import { LineBadge } from "../../common/LineBadge";
-import { RouteBar } from "../../common/RouteBar";
-import { UpdateChip } from "../../common/UpdateChip";
-import { CourseMenu } from "./CourseMenu";
-import { DragHandle } from "./DragHandle";
-import { SelectMark, useSelectableClick } from "./SelectMark";
-import type { HandleProps } from "./SortableItem";
-import { TranscriptBadge } from "./TranscriptBadge";
-import styles from "./library.module.css";
+import { PushpinFilled } from "@ant-design/icons"
+import { Tag } from "antd"
+import Link from "next/link"
+import { humanDuration } from "@/shared/format"
+import { routeStyle } from "@/shared/lines"
+import type { CourseSummary } from "@/shared/types"
+import { LineBadge } from "../../common/LineBadge"
+import { RouteBar } from "../../common/RouteBar"
+import { UpdateChip } from "../../common/UpdateChip"
+import { CourseMenu } from "./CourseMenu"
+import { DragHandle } from "./DragHandle"
+import { SelectMark, useSelectableClick } from "./SelectMark"
+import type { HandleProps } from "./SortableItem"
+import { TranscriptBadge } from "./TranscriptBadge"
+import styles from "./library.module.css"
 
 /** Grid view card, painted in the course's line colour. Tools sit outside the link so they don't navigate. */
 export const CourseCard = ({ course: c, handle }: { course: CourseSummary; handle: HandleProps | null }) => {
-  const { selecting, selected, onClick } = useSelectableClick(c.token);
+  const { selecting, selected, onClick } = useSelectableClick(c.token)
 
   return (
     <div className={styles.card} data-selected={selected} style={routeStyle(c.line)}>
@@ -62,5 +62,5 @@ export const CourseCard = ({ course: c, handle }: { course: CourseSummary; handl
         )}
       </div>
     </div>
-  );
-};
+  )
+}

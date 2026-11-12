@@ -1,24 +1,24 @@
-"use client";
+"use client"
 
-import { CheckCircleFilled, CloseCircleFilled, CloudDownloadOutlined, InfoCircleFilled } from "@ant-design/icons";
-import { Button } from "antd";
-import Link from "next/link";
-import type { ReactNode } from "react";
-import { useNotificationActions } from "@/client/hooks/useNotifications";
-import { timeAgo } from "@/shared/format";
-import type { AppEvent, EventKind } from "@/shared/types";
-import styles from "./notifications.module.css";
+import { CheckCircleFilled, CloseCircleFilled, CloudDownloadOutlined, InfoCircleFilled } from "@ant-design/icons"
+import { Button } from "antd"
+import Link from "next/link"
+import type { ReactNode } from "react"
+import { useNotificationActions } from "@/client/hooks/useNotifications"
+import { timeAgo } from "@/shared/format"
+import type { AppEvent, EventKind } from "@/shared/types"
+import styles from "./notifications.module.css"
 
 const ICON: Record<EventKind, ReactNode> = {
   update: <CloudDownloadOutlined />,
   success: <CheckCircleFilled />,
   error: <CloseCircleFilled />,
   info: <InfoCircleFilled />,
-};
+}
 
 /** Recent server activity: transcripts ready, videos added, failures. */
 export const ActivityList = ({ events, onNavigate }: { events: AppEvent[]; onNavigate: () => void }) => {
-  const { clear } = useNotificationActions();
+  const { clear } = useNotificationActions()
 
   return (
     <section className={styles.section}>
@@ -44,7 +44,7 @@ export const ActivityList = ({ events, onNavigate }: { events: AppEvent[]; onNav
             </span>
             <time className={styles.time}>{timeAgo(e.createdAt)}</time>
           </>
-        );
+        )
         return e.courseToken ? (
           <Link
             key={e.id}
@@ -59,8 +59,8 @@ export const ActivityList = ({ events, onNavigate }: { events: AppEvent[]; onNav
           <div key={e.id} className={styles.event} data-unread={!e.read}>
             {body}
           </div>
-        );
+        )
       })}
     </section>
-  );
-};
+  )
+}

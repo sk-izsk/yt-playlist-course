@@ -1,28 +1,28 @@
-"use client";
+"use client"
 
-import { DeleteOutlined, YoutubeOutlined } from "@ant-design/icons";
-import { Button, Popconfirm } from "antd";
-import { useRouter } from "next/navigation";
-import { useDeleteCourse } from "@/client/hooks/useCourse";
-import { useSession } from "@/client/hooks/useSession";
-import { humanDuration } from "@/shared/format";
-import { lineFor } from "@/shared/lines";
-import type { CourseDetail } from "@/shared/types";
-import { LineBadge } from "../common/LineBadge";
-import { RouteBar } from "../common/RouteBar";
-import { TokenChip } from "../common/TokenChip";
-import { SyncButton } from "./SyncButton";
-import styles from "./course.module.css";
+import { DeleteOutlined, YoutubeOutlined } from "@ant-design/icons"
+import { Button, Popconfirm } from "antd"
+import { useRouter } from "next/navigation"
+import { useDeleteCourse } from "@/client/hooks/useCourse"
+import { useSession } from "@/client/hooks/useSession"
+import { humanDuration } from "@/shared/format"
+import { lineFor } from "@/shared/lines"
+import type { CourseDetail } from "@/shared/types"
+import { LineBadge } from "../common/LineBadge"
+import { RouteBar } from "../common/RouteBar"
+import { TokenChip } from "../common/TokenChip"
+import { SyncButton } from "./SyncButton"
+import styles from "./course.module.css"
 
 const youtubeUrl = (c: CourseDetail) =>
   c.kind === "playlist"
     ? `https://www.youtube.com/playlist?list=${c.youtubeId}`
-    : `https://www.youtube.com/watch?v=${c.youtubeId}`;
+    : `https://www.youtube.com/watch?v=${c.youtubeId}`
 
 export const CourseHeader = ({ course: c }: { course: CourseDetail }) => {
-  const router = useRouter();
-  const del = useDeleteCourse(c.token);
-  const { canEdit } = useSession();
+  const router = useRouter()
+  const del = useDeleteCourse(c.token)
+  const { canEdit } = useSession()
 
   return (
     <header className={styles.header}>
@@ -63,5 +63,5 @@ export const CourseHeader = ({ course: c }: { course: CourseDetail }) => {
         <img src={c.thumbnail} alt="" />
       </div>
     </header>
-  );
-};
+  )
+}
