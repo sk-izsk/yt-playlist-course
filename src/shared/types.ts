@@ -97,6 +97,14 @@ export interface SyncResult {
   added: LessonRow[];
 }
 
+/** Newest local dump (Settings → Data source). */
+export interface BackupStatus {
+  lastAt: number | null;
+  file: string | null;
+  sizeBytes: number | null;
+  dumps: number;
+}
+
 /** A deleted course, restorable until `purgeAt`. */
 export interface TrashedCourse {
   token: string;
