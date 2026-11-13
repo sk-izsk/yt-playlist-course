@@ -2,6 +2,9 @@ import { theme, type ThemeConfig } from "antd"
 
 export type Mode = "light" | "dark"
 
+/** Mirror of prefs.mode that the server can read, so SSR paints the saved theme (no light flash on reload). */
+export const THEME_COOKIE = "tw_theme"
+
 // Mirrors the tokens in globals.css — antd needs real values, not var() refs, to derive its palette.
 const palette = {
   light: {
