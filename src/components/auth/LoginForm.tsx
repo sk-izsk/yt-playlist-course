@@ -2,8 +2,9 @@
 
 import { Alert, Button, Form, Input } from "antd"
 import Link from "next/link"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { api, errorMessage } from "@/client/api"
+import { useSession } from "@/client/hooks/useSession"
 import { Logo } from "../layout/Logo"
 import styles from "./LoginForm.module.css"
 
@@ -18,6 +19,15 @@ const safeNext = () => {
 export const LoginForm = () => {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const { user, loading } = useSession()
+
+  // Already logged in: skip the form. Done here, not in the proxy: only the server can tell a live session
+  // (an expired access token refreshes through /me) from a dead cookie, which must still reach this form.
+  useEffect(() => {
+    if (user) {
+      window.location.replace(safeNext())
+    }
+  }, [user])
 
   const submit = async ({ username, password }: Fields) => {
     setBusy(true)
@@ -30,6 +40,10 @@ export const LoginForm = () => {
       setError(await errorMessage(err))
       setBusy(false)
     }
+  }
+
+  if (loading || user) {
+    return <div className={styles.page} aria-busy="true" />
   }
 
   return (

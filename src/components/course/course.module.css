@@ -223,3 +223,28 @@
   font-size: 12px;
   font-weight: 600;
 }
+
+/* Phones: badge above the title, and the day pills become one swipeable strip instead of a wall of 90 buttons. */
+@media (max-width: 640px) {
+  .header {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .title {
+    font-size: 26px;
+    line-height: 32px;
+  }
+  .days {
+    position: relative;
+    flex-wrap: nowrap;
+    margin-inline: -16px;
+    padding: 4px 16px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+  .days .day {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+}
