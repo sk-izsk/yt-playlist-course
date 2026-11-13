@@ -17,7 +17,7 @@ export const SessionGate = ({ children }: { children: ReactNode }) => {
   return (
     <div className={styles.screen} role="status" aria-label="Loading">
       <div className={styles.mark}>
-        <Logo size={44} />
+        <Logo size={56} />
       </div>
     </div>
   )
