@@ -2,7 +2,7 @@
 
 import { CheckOutlined } from "@ant-design/icons"
 import { Button, Segmented } from "antd"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { splitIntoDays, todayIndex } from "@/client/lib/plan"
 import { DAILY_OPTIONS, usePrefs } from "@/client/store/prefs"
 import { humanDuration } from "@/shared/format"
@@ -18,6 +18,18 @@ export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
   const [picked, setPicked] = useState<number | null>(null)
   const active = days[Math.min(picked ?? today, days.length - 1)]
   const nextToken = lessons.find((l) => !l.completed)?.token
+  const strip = useRef<HTMLDivElement>(null)
+
+  // On phones the pills are a horizontal strip: keep the selected day in view. scrollLeft, not
+  // scrollIntoView, so the page itself never jumps. A no-op on desktop, where the pills wrap.
+  const activeIndex = active?.index ?? 0
+  useEffect(() => {
+    const el = strip.current
+    const pill = el?.children[activeIndex] as HTMLElement | undefined
+    if (el && pill) {
+      el.scrollLeft = pill.offsetLeft - el.clientWidth / 2 + pill.offsetWidth / 2
+    }
+  }, [activeIndex])
 
   if (!active) {
     return null
@@ -36,7 +48,7 @@ export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
         />
       </div>
 
-      <div className={styles.days} role="tablist" aria-label="Days">
+      <div ref={strip} className={styles.days} role="tablist" aria-label="Days">
         {days.map((d) => {
           const progress = d.done ? "done" : d.lessons.some((l) => l.completed) ? "partial" : undefined
           return (
@@ -58,7 +70,9 @@ export const DayPlan = ({ lessons }: { lessons: Lesson[] }) => {
 
       <div className={styles.dayHead}>
         <h3>Day {active.index + 1}</h3>
-        <span>{active.lessons.length} lessons</span>
+        <span>
+          {active.lessons.length} lesson{active.lessons.length === 1 ? "" : "s"}
+        </span>
         <span className="mono">{humanDuration(active.totalSec)}</span>
         {active.index === today && <span className={styles.today}>Today</span>}
       </div>
