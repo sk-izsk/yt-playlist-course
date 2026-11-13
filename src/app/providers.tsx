@@ -6,6 +6,7 @@ import { App, ConfigProvider } from "antd"
 import { useEffect, useState, type ReactNode } from "react"
 import { buildTheme, THEME_COOKIE, type Mode } from "@/client/theme/antd-theme"
 import { usePrefs } from "@/client/store/prefs"
+import { SessionGate } from "@/components/layout/SessionGate"
 
 /** `serverMode` comes from the theme cookie so the server renders antd in the right colours; the browser uses the store. */
 export const Providers = ({ children, serverMode }: { children: ReactNode; serverMode: Mode }) => {
@@ -25,7 +26,9 @@ export const Providers = ({ children, serverMode }: { children: ReactNode; serve
     <AntdRegistry>
       <ConfigProvider theme={buildTheme(mode)}>
         <App>
-          <QueryClientProvider client={client}>{children}</QueryClientProvider>
+          <QueryClientProvider client={client}>
+            <SessionGate>{children}</SessionGate>
+          </QueryClientProvider>
         </App>
       </ConfigProvider>
     </AntdRegistry>

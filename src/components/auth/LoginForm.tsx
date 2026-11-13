@@ -19,7 +19,7 @@ const safeNext = () => {
 export const LoginForm = () => {
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-  const { user, loading } = useSession()
+  const { user } = useSession()
 
   // Already logged in: skip the form. Done here, not in the proxy: only the server can tell a live session
   // (an expired access token refreshes through /me) from a dead cookie, which must still reach this form.
@@ -42,7 +42,8 @@ export const LoginForm = () => {
     }
   }
 
-  if (loading || user) {
+  // SessionGate already waited for /me; a logged-in user only sees this blank page while the redirect runs.
+  if (user) {
     return <div className={styles.page} aria-busy="true" />
   }
 

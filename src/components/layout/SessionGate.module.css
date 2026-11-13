@@ -1,0 +1,23 @@
+.screen {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  background: var(--paper);
+}
+
+.mark {
+  animation: pulse 1.1s var(--ease) infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.35;
+    transform: scale(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark {
+    animation: none;
+  }
+}
