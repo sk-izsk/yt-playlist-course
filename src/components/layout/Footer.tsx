@@ -24,7 +24,7 @@ export const Footer = () => (
     <span>
       Built by{" "}
       <a href="https://izsk.dev" target="_blank" rel="noopener noreferrer" style={link}>
-        Shaikh Zeeshan Murshed
+        iZsk
       </a>
     </span>
     <a
