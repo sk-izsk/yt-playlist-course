@@ -24,6 +24,8 @@ export const courses = pgTable("courses", {
   line: integer("line").notNull().default(0),
   // Soft delete: set = in the trash (hidden everywhere, restorable); purged for good after 7 days.
   deletedAt: ms("deleted_at"),
+  // Visitors (logged out) see only demo courses, and without any of the owner's progress.
+  demo: boolean("demo").notNull().default(false),
 })
 
 /** Activity feed behind the notification center: updates found, videos added, failures. */

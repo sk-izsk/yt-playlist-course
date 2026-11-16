@@ -1,7 +1,8 @@
 // Local mode: talks to Postgres directly through the server code (needs DATABASE_URL).
 import { readFileSync } from "node:fs"
 import { pool } from "@/server/db/client"
-import { findCourse, listCourses } from "@/server/repo/courses"
+import { findCourse, listCourses, OWNER } from "@/server/repo/courses"
+import { setDemo } from "@/server/repo/course-order"
 import { pendingLessons } from "@/server/repo/lessons"
 import { resolveAs } from "@/server/repo/resolve"
 import { importCourse } from "@/server/services/import-course"
@@ -14,7 +15,7 @@ import { showId } from "./show"
 
 export const commands: Commands = {
   list: async () => {
-    for (const c of await listCourses()) {
+    for (const c of await listCourses(OWNER)) {
       console.log(
         `${c.token}  ${c.completedCount}/${c.lessonCount} watched  ${c.lessonCount - c.pendingNotes}/${c.lessonCount} notes  ${c.title}`,
       )
@@ -42,6 +43,11 @@ export const commands: Commands = {
       console.log(`  ${l.token}  #${l.position}  ${l.title}`)
     }
     await res.transcripts
+  },
+  demo: async ([id, flag]) => {
+    const token = await resolveAs("course", required(id, "course id"))
+    await setDemo(token, flag !== "off")
+    console.log(flag === "off" ? `${token} is private again.` : `${token} is now visible to logged-out visitors.`)
   },
   transcripts: async ([id]) => {
     const course = (await findCourse(await resolveAs("course", required(id, "course id"))))!

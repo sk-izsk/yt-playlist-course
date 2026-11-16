@@ -3,7 +3,7 @@
 
 .DEFAULT_GOAL := help
 .PHONY: help install dev build start stop lint fmt fmt-check typecheck selfcheck check clean \
-        list pending show add sync fill report transcripts db-generate db-migrate db-copy db-studio user mcp-add db-backup backup-install backup-uninstall
+        list pending show add sync fill report transcripts demo db-generate db-migrate db-copy db-studio user mcp-add db-backup backup-install backup-uninstall
 
 PORT ?= 3000
 
@@ -75,6 +75,10 @@ sync: ## Add new videos from a playlist (ID=course-id)
 fill: ## Fill all pending lessons, one fresh agent session each (ID=course-id AGENT=codex|claude|echo MAX=n)
 	@test -n "$(ID)" || (echo "usage: make fill ID=<course-id> [AGENT=codex] [MAX=5]"; exit 1)
 	scripts/fill-course.sh $(ID) $(or $(AGENT),codex) $(or $(MAX),1000)
+
+demo: ## Show a course to logged-out visitors (ID=course-id; add OFF=1 to hide it again)
+	@test -n "$(ID)" || (echo "usage: make demo ID=<course-id> [OFF=1]" && exit 1)
+	bun run --silent agent demo $(ID) $(if $(OFF),off)
 
 report: ## Per-lesson notes table for a course (ID=course-id)
 	bun run --silent agent report $(ID)

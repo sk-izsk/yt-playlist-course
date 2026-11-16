@@ -1,0 +1,1 @@
+ALTER TABLE "courses" ADD COLUMN "demo" boolean DEFAULT false NOT NULL;
