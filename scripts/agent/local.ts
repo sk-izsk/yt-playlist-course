@@ -2,6 +2,7 @@
 import { readFileSync } from "node:fs"
 import { pool } from "@/server/db/client"
 import { findCourse, listCourses, OWNER } from "@/server/repo/courses"
+import { setDemo } from "@/server/repo/course-order"
 import { pendingLessons } from "@/server/repo/lessons"
 import { resolveAs } from "@/server/repo/resolve"
 import { importCourse } from "@/server/services/import-course"
@@ -42,6 +43,11 @@ export const commands: Commands = {
       console.log(`  ${l.token}  #${l.position}  ${l.title}`)
     }
     await res.transcripts
+  },
+  demo: async ([id, flag]) => {
+    const token = await resolveAs("course", required(id, "course id"))
+    await setDemo(token, flag !== "off")
+    console.log(flag === "off" ? `${token} is private again.` : `${token} is now visible to logged-out visitors.`)
   },
   transcripts: async ([id]) => {
     const course = (await findCourse(await resolveAs("course", required(id, "course id"))))!

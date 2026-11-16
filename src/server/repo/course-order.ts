@@ -25,5 +25,9 @@ export const reorderCourses = (tokens: string[]) =>
     }
   })
 
+/** Demo courses are the only ones logged-out visitors can open (see repo/courses.ts). */
+export const setDemo = async (token: string, demo: boolean) =>
+  (await db.update(courses).set({ demo }).where(eq(courses.token, token)).returning({ id: courses.id })).length > 0
+
 export const setPinned = async (token: string, pinned: boolean) =>
   (await db.update(courses).set({ pinned }).where(eq(courses.token, token)).returning({ id: courses.id })).length > 0

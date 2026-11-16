@@ -12,6 +12,7 @@ export const HELP = `Commands (ids = full UUID v4 from the app):
                                 positions are shuffled on save; --force overwrites existing notes
   add <youtube-url>             import a video or playlist and fetch transcripts   (local mode only)
   sync <course-id>              pull new videos from the playlist                 (local mode only)
+  demo <course-id> [off]        show a course to logged-out visitors (off hides it again)   (local mode only)
   transcripts <course-id>       retry missing/failed transcripts
 
 Mode: local (DATABASE_URL) by default; remote (the app's agent API) when TUBEWISE_URL and TUBEWISE_TOKEN are set.`
