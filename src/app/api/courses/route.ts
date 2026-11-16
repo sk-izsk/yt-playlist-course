@@ -5,7 +5,7 @@ import { importCourse } from "@/server/services/import-course"
 
 export const dynamic = "force-dynamic"
 
-export const GET = () => handleRead(() => listCourses())
+export const GET = () => handleRead((user) => listCourses(user))
 
 /** Body: { url } — returns as soon as lessons exist; transcripts keep filling in the background. */
 export const POST = async (req: Request) => {

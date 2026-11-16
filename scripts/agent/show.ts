@@ -1,4 +1,4 @@
-import { getCourseDetail } from "@/server/repo/courses"
+import { getCourseDetail, OWNER } from "@/server/repo/courses"
 import { resolveId } from "@/server/repo/resolve"
 import { lessonContext } from "@/server/services/agent-context"
 import { formatCourse, formatLesson, modeFromFlags } from "@/shared/agent-format"
@@ -11,7 +11,7 @@ export const showId = async (input: string, flags: string[] = []) => {
   const { type, token } = await resolveId(input)
   console.log(
     type === "course"
-      ? formatCourse((await getCourseDetail(token))!)
+      ? formatCourse((await getCourseDetail(token, OWNER))!)
       : formatLesson((await lessonContext(token, modeFromFlags(flags)))!),
   )
 }

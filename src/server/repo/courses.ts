@@ -1,5 +1,6 @@
 import { and, asc, eq, inArray, isNull, sql } from "drizzle-orm"
 import { db, first, schema } from "../db/client"
+import type { AuthUser } from "../auth/tokens"
 import type { CourseDetail, CourseSummary } from "@/shared/types"
 import { toLessonRow } from "./mappers"
 
@@ -42,11 +43,34 @@ export const live = isNull(courses.deletedAt)
 /** Lessons whose course is not in the trash. */
 export const liveLesson = inArray(lessons.courseId, db.select({ id: courses.id }).from(courses).where(live))
 
-export const listCourses = (): Promise<CourseSummary[]> =>
+/** Only the owner sees everything; visitors and read-only accounts get demo courses. */
+/** Agent tokens and the CLI are the owner by definition: they see everything. */
+export const OWNER: AuthUser = { id: 0, role: "owner", sid: "" }
+export const isOwner = (user: AuthUser | null) => user?.role === "owner"
+const visible = (user: AuthUser | null) => (isOwner(user) ? live : and(live, eq(courses.demo, true)))
+
+/** Strips the owner's activity from a course summary for visitors. */
+const anonymous = <T extends CourseSummary>(c: T): T => ({
+  ...c,
+  completedCount: 0,
+  newCount: 0,
+  availableUpdates: 0,
+  lastSyncedAt: null,
+  pinned: false,
+})
+
+const anonymousDetail = (d: CourseDetail): CourseDetail => ({
+  ...anonymous(d),
+  lessons: d.lessons.map((l) => ({ ...l, completed: false, isNew: false })),
+})
+
+export const listCourses = async (user: AuthUser | null): Promise<CourseSummary[]> => {
   // Pinned first, then your drag order, then newest.
-  summaryQuery()
-    .where(live)
+  const rows = await summaryQuery()
+    .where(visible(user))
     .orderBy(sql`${courses.pinned} desc`, asc(courses.sortOrder), sql`${courses.createdAt} desc`)
+  return isOwner(user) ? rows : rows.map(anonymous)
+}
 
 export const findCourse = (token: string) =>
   first(
@@ -69,8 +93,8 @@ export const findCourseById = (id: number) =>
 export const findCourseByYoutubeId = (youtubeId: string) =>
   first(db.select().from(courses).where(eq(courses.youtubeId, youtubeId)).limit(1))
 
-export const getCourseDetail = async (token: string): Promise<CourseDetail | null> => {
-  const summary = await first(summaryQuery().where(and(eq(courses.token, token), live)))
+export const getCourseDetail = async (token: string, user: AuthUser | null): Promise<CourseDetail | null> => {
+  const summary = await first(summaryQuery().where(and(eq(courses.token, token), visible(user))))
   if (!summary) {
     return null
   }
@@ -80,7 +104,8 @@ export const getCourseDetail = async (token: string): Promise<CourseDetail | nul
     .innerJoin(courses, eq(lessons.courseId, courses.id))
     .where(eq(courses.token, token))
     .orderBy(asc(lessons.position))
-  return { ...summary, lessons: rows.map((r) => toLessonRow(r.lessons)) }
+  const detail = { ...summary, lessons: rows.map((r) => toLessonRow(r.lessons)) }
+  return isOwner(user) ? detail : anonymousDetail(detail)
 }
 
 /** Moves a course to the trash (restorable for 7 days, see repo/trash.ts). */

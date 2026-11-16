@@ -1,7 +1,7 @@
 // Local mode: talks to Postgres directly through the server code (needs DATABASE_URL).
 import { readFileSync } from "node:fs"
 import { pool } from "@/server/db/client"
-import { findCourse, listCourses } from "@/server/repo/courses"
+import { findCourse, listCourses, OWNER } from "@/server/repo/courses"
 import { pendingLessons } from "@/server/repo/lessons"
 import { resolveAs } from "@/server/repo/resolve"
 import { importCourse } from "@/server/services/import-course"
@@ -14,7 +14,7 @@ import { showId } from "./show"
 
 export const commands: Commands = {
   list: async () => {
-    for (const c of await listCourses()) {
+    for (const c of await listCourses(OWNER)) {
       console.log(
         `${c.token}  ${c.completedCount}/${c.lessonCount} watched  ${c.lessonCount - c.pendingNotes}/${c.lessonCount} notes  ${c.title}`,
       )

@@ -1,4 +1,4 @@
-import { findCourse } from "../repo/courses"
+import { findCourse, OWNER } from "../repo/courses"
 import { getTranscript, practiceOf, quizOf } from "../repo/lesson-content"
 import { getLessonDetail } from "../repo/lesson-detail"
 import { findLesson, lessonsOfCourse } from "../repo/lessons"
@@ -7,7 +7,7 @@ import { HEAD_SEC, targetChars, type LessonContext, type ReportData, type Transc
 
 /** Everything an agent needs to write one lesson's notes (the CLI `show` and the agent API both use it). */
 export const lessonContext = async (token: string, mode: TranscriptMode = "compact"): Promise<LessonContext | null> => {
-  const lesson = await getLessonDetail(token)
+  const lesson = await getLessonDetail(token, OWNER)
   if (!lesson) {
     return null
   }

@@ -9,7 +9,7 @@ type Ctx = RouteContext<"/api/courses/[token]">
 export const GET = async (_: Request, ctx: Ctx) => {
   const { token } = await ctx.params
   return handleRead(async (user) => {
-    const detail = await getCourseDetail(token)
+    const detail = await getCourseDetail(token, user)
     if (!detail) {
       throw notFound("Course")
     }
