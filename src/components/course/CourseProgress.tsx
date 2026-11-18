@@ -2,6 +2,7 @@
 
 import { Button, Progress } from "antd"
 import { useCopy } from "@/client/hooks/useCopy"
+import { agentPrompt } from "@/shared/agent-prompt"
 import { displayId } from "@/shared/format"
 import type { CourseDetail } from "@/shared/types"
 import styles from "./course.module.css"
@@ -24,7 +25,7 @@ export const CourseProgress = ({ course }: { course: CourseDetail }) => {
   }
 
   const nextUp = course.lessons.find((l) => !l.hasNotes)
-  const prompt = `Fill notes for course ${course.token}`
+  const prompt = agentPrompt(`fill notes for course ${course.token}`)
 
   return (
     <div className={styles.banner}>
