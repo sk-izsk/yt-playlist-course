@@ -2,7 +2,7 @@
 
 import { App } from "antd"
 import { useRouter } from "next/navigation"
-import { useCallback, useMemo } from "react"
+import { useCallback, useEffect, useMemo } from "react"
 import { useToggleComplete } from "@/client/hooks/useLesson"
 import { usePlayerShortcuts } from "@/client/hooks/usePlayerShortcuts"
 import { useYouTubePlayer } from "@/client/hooks/useYouTubePlayer"
@@ -21,6 +21,14 @@ export const LessonView = ({ lesson }: { lesson: LessonDetail }) => {
   const router = useRouter()
   const { speed, setSpeed, autoNext, theater, toggleTheater } = usePrefs()
   const { mutate } = toggle
+  // Leaving the lesson page resets theater, so the next course opens in the default view.
+  // Moving lesson to lesson keeps this component mounted, so auto-next stays enlarged.
+  useEffect(
+    () => () => {
+      usePrefs.setState({ theater: false })
+    },
+    [],
+  )
   const nextHref = lesson.nextToken ? `/lessons/${lesson.nextToken}` : null
 
   // Finishing the video marks the lesson done, and with auto-next on, moves you along.

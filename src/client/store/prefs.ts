@@ -41,6 +41,12 @@ export const usePrefs = create<Prefs>()(
       toggleTheater: () => set((s) => ({ theater: !s.theater })),
     }),
     // ponytail: key keeps the old app name on purpose; renaming it would reset everyone's prefs.
-    { name: "courseit-prefs" },
+    {
+      name: "courseit-prefs",
+      // Theater is per-visit: every lesson opens in the default view. The merge also
+      // drops a `theater: true` that older versions already saved in localStorage.
+      partialize: ({ theater: _theater, ...rest }) => rest,
+      merge: (saved, current) => ({ ...current, ...(saved as Partial<Prefs>), theater: false }),
+    },
   ),
 )
