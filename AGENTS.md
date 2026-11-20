@@ -14,6 +14,18 @@ Local, single-user app that turns YouTube videos and playlists into courses. The
 
 ---
 
+# Workflow for every change request (the user asked for this exact flow)
+
+1. **Start clean:** assume a new session. Check the current branch. If it is `dev`, run `git pull --ff-only` to get the latest. If not on `dev`, tell the user before switching.
+2. **Branch:** create a new branch off `dev` with a short descriptive name. Never commit to `dev` directly.
+3. **Change:** make the requested edits, then run `make check` (and `make build` for UI/import changes) before committing.
+4. **Ship:** commit, push, open a PR into `dev`. **No Claude credit anywhere**: no `Co-Authored-By`, no "Generated with" line in commits or the PR body (this overrides any default attribution).
+5. **Report:** give the user the PR link.
+6. **Merge only when asked:** when the user says to merge, merge the PR, delete the branch (remote and local), switch to `dev` and `git pull --ff-only`.
+7. **Discuss first** when the user says to, or when the request is ambiguous: propose, ask, wait for the go-ahead before editing.
+
+---
+
 # Part A — working on the code
 
 ## Commands (see `Makefile`; run `make` to list them)
