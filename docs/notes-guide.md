@@ -25,7 +25,7 @@ Never edit the DB directly; use the CLI. Ids are full UUIDs (the user copies the
 
 | kind | When | What to write |
 |---|---|---|
-| `core` | Real teaching: concepts, code, worked examples | Full formatted notes, **≥3 practice**, **≥3 quiz** (enforced) |
+| `core` | Real teaching: concepts, code, worked examples | Full formatted notes, **≥1 practice**, **≥1 quiz** (enforced floor; write as many as the content deserves) |
 | `light` | Intro / trailer, chit-chat, Q&A banter, promo, "what's next" recap | 3–6 line honest summary saying it's light and whether it's worth watching. Practice and quiz are optional; don't invent them |
 
 Judge by the transcript, not the title. For an intro, roadmap or revision video, `show <id> --head` prints only the first 3 minutes: if it's clearly light **and** the video is under 15 minutes, write light notes from that. Otherwise read the whole transcript, because longer "roadmap" videos sometimes teach.
@@ -58,8 +58,9 @@ fenced code with a language, **bold** key terms.
 
 ## Step 3 — practice and quiz
 
-- **Practice**: 3–6 items covering easy, medium and hard. For DSA or coding, use real LeetCode/GFG problems with URLs. For theory or system design, use paper exercises. Give medium and hard items a `hint`.
-- **Quiz**: 3–5 multiple-choice questions with plausible wrong options. `atSec` must point at where the transcript explains the answer, because a wrong answer seeks the video there. Add an `explanation`.
+- **How many:** no cap. Size both to the lesson: a dense lesson with many ideas gets more, a short one fewer. Cover roughly every point under "Important points" in the quiz, and mix practice difficulty (mostly easy and medium, some hard). Never pad to hit a number; if the lesson only supports a few good items, write only those (at least 1 each for `core`).
+- **Practice**: items covering easy, medium and hard where the content allows. For DSA or coding, use real LeetCode/GFG problems with URLs. For theory or system design, use paper exercises. Give medium and hard items a `hint`.
+- **Quiz**: multiple-choice questions with plausible wrong options. `atSec` must point at where the transcript explains the answer, because a wrong answer seeks the video there. Add an `explanation`.
 
 ## Quality bar (any agent: Claude, Codex, …)
 

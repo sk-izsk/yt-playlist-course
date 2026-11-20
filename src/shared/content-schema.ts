@@ -22,7 +22,7 @@ const quizItem = z
  * Shape an agent (Claude / Codex) writes for one lesson via `bun run agent save`.
  * Timestamps inside `summary` use markdown links: [18:37](#t=1117) → clickable seek.
  *
- * kind "core"  = real teaching → full notes with an "Important points" section, ≥3 practice, ≥3 quiz.
+ * kind "core"  = real teaching → full notes with an "Important points" section, ≥1 practice, ≥1 quiz (no cap).
  * kind "light" = intro / chit-chat / promo → short honest summary; practice and quiz optional.
  */
 export const lessonContentSchema = z
@@ -39,11 +39,11 @@ export const lessonContentSchema = z
     if (!/^##\s+Important points/im.test(c.summary)) {
       ctx.addIssue({ code: "custom", path: ["summary"], message: 'core lessons need a "## Important points" section' })
     }
-    if (c.practice.length < 3) {
-      ctx.addIssue({ code: "custom", path: ["practice"], message: "core lessons need at least 3 practice items" })
+    if (c.practice.length < 1) {
+      ctx.addIssue({ code: "custom", path: ["practice"], message: "core lessons need at least 1 practice item" })
     }
-    if (c.quiz.length < 3) {
-      ctx.addIssue({ code: "custom", path: ["quiz"], message: "core lessons need at least 3 quiz questions" })
+    if (c.quiz.length < 1) {
+      ctx.addIssue({ code: "custom", path: ["quiz"], message: "core lessons need at least 1 quiz question" })
     }
   })
 
