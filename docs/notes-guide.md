@@ -32,6 +32,13 @@ Judge by the transcript, not the title. For an intro, roadmap or revision video,
 
 ## Step 2 — formatted summary (markdown, rendered with styling)
 
+### Code examples: Node.js, TypeScript and Express
+
+- From now on, write code examples, implementation explanations and coding practice in **TypeScript running on Node.js**, using **Express** when the lesson needs HTTP routes, middleware or a web server. Do not add an Express server to examples that only need plain TypeScript.
+- When the video uses C++, translate its example into idiomatic TypeScript rather than reproducing C++ code. Preserve the lesson's concepts, domain examples and behavior, and keep timestamps tied to where the video teaches the underlying idea. Clearly label translated examples as TypeScript adaptations; do not imply the video demonstrates Node.js or Express.
+- Explain meaningful language/runtime differences when relevant: TypeScript interfaces are erased at runtime, classes have single inheritance, overload signatures share one implementation, memory is garbage-collected, and Node.js concurrency differs from C++ threads. Adapt pointer, destructor, mutex and singleton examples instead of translating their syntax literally. Do not carry over C++ claims that are false for Node.js/TypeScript.
+- Apply this stack to new notes and explicitly requested rewrites. Finished lessons remain untouched unless the user asks to revise them.
+
 Make it scannable, never a wall of text. Template for `core`:
 
 ```markdown
