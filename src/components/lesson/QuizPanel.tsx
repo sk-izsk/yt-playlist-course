@@ -10,7 +10,12 @@ import styles from "./lesson.module.css"
 export const QuizPanel = ({ items, seek }: { items: QuizItem[]; seek: (sec: number) => void }) => {
   // question index → chosen option
   const [answers, setAnswers] = useState<Record<number, number>>({})
-  const [questions] = useState(() => shuffleQuiz(items, []))
+  const [questions, setQuestions] = useState(() => shuffleQuiz(items, []))
+
+  const retry = () => {
+    setQuestions(shuffleQuiz(items, []))
+    setAnswers({})
+  }
 
   if (!questions.length) {
     return <Empty description="No quiz yet — it's written together with the notes." />
@@ -37,7 +42,7 @@ export const QuizPanel = ({ items, seek }: { items: QuizItem[]; seek: (sec: numb
           <span>
             You got <b>{correct}</b> of {questions.length}
           </span>
-          <Button onClick={() => setAnswers({})}>Retry</Button>
+          <Button onClick={retry}>Retry</Button>
         </div>
       )}
     </div>
