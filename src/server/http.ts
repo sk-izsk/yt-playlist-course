@@ -1,6 +1,7 @@
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
-import { backupAvailable, withSource, type DbSource } from "./db/client"
+import { backupAvailable, backupPool, withSource, type DbSource } from "./db/client"
+import { requireBackupReady } from "./db/backup-ready"
 import { requireAgent } from "./auth/agent-tokens"
 import { optionalUser, requireUser } from "./auth/require-user"
 import type { AuthUser } from "./auth/tokens"
@@ -39,7 +40,12 @@ export const chosenSource = async (): Promise<DbSource> =>
 export const handleRead = <T>(fn: (user: AuthUser | null) => T | Promise<T>, status = 200) =>
   handlePublic(async () => {
     const user = await optionalUser()
-    return withSource(await chosenSource(), () => fn(user))
+    const selected = await chosenSource()
+    if (selected === "backup") {
+      const mirror = backupPool
+      await requireBackupReady(mirror && (() => mirror.query("SELECT id FROM courses LIMIT 0")))
+    }
+    return withSource(selected, () => fn(user))
   }, status)
 
 /** Every write: 401 unless logged in; 403 while viewing the local backup, which is read-only. Always hits Neon. */

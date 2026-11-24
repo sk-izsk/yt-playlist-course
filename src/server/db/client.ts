@@ -24,7 +24,14 @@ export const pool = (g.__pg ??= new Pool({ connectionString: url, max: 5 }))
 
 // Optional local mirror (scripts/backup.sh keeps it fresh). Only on a Mac: Vercel can't reach it.
 const backupUrl = process.env.VERCEL ? undefined : process.env.LOCAL_DATABASE_URL
-const backupPool = backupUrl ? (g.__pgBackup ??= new Pool({ connectionString: backupUrl, max: 3 })) : undefined
+export const backupPool = backupUrl
+  ? (g.__pgBackup ??= new Pool({
+      connectionString: backupUrl,
+      max: 3,
+      connectionTimeoutMillis: 5000,
+      query_timeout: 5000,
+    }))
+  : undefined
 
 const liveDb = drizzle(pool, { schema })
 const backupDb = backupPool ? drizzle(backupPool, { schema }) : undefined

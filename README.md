@@ -207,6 +207,9 @@ make dev                      # http://localhost:3000
 
 Log in, paste a playlist link, then ask your agent to fill the notes. Run `make check` before changing code.
 
+Development uses Webpack to avoid the repeated Turbopack reloads observed in this workspace, which kept the
+browser on the loading screen.
+
 **Visitors see nothing until you pick demo courses.** Logged-out visitors only get courses you mark as demo:
 `make demo ID=<course-id>` (`OFF=1` hides it again). Find ids with `make list`. Your progress is never shown to them.
 
