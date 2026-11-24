@@ -1,6 +1,7 @@
 import { cookies } from "next/headers"
 import { requireUser } from "@/server/auth/require-user"
-import { backupAvailable } from "@/server/db/client"
+import { backupAvailable, backupPool } from "@/server/db/client"
+import { requireBackupReady } from "@/server/db/backup-ready"
 import { chosenSource, DB_COOKIE, handlePublic, HttpError, readJson } from "@/server/http"
 
 export const dynamic = "force-dynamic"
@@ -16,8 +17,9 @@ export const PUT = (req: Request) =>
     if (source !== "live" && source !== "backup") {
       throw new HttpError(400, "source must be live or backup")
     }
-    if (source === "backup" && !backupAvailable()) {
-      throw new HttpError(400, "No local backup configured (LOCAL_DATABASE_URL)")
+    if (source === "backup") {
+      const mirror = backupPool
+      await requireBackupReady(mirror && (() => mirror.query("SELECT id FROM courses LIMIT 0")))
     }
     ;(await cookies()).set(DB_COOKIE, source, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 30 * 24 * 3600 })
     return { source }

@@ -6,6 +6,7 @@
 #        make backup-install     (every 15 min via launchd; see scripts/launchd/)
 # Restore Neon from a dump:  pg_restore --clean --if-exists --no-owner --no-privileges -d "$DIRECT_URL" <file>
 set -euo pipefail
+export PGCONNECT_TIMEOUT=5
 cd "$(dirname "$0")/.."
 
 env_val() { grep -E "^$1=" .env.local 2>/dev/null | head -1 | cut -d= -f2- | tr -d '"' || true; }
@@ -28,6 +29,10 @@ ls -1t "$dir"/tubewise-*.dump | tail -n +"$((keep + 1))" | while read -r old; do
 echo "$(date '+%F %T') dumped $(basename "$out") ($(du -h "$out" | cut -f1)), keeping $(ls "$dir"/tubewise-*.dump | wc -l | tr -d ' ')"
 
 if [ -n "$local_url" ]; then
+  if ! psql --dbname="$local_url" --no-psqlrc --command='SELECT 1' >/dev/null; then
+    echo "Neon dump saved, but the local mirror is unavailable. Start PostgreSQL on the Mac and check the host/port in LOCAL_DATABASE_URL, then retry Back up now." >&2
+    exit 1
+  fi
   pg_restore --clean --if-exists --no-owner --no-privileges --single-transaction --dbname="$local_url" "$out"
   echo "$(date '+%F %T') mirrored into the local backup database"
 fi
