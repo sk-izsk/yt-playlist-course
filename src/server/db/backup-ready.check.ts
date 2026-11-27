@@ -10,7 +10,7 @@ const main = async () => {
       requireBackupReady(async () => {
         throw new Error(reason)
       }),
-      (err: unknown) => err instanceof HttpError && err.status === 503 && err.message.includes("Start PostgreSQL"),
+      (err: unknown) => err instanceof HttpError && err.status === 503 && err.message.includes("Start local database"),
     )
   }
   console.log("backup readiness ok")

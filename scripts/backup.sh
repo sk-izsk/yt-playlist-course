@@ -30,7 +30,7 @@ echo "$(date '+%F %T') dumped $(basename "$out") ($(du -h "$out" | cut -f1)), ke
 
 if [ -n "$local_url" ]; then
   if ! psql --dbname="$local_url" --no-psqlrc --command='SELECT 1' >/dev/null; then
-    echo "Neon dump saved, but the local mirror is unavailable. Start PostgreSQL on the Mac and check the host/port in LOCAL_DATABASE_URL, then retry Back up now." >&2
+    echo "Neon dump saved, but the local mirror is unavailable. In Settings, click Start local database, then retry Back up now. If it still fails, check the host/port in LOCAL_DATABASE_URL." >&2
     exit 1
   fi
   pg_restore --clean --if-exists --no-owner --no-privileges --single-transaction --dbname="$local_url" "$out"
