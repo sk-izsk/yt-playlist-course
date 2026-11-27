@@ -240,6 +240,11 @@ browser on the loading screen.
 | Nightly off-site backups | add repository secret `NEON_DATABASE_URL` (Neon **direct** URL, no `-pooler`); `.github/workflows/backup.yml` runs daily |
 | AI tutor | set `ANTHROPIC_API_KEY` (locally and/or in Vercel); caps via `TUTOR_DAILY_CAP_OWNER` / `TUTOR_DAILY_CAP_PUBLIC` |
 
+If the local mirror is offline, use **Settings → Data source → Start local database**, then **Back up now**.
+Both buttons appear only on localhost (including loopback IPs), not hosted or LAN URLs. The start button is
+owner-only and supports this Mac's Homebrew `postgresql@18` service. It waits for a connection
+to `LOCAL_DATABASE_URL`; it does not create a missing database or restore data until you run the backup.
+
 ## Commands
 
 | Command | What it does |

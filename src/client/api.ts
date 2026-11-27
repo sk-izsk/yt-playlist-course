@@ -85,6 +85,7 @@ export const api = {
   setDbSource: (source: "live" | "backup") => http.put("db-source", { json: { source } }).json(),
   backupStatus: () => http.get("backup").json<BackupStatus>(),
   runBackup: () => http.post("backup").json<{ log: string[]; status: BackupStatus }>(),
+  startLocalDatabase: () => http.post("backup/start", { timeout: 60_000 }).json<{ started: boolean }>(),
   trash: () => http.get("trash").json<TrashedCourse[]>(),
   tutor: () => http.get("tutor").json<{ enabled: boolean }>(),
   restoreCourse: (token: string) => http.post(`trash/${token}`).json(),

@@ -10,7 +10,7 @@ export const requireBackupReady = async (probe: (() => Promise<unknown>) | undef
   } catch {
     throw new HttpError(
       503,
-      "Local backup unavailable. Start PostgreSQL on the Mac, check the host and port in LOCAL_DATABASE_URL, then run Back up now. Switch to Neon (live) in Settings to continue.",
+      "Local backup unavailable. In Settings, click Start local database, then Back up now. If it still fails, check the host and port in LOCAL_DATABASE_URL. Switch to Neon (live) to continue.",
     )
   }
 }
